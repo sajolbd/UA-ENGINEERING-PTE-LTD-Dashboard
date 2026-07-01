@@ -1,0 +1,86 @@
+{
+  "home": {
+    "content": {
+      "heading": "From Renovation to Painting, Roofing, Electrical, Plumbing and Steel Works.",
+      "subheading": "We handle it all with expertise, reliability, and guaranteed quality.",
+      "heroImage": "/images/home/hero/hero-bg.png",
+      "bodyText1": "Certified Workmanship, Guaranteed Quality, Transparent Pricing, On-Time Delivery"
+    },
+    "seo": {
+      "metaTitle": "UA Engineering PTE. LTD.",
+      "metaDescription": "UA Engineering PTE. LTD. provides renovation, waterproofing, steel works, roofing, electrical, plumbing, aircon, aluminium glazing and maintenance services across Singapore.",
+      "metaKeywords": "UA Engineering, Singapore Renovation, Waterproofing Singapore, Roof Extension, Steel Works, Electrical Services, Plumbing Services, Aircon Repair, Aluminium Works, Engineering Company Singapore",
+      "schemaJson": "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"LocalBusiness\",\n  \"name\": \"UA Engineering Pte Ltd\",\n  \"image\": \"https://ua-engineering.com/images/logo.png\",\n  \"address\": {\n    \"@type\": \"PostalAddress\",\n    \"streetAddress\": \"10 Anson Road\",\n    \"addressLocality\": \"Singapore\",\n    \"postalCode\": \"079903\"\n  },\n  \"telephone\": \"+65 9841 1786\"\n}"
+    }
+  },
+  "about": {
+    "content": {
+      "heading": "Your Trusted Partner for High Quality Renovation & Upgrading Services.",
+      "subheading": "At UA ENGINEERING PTE. LTD. we deliver reliable Renovation & Upgrading solutions grounded in integrity, expertise, and precision. Our team ensures every project meets high standards of safety, durability, and quality workmanship.",
+      "heroImage": "/images/home/about/about-main.jpg",
+      "bodyText1": "15 Years Experience"
+    },
+    "seo": {
+      "metaTitle": "About Us | UA Engineering PTE. LTD.",
+      "metaDescription": "Learn more about UA Engineering's team, licensed professional engineers, safety track record, and commercial construction capability in Singapore.",
+      "metaKeywords": "about UA engineering, site engineers Singapore, certified contractors Singapore, BCA registered contractor",
+      "schemaJson": "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"AboutPage\",\n  \"name\": \"About UA Engineering Pte Ltd\"\n}"
+    }
+  },
+  "services": {
+    "content": {
+      "heading": "Our Specialized Engineering Services",
+      "subheading": "Professional solutions covering plumbing, substation electrical networks, waterproofing membranes, drywall, tiling, hacking, and solar panels.",
+      "heroImage": "/images/services/services-bg.jpg",
+      "bodyText1": "All services are executed under strict workplace safety and health guidelines (EHS) and certified by registered professional engineers."
+    },
+    "seo": {
+      "metaTitle": "Our Services | Substation Electrical, Plumbing, Waterproofing",
+      "metaDescription": "Explore our commercial and industrial services in Singapore. We specialize in plumbing layout, substation electrical grids, concrete hacking, and solar roof setups.",
+      "metaKeywords": "substation electrical works, commercial plumbing Singapore, industrial concrete demolition, commercial solar array",
+      "schemaJson": "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"Service\"\n}"
+    }
+  },
+  "projects": {
+    "content": {
+      "heading": "Our Completed Projects",
+      "subheading": "A catalog of successfully delivered commercial, retail, and residential projects reflecting structural engineering precision and quality.",
+      "heroImage": "/images/projects/projects-bg.jpg",
+      "bodyText1": "From retail mall commercial plumbing systems to rooftop solar array grid integrations, we complete all tasks on time and within budget."
+    },
+    "seo": {
+      "metaTitle": "Completed Projects | UA Engineering Portfolio",
+      "metaDescription": "Review our portfolio of successfully delivered projects in Singapore, including shopping mall drywalls, substation setups, and waterproofing flat roofs.",
+      "metaKeywords": "engineering portfolio Singapore, substation works Singapore, commercial plumbing project, solar roof layout",
+      "schemaJson": "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"CollectionPage\"\n}"
+    }
+  },
+  "blog": {
+    "content": {
+      "heading": "Engineering & Safety Resources",
+      "subheading": "Professional insights, building codes, EHS checklists, and tips on flat roof waterproofing and electrical safety upgrades in HDBs.",
+      "heroImage": "/images/blog/blog-bg.jpg",
+      "bodyText1": "Stay up-to-date with Singapore BCA and HDB guidelines. Our registered engineers share field checklists, tips, and safety articles."
+    },
+    "seo": {
+      "metaTitle": "Blog & Engineering Resources | UA Engineering",
+      "metaDescription": "Read the latest engineering articles, safety tips, BTO renovation rules, and electrical rewiring checklists written by our expert engineers.",
+      "metaKeywords": "engineering blog, BTO renovation tips, electrical safety HDB, Singapore building code audit",
+      "schemaJson": "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"Blog\"\n}"
+    }
+  },
+  "contact": {
+    "content": {
+      "heading": "Contact UA Engineering",
+      "subheading": "Get in touch for commercial quotations, structural surveys, emergency substation audits, or custom plumbing design layout consultations.",
+      "heroImage": "/images/contact/contact-bg.jpg",
+      "bodyText1": "Our team operates 24/7 for emergency service requests. Speak to our customer support or schedule a BCA-registered engineer site visit."
+    },
+    "seo": {
+      "metaTitle": "Contact Us | UA Engineering PTE. LTD.",
+      "metaDescription": "Request a callback or quotation from UA Engineering Singapore. Visit our office, email us, or call for immediate high-voltage substation checks.",
+      "metaKeywords": "contact UA engineering, Singapore engineer inspection, substation maintenance quotation",
+      "schemaJson": "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"ContactPage\"\n}"
+    }
+  }
+}

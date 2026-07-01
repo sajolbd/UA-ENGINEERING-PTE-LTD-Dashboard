@@ -1,18 +1,12 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
-import KPISection from "../components/KPISection";
-import BlogCharts from "../components/BlogCharts";
-import BlogTable from "../components/BlogTable";
-import CmsForms from "../components/CmsForms";
-import ServicesListEditor from "../components/ServicesListEditor";
-import ProjectsListEditor from "../components/ProjectsListEditor";
-import { blogPosts } from "../data/blogData";
-import { initialCmsData, CmsDatabase, CmsContentUnion, PageSeo } from "../data/cmsData";
 import {
+  Search,
+  ArrowUpRight,
+  Database,
   Plus,
+  Trash2,
   X,
   Save,
   CheckCircle,
@@ -34,6 +28,20 @@ import {
   Video as VideoIcon,
   Table as TableIcon
 } from "lucide-react";
+import { BlogPost } from "../data/blogData";
+
+interface BlogPostWithId extends BlogPost {
+  id?: string;
+  _id?: string;
+}
+
+interface BlogTableProps {
+  posts: BlogPostWithId[];
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  onSeedData: () => void;
+  onRefresh: () => void;
+}
 
 interface ImageUploadFieldProps {
   label: string;
@@ -136,32 +144,17 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
   );
 }
 
-export default function DashboardHome() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<string>("overview");
-  
-  // Authentication states
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [loginUsername, setLoginUsername] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
-  const [loginError, setLoginError] = useState<string | null>(null);
+export default function BlogTable({
+  posts,
+  searchQuery,
+  setSearchQuery,
+  onSeedData,
+  onRefresh
+}: BlogTableProps) {
+  const [showModal, setShowModal] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Blog State prefilled with actual website blog posts data
-  const [posts, setPosts] = useState<typeof blogPosts>(blogPosts);
-
-  // CMS State prefilled with actual website pages and SEO data
-  const [cmsData, setCmsData] = useState<CmsDatabase>(initialCmsData);
-
-  // Add Blog Modal States
-  const [showAddBlogModal, setShowAddBlogModal] = useState(false);
-  const [newTitle, setNewTitle] = useState("");
-  const [newCategory, setNewCategory] = useState("Renovation & Upgrading");
-  const [newImage, setNewImage] = useState("");
-  const [newBgColor, setNewBgColor] = useState("bg-amber-100");
-  const [newPopular, setNewPopular] = useState(false);
-
-  // MS Word custom grid table selector states
+  // Table grid states inside blog table component
   const [showTableSelector, setShowTableSelector] = useState(false);
   const [hoveredGrid, setHoveredGrid] = useState({ rows: 0, cols: 0 });
 
@@ -175,12 +168,26 @@ export default function DashboardHome() {
     message: string;
   }>({ show: false, type: "success", title: "", message: "" });
 
+  // Custom Delete Confirm State
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    show: boolean;
+    blogId: string;
+    blogTitle: string;
+  }>({ show: false, blogId: "", blogTitle: "" });
+
   const showToast = (type: "success" | "error" | "warning", title: string, message: string) => {
     setToast({ show: true, type, title, message });
     setTimeout(() => {
       setToast((prev) => (prev.title === title && prev.message === message ? { ...prev, show: false } : prev));
     }, 4000);
   };
+
+  // Form Fields State
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("Renovation & Upgrading");
+  const [image, setImage] = useState("");
+  const [bgColor, setBgColor] = useState("bg-amber-100");
+  const [popular, setPopular] = useState(false);
 
   const CATEGORIES = [
     "Renovation & Upgrading",
@@ -198,115 +205,14 @@ export default function DashboardHome() {
     { value: "bg-slate-100", label: "Slate / Grey" }
   ];
 
-  const fetchBlogs = () => {
-    fetch("http://localhost:5000/api/blogs")
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.success && res.data) {
-          setPosts(res.data);
-        }
-      })
-      .catch((err) => console.error("Failed to load blog posts from Express backend:", err));
-  };
-
-  // Check auth state on mount
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      const auth = localStorage.getItem("admin_auth");
-      setIsAuthenticated(auth === "true");
-    }
-
-    fetch("http://localhost:5000/api/cms")
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.success && res.data) {
-          setCmsData(res.data);
-        }
-      })
-      .catch((err) => console.error("Failed to load CMS settings from Express backend:", err));
-
-    fetchBlogs();
-  }, []);
-
-  // Blog Seeder
-  const handleSeedBlogData = () => {
-    setPosts(blogPosts);
-  };
-
-  // CMS Seeder for specific page (Syncs to Express backend API)
-  const handleSeedPageData = (pageId: keyof CmsDatabase) => {
-    // 1. Sync Content data
-    fetch("http://localhost:5000/api/cms", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        pageId,
-        formType: "content",
-        data: initialCmsData[pageId].content,
-      }),
-    });
-
-    // 2. Sync SEO data
-    fetch("http://localhost:5000/api/cms", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        pageId,
-        formType: "seo",
-        data: initialCmsData[pageId].seo,
-      }),
-    });
-
-    setCmsData((prev) => ({
-      ...prev,
-      [pageId]: {
-        content: { ...initialCmsData[pageId].content },
-        seo: { ...initialCmsData[pageId].seo },
-      },
-    }));
-  };
-
-  const handleUpdateCmsData = async (
-    pageId: keyof CmsDatabase,
-    formType: "content" | "seo",
-    updatedData: CmsContentUnion | PageSeo
-  ): Promise<boolean> => {
-    try {
-      const res = await fetch("http://localhost:5000/api/cms", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          pageId,
-          formType,
-          data: updatedData,
-        }),
-      });
-      const result = await res.json();
-      if (result.success) {
-        setCmsData((prev) => ({
-          ...prev,
-          [pageId]: {
-            ...prev[pageId],
-            [formType]: { ...updatedData },
-          },
-        }));
-        return true;
-      }
-      return false;
-    } catch (err) {
-      console.error("[CMS Save Error]", err);
-      return false;
-    }
-  };
-
-  const handleOpenAddBlogModal = () => {
-    setNewTitle("");
-    setNewCategory("Renovation & Upgrading");
-    setNewImage("");
-    setNewBgColor("bg-amber-100");
-    setNewPopular(false);
+  const handleOpenAddModal = () => {
+    setTitle("");
+    setCategory("Renovation & Upgrading");
+    setImage("");
+    setBgColor("bg-amber-100");
+    setPopular(false);
     setShowTableSelector(false);
-    setShowAddBlogModal(true);
+    setShowModal(true);
     setTimeout(() => {
       if (editorRef.current) {
         editorRef.current.innerHTML = "";
@@ -316,7 +222,7 @@ export default function DashboardHome() {
 
   const handleAddBlogSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle.trim()) {
+    if (!title.trim()) {
       showToast("warning", "Missing Title", "Please enter a blog title.");
       return;
     }
@@ -332,20 +238,20 @@ export default function DashboardHome() {
     const wordCount = cleanText.split(/\s+/).filter(Boolean).length;
     const calculatedReadTime = Math.max(1, Math.ceil(wordCount / 200)) + " mins read";
 
-    const slug = newTitle.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-    const categorySlug = newCategory.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    const slug = title.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    const categorySlug = category.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
     const newBlog = {
       slug,
-      title: newTitle.trim(),
-      category: newCategory,
+      title: title.trim(),
+      category,
       categorySlug,
       date: new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
       author: "Er. Tan Boon",
-      image: newImage || "/images/services/sub_home_reno.png",
-      bgColor: newBgColor,
+      image: image || "/images/services/sub_home_reno.png",
+      bgColor,
       readTime: calculatedReadTime,
-      popular: newPopular,
+      popular,
       content: htmlContent.trim(),
       views: 0
     };
@@ -358,11 +264,37 @@ export default function DashboardHome() {
       });
       const result = await res.json();
       if (result.success) {
-        setShowAddBlogModal(false);
-        fetchBlogs();
-        showToast("success", "Article Published", `"${newTitle.trim()}" published successfully!`);
+        setSaveSuccess(true);
+        setShowModal(false);
+        onRefresh();
+        showToast("success", "Article Published", `"${title.trim()}" has been published successfully.`);
+        setTimeout(() => setSaveSuccess(false), 4000);
       } else {
         showToast("error", "Publish Failed", result.error || "Failed to publish article");
+      }
+    } catch {
+      showToast("error", "Connection Error", "Failed to connect to Express REST server.");
+    }
+  };
+
+  const handleDeleteBlog = (blogId: string, blogTitle: string) => {
+    setDeleteConfirm({ show: true, blogId, blogTitle });
+  };
+
+  const confirmDeleteBlog = async () => {
+    const { blogId, blogTitle } = deleteConfirm;
+    setDeleteConfirm({ show: false, blogId: "", blogTitle: "" });
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/blogs/${blogId}`, {
+        method: "DELETE"
+      });
+      const result = await res.json();
+      if (result.success) {
+        onRefresh();
+        showToast("success", "Article Deleted", `"${blogTitle}" has been removed successfully.`);
+      } else {
+        showToast("error", "Delete Failed", result.error || "Failed to delete article");
       }
     } catch {
       showToast("error", "Connection Error", "Failed to connect to Express REST server.");
@@ -484,223 +416,135 @@ export default function DashboardHome() {
     execEditorCommand("foreColor", e.target.value);
   };
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoginError(null);
-    if (loginUsername === "admin" && loginPassword === "admin123") {
-      localStorage.setItem("admin_auth", "true");
-      setIsAuthenticated(true);
-      showToast("success", "Access Granted", "Welcome back, Administrator!");
-    } else {
-      setLoginError("Invalid username or password credentials. Please try again.");
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("admin_auth");
-    setIsAuthenticated(false);
-    showToast("warning", "Signed Out", "You have successfully signed out.");
-  };
-
-  // Blog Calculations
-  const totalBlogs = posts.length;
-  const totalViews = posts.reduce((sum, post) => sum + (post.views || 0), 0);
-
-  // Group blogs by category
-  const categoryCounts = posts.reduce((acc, post) => {
-    acc[post.category] = (acc[post.category] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const categoryData = Object.entries(categoryCounts).map(([name, count]) => ({
-    name,
-    count,
-  }));
-
-  // Filtered posts for search
-  const filteredPosts = posts.filter(
-    (post) =>
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // loading view during hydration verification
-  if (isAuthenticated === null) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-[#0b0f19] text-white font-sans">
-        <div className="animate-pulse flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-t-primary border-slate-700 rounded-full animate-spin" />
-          <span className="text-xs font-bold tracking-widest uppercase text-slate-400">Initializing Portal...</span>
-        </div>
-      </div>
-    );
-  }
-
-  // Login view if unauthenticated
-  if (!isAuthenticated) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-[#0b0f19] font-sans relative overflow-hidden">
-        {/* Glowing Background Orbs */}
-        <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-primary/10 blur-[120px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-blue-500/10 blur-[120px]" />
-
-        <div className="w-full max-w-md mx-4 p-8 bg-slate-900/50 backdrop-blur-xl border border-slate-800/80 rounded-3xl shadow-2xl space-y-6 text-center animate-scale-up z-10">
-          {/* Logo Header */}
-          <div className="space-y-2 flex flex-col items-center">
-            <img 
-              src="http://localhost:5000/images/footer-logo.png" 
-              alt="Logo" 
-              className="h-12 w-auto mb-2" 
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = "/images/footer-logo.png";
-              }} 
-            />
-            <h2 className="text-lg font-black text-white font-display tracking-wide uppercase">
-              Control Center Login
-            </h2>
-            <p className="text-xs text-slate-400 font-medium max-w-xs leading-relaxed">
-              Enter administrator username and password to authenticate dashboard session.
-            </p>
-          </div>
-
-          {/* Login Form */}
-          <form onSubmit={handleLoginSubmit} className="space-y-4 text-left">
-            <div>
-              <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                Username
-              </label>
-              <input
-                type="text"
-                placeholder="Enter username"
-                value={loginUsername}
-                onChange={(e) => setLoginUsername(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-950/60 border border-slate-800 rounded-xl text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-medium"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                Password
-              </label>
-              <input
-                type="password"
-                placeholder="Enter password"
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-950/60 border border-slate-800 rounded-xl text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-medium"
-                required
-              />
-            </div>
-
-            {loginError && (
-              <p className="text-xs font-bold text-rose-500 bg-rose-500/10 border border-rose-500/20 p-3 rounded-xl">
-                {loginError}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              className="w-full py-3 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 mt-2"
-            >
-              Sign In
-            </button>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
-  // Dashboard Main Interface
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 font-sans">
-      {/* SIDEBAR */}
-      <Sidebar
-        isCollapsed={isCollapsed}
-        setIsCollapsed={setIsCollapsed}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onLogout={handleLogout}
-      />
+    <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+      
+      {/* Header */}
+      <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h3 className="text-base font-extrabold text-secondary font-display">
+            Published Articles Catalog
+          </h3>
+          <p className="text-xs text-slate-500 font-medium">Live feed monitoring and articles setup</p>
+        </div>
 
-      {/* MAIN CONTAINER */}
-      <div className="flex flex-col flex-1 overflow-hidden">
-        {/* HEADER BAR */}
-        <Header totalViews={totalViews} />
-
-        {/* PAGE CONTENT CONTAINER */}
-        <main className="flex-1 p-6 overflow-y-auto bg-slate-50/50 thin-scrollbar">
-          {activeTab === "overview" ? (
-            /* OVERVIEW TAB VIEW */
-            <div className="space-y-6 animate-fade-in">
-              {/* KPI SECTION */}
-              <KPISection
-                totalBlogs={totalBlogs}
-                totalViews={totalViews}
-                onAddBlogClick={handleOpenAddBlogModal}
-              />
-
-              {/* CHARTS CONTAINER */}
-              <BlogCharts categoryData={categoryData} totalBlogs={totalBlogs} />
-
-              {/* TABLE LIST CATALOG */}
-              <BlogTable
-                posts={filteredPosts}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                onSeedData={handleSeedBlogData}
-                onRefresh={fetchBlogs}
-              />
-            </div>
-          ) : activeTab === "services_list" ? (
-            /* DYNAMIC SERVICES LIST EDITOR VIEW */
-            <ServicesListEditor />
-          ) : activeTab === "projects_list" ? (
-            /* DYNAMIC PROJECTS PORTFOLIO EDITOR VIEW */
-            <ProjectsListEditor />
-          ) : (
-            /* CMS FORMS PANEL VIEW */
-            <CmsForms
-              activeTab={activeTab}
-              cmsData={cmsData}
-              onUpdateCmsData={handleUpdateCmsData}
-              onSeedPageData={handleSeedPageData}
-            />
+        {/* Search & Actions */}
+        <div className="flex items-center gap-2">
+          {posts.length === 0 && (
+            <button
+              onClick={onSeedData}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-light hover:bg-primary-light/80 text-primary border border-primary/10 rounded-xl text-xs font-bold transition-all duration-300"
+            >
+              <Database className="w-3.5 h-3.5" />
+              <span>Seed Demo Articles</span>
+            </button>
           )}
-        </main>
+
+          <div className="relative">
+            <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search articles..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-8.5 pr-4 py-1.5 text-xs border border-slate-200 rounded-xl outline-none focus:border-primary w-full sm:w-48 text-slate-900 font-bold transition-all"
+            />
+          </div>
+
+          <button
+            onClick={handleOpenAddModal}
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-sm transition-all active:scale-95 shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Article</span>
+          </button>
+        </div>
       </div>
 
-      {/* Dynamic Slide-in Toast Notification */}
-      {toast.show && (
-        <div className="fixed top-5 right-5 z-[9999] flex items-center gap-3 p-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-100 max-w-sm animate-slide-in-right">
-          <div className={`p-2.5 rounded-xl ${
-            toast.type === "success"
-              ? "bg-emerald-50 text-emerald-600"
-              : toast.type === "error"
-              ? "bg-rose-50 text-rose-600"
-              : "bg-amber-50 text-amber-600"
-          }`}>
-            {toast.type === "success" ? (
-              <CheckCircle className="w-5 h-5" />
-            ) : (
-              <X className="w-5 h-5" />
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="text-xs font-black text-secondary">{toast.title}</h4>
-            <p className="text-[10px] text-slate-500 font-medium leading-relaxed truncate">{toast.message}</p>
-          </div>
-          <button
-            onClick={() => setToast({ ...toast, show: false })}
-            className="p-1 hover:bg-slate-100 rounded-full text-slate-400"
-          >
-            <X className="w-4 h-4" />
-          </button>
+      {/* SAVE SUCCESS NOTIFICATION */}
+      {saveSuccess && (
+        <div className="mx-5 my-4 flex items-center gap-3 p-4 bg-emerald-50 text-emerald-800 border border-emerald-100 rounded-2xl shadow-sm animate-slide-up">
+          <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+          <span className="text-xs font-bold">
+            New article successfully published and synced to Website!
+          </span>
         </div>
       )}
 
-      {/* --- ADD NEW BLOG POST MODAL DIALOG WITH WYSIWYG EDITOR --- */}
-      {showAddBlogModal && (
+      {/* Table grid */}
+      <div className="overflow-x-auto thin-scrollbar">
+        <table className="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr className="bg-slate-50 border-b border-slate-100 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+              <th className="py-3 px-5">Title</th>
+              <th className="py-3 px-4">Category</th>
+              <th className="py-3 px-4">Publish Date</th>
+              <th className="py-3 px-4">Views</th>
+              <th className="py-3 px-5 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+            {posts.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="py-12 text-center text-slate-400 font-semibold">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <Database className="w-8 h-8 text-slate-300 animate-bounce" />
+                    <p>No articles found (database is empty).</p>
+                    <button
+                      onClick={onSeedData}
+                      className="mt-2 text-xs font-bold text-primary hover:underline"
+                    >
+                      Click here to load mock data.
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              posts.map((post, idx) => {
+                const id = post.id || post._id || idx.toString();
+                return (
+                  <tr key={id} className="hover:bg-slate-50/50 transition-colors group">
+                    <td className="py-3.5 px-5 font-bold text-secondary group-hover:text-primary transition-colors max-w-xs truncate">
+                      {post.title}
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px] font-bold">
+                        {post.category}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4">{post.date}</td>
+                    <td className="py-3.5 px-4 font-bold text-slate-900">
+                      {post.views.toLocaleString()}
+                    </td>
+                    <td className="py-3.5 px-5 text-right flex items-center justify-end gap-3.5">
+                      <a
+                        href={`https://ua-engineering.com/blog/${post.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-0.5 text-primary hover:underline font-bold"
+                      >
+                        <span>Live</span>
+                        <ArrowUpRight className="w-3 h-3" />
+                      </a>
+
+                      <button
+                        onClick={() => handleDeleteBlog(id, post.title)}
+                        className="p-1 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-md transition-colors"
+                        title="Delete Article"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* --- ADD NEW ARTICLE MODAL DIALOG --- */}
+      {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 py-8">
           <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto thin-scrollbar relative space-y-6 animate-scale-up">
             
@@ -709,11 +553,11 @@ export default function DashboardHome() {
               <div className="flex items-center gap-2">
                 <Plus className="w-5 h-5 text-primary" />
                 <h3 className="text-sm font-black text-secondary font-display">
-                  Create Blog Article (MS Word Editor)
+                  Publish New Article (MS Word Editor)
                 </h3>
               </div>
               <button
-                onClick={() => setShowAddBlogModal(false)}
+                onClick={() => setShowModal(false)}
                 className="p-1 hover:bg-slate-100 rounded-full text-slate-400 transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -721,6 +565,7 @@ export default function DashboardHome() {
             </div>
 
             <form onSubmit={handleAddBlogSubmit} className="space-y-5">
+              
               {/* Title */}
               <div>
                 <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
@@ -728,22 +573,22 @@ export default function DashboardHome() {
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Waterproofing Methods for flat roofs in Singapore"
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
+                  placeholder="e.g. Top 10 Water Leakage Solutions in Singapore"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                   className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
                   required
                 />
               </div>
 
-              {/* Category */}
+              {/* Category Selection */}
               <div>
                 <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                  Category
+                  Category Selection
                 </label>
                 <select
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
                   className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-bold"
                 >
                   {CATEGORIES.map((c) => (
@@ -757,8 +602,8 @@ export default function DashboardHome() {
               {/* Banner Image */}
               <ImageUploadField
                 label="Article Feature Banner Image"
-                value={newImage}
-                onChange={setNewImage}
+                value={image}
+                onChange={setImage}
               />
 
               {/* Card Background Color */}
@@ -767,8 +612,8 @@ export default function DashboardHome() {
                   Card Background Color Theme
                 </label>
                 <select
-                  value={newBgColor}
-                  onChange={(e) => setNewBgColor(e.target.value)}
+                  value={bgColor}
+                  onChange={(e) => setBgColor(e.target.value)}
                   className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-bold"
                 >
                   {BG_COLORS.map((bg) => (
@@ -783,12 +628,12 @@ export default function DashboardHome() {
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  id="newPopular"
-                  checked={newPopular}
-                  onChange={(e) => setNewPopular(e.target.checked)}
+                  id="popular"
+                  checked={popular}
+                  onChange={(e) => setPopular(e.target.checked)}
                   className="rounded border-slate-200 text-primary focus:ring-primary h-4 w-4"
                 />
-                <label htmlFor="newPopular" className="text-xs font-bold text-secondary">
+                <label htmlFor="popular" className="text-xs font-bold text-secondary">
                   Flag as Popular / Featured Article
                 </label>
               </div>
@@ -932,7 +777,7 @@ export default function DashboardHome() {
                     <VideoIcon className="w-4 h-4" />
                   </button>
 
-                  {/* Table Selection Dropdown Grid */}
+                  {/* Table Grid Size Dropdown Selector */}
                   <div className="relative">
                     <button
                       type="button"
@@ -1029,7 +874,7 @@ export default function DashboardHome() {
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => setShowAddBlogModal(false)}
+                  onClick={() => setShowModal(false)}
                   className="px-4 py-2.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors"
                 >
                   Cancel
@@ -1048,6 +893,67 @@ export default function DashboardHome() {
           </div>
         </div>
       )}
+
+      {/* Dynamic Slide-in Toast Notification */}
+      {toast.show && (
+        <div className="fixed top-5 right-5 z-[9999] flex items-center gap-3 p-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-100 max-w-sm animate-slide-in-right">
+          <div className={`p-2.5 rounded-xl ${
+            toast.type === "success"
+              ? "bg-emerald-50 text-emerald-600"
+              : toast.type === "error"
+              ? "bg-rose-50 text-rose-600"
+              : "bg-amber-50 text-amber-600"
+          }`}>
+            {toast.type === "success" ? (
+              <CheckCircle className="w-5 h-5" />
+            ) : (
+              <X className="w-5 h-5" />
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="text-xs font-black text-secondary">{toast.title}</h4>
+            <p className="text-[10px] text-slate-500 font-medium leading-relaxed truncate">{toast.message}</p>
+          </div>
+          <button
+            onClick={() => setToast({ ...toast, show: false })}
+            className="p-1 hover:bg-slate-100 rounded-full text-slate-400"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Custom Delete Confirmation Modal */}
+      {deleteConfirm.show && (
+        <div className="fixed inset-0 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm z-[9998] animate-fade-in">
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl p-6 max-w-sm w-full mx-4 text-center space-y-6 animate-scale-up">
+            <div className="mx-auto w-12 h-12 bg-rose-50 text-rose-600 rounded-full border border-rose-100 flex items-center justify-center shadow-inner">
+              <Trash2 className="w-6 h-6" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-sm font-black text-secondary">Delete Article</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Are you sure you want to permanently delete <span className="font-extrabold text-secondary">&ldquo;{deleteConfirm.blogTitle}&rdquo;</span>? This operation is permanent.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <button
+                onClick={() => setDeleteConfirm({ show: false, blogId: "", blogTitle: "" })}
+                className="py-2.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+              >
+                Keep Article
+              </button>
+              <button
+                onClick={confirmDeleteBlog}
+                className="py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95"
+              >
+                Delete Post
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
