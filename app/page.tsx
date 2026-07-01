@@ -1,4 +1,5 @@
 "use client";
+import { API_BASE } from "../lib/api";
 
 import React, { useState, useRef } from "react";
 import Sidebar from "../components/Sidebar";
@@ -61,7 +62,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     formData.append("image", file);
 
     try {
-      const res = await fetch("http://localhost:5000/api/upload", {
+      const res = await fetch(`${API_BASE}/api/upload`, {
         method: "POST",
         body: formData,
       });
@@ -82,7 +83,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
   const fullImageUrl = value
     ? (value.startsWith("http") || value.startsWith("data")
       ? value
-      : "http://localhost:5000" + value)
+      : `${API_BASE}${value}`)
     : "";
 
   return (
@@ -199,7 +200,7 @@ export default function DashboardHome() {
   ];
 
   const fetchBlogs = () => {
-    fetch("http://localhost:5000/api/blogs")
+    fetch(`${API_BASE}/api/blogs`)
       .then((res) => res.json())
       .then((res) => {
         if (res.success && res.data) {
@@ -216,7 +217,7 @@ export default function DashboardHome() {
       setIsAuthenticated(auth === "true");
     }
 
-    fetch("http://localhost:5000/api/cms")
+    fetch(`${API_BASE}/api/cms`)
       .then((res) => res.json())
       .then((res) => {
         if (res.success && res.data) {
@@ -236,7 +237,7 @@ export default function DashboardHome() {
   // CMS Seeder for specific page (Syncs to Express backend API)
   const handleSeedPageData = (pageId: keyof CmsDatabase) => {
     // 1. Sync Content data
-    fetch("http://localhost:5000/api/cms", {
+    fetch(`${API_BASE}/api/cms`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -247,7 +248,7 @@ export default function DashboardHome() {
     });
 
     // 2. Sync SEO data
-    fetch("http://localhost:5000/api/cms", {
+    fetch(`${API_BASE}/api/cms`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -272,7 +273,7 @@ export default function DashboardHome() {
     updatedData: CmsContentUnion | PageSeo
   ): Promise<boolean> => {
     try {
-      const res = await fetch("http://localhost:5000/api/cms", {
+      const res = await fetch(`${API_BASE}/api/cms`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -351,7 +352,7 @@ export default function DashboardHome() {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/api/blogs", {
+      const res = await fetch(`${API_BASE}/api/blogs`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newBlog)
@@ -400,13 +401,13 @@ export default function DashboardHome() {
     formData.append("image", file);
 
     try {
-      const res = await fetch("http://localhost:5000/api/upload", {
+      const res = await fetch(`${API_BASE}/api/upload`, {
         method: "POST",
         body: formData,
       });
       const result = await res.json();
       if (result.success && result.imagePath) {
-        const fullUrl = "http://localhost:5000" + result.imagePath;
+        const fullUrl = `${API_BASE}${result.imagePath}`;
         if (editorRef.current) {
           editorRef.current.focus();
         }
@@ -548,7 +549,7 @@ export default function DashboardHome() {
           {/* Logo Header */}
           <div className="space-y-2 flex flex-col items-center">
             <img 
-              src="http://localhost:5000/images/footer-logo.png" 
+              src={`${API_BASE}/images/footer-logo.png`} 
               alt="Logo" 
               className="h-12 w-auto mb-2" 
               onError={(e) => {

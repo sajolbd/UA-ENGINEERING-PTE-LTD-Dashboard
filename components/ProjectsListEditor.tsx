@@ -1,4 +1,5 @@
 "use client";
+import { API_BASE } from "../lib/api";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -48,7 +49,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     formData.append("image", file);
 
     try {
-      const res = await fetch("http://localhost:5000/api/upload", {
+      const res = await fetch(`${API_BASE}/api/upload`, {
         method: "POST",
         body: formData,
       });
@@ -69,7 +70,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
   const fullImageUrl = value
     ? (value.startsWith("http") || value.startsWith("data")
       ? value
-      : "http://localhost:5000" + value)
+      : `${API_BASE}${value}`)
     : "";
 
   return (
@@ -172,7 +173,7 @@ export default function ProjectsListEditor() {
 
   const loadProjects = () => {
     setLoading(true);
-    fetch("http://localhost:5000/api/projects")
+    fetch(`${API_BASE}/api/projects`)
       .then((res) => res.json())
       .then((res) => {
         if (res.success && res.data) {
@@ -228,7 +229,7 @@ export default function ProjectsListEditor() {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/api/projects", {
+      const res = await fetch(`${API_BASE}/api/projects`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newProject)
@@ -260,7 +261,7 @@ export default function ProjectsListEditor() {
     const updatedProjects = projects.filter((p) => (p.id || p._id) !== projectId);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/projects/${projectId}`, {
+      const response = await fetch(`${API_BASE}/api/projects/${projectId}`, {
         method: "DELETE"
       });
       const result = await response.json();
@@ -362,7 +363,7 @@ export default function ProjectsListEditor() {
                     {/* Thumbnail Banner */}
                     <div className="relative aspect-video w-full bg-slate-50 border-b border-slate-50">
                       <img
-                        src={p.image.startsWith("/") ? "http://localhost:5000" + p.image : p.image}
+                        src={p.image.startsWith("/") ? `${API_BASE}${p.image}` : p.image}
                         alt={p.title}
                         className="w-full h-full object-cover"
                         onError={(e) => {

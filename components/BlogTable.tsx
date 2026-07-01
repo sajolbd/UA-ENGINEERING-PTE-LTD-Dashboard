@@ -1,4 +1,5 @@
 "use client";
+import { API_BASE } from "../lib/api";
 
 import React, { useState, useRef } from "react";
 import {
@@ -69,7 +70,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     formData.append("image", file);
 
     try {
-      const res = await fetch("http://localhost:5000/api/upload", {
+      const res = await fetch(`${API_BASE}/api/upload`, {
         method: "POST",
         body: formData,
       });
@@ -90,7 +91,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
   const fullImageUrl = value
     ? (value.startsWith("http") || value.startsWith("data")
       ? value
-      : "http://localhost:5000" + value)
+      : `${API_BASE}${value}`)
     : "";
 
   return (
@@ -257,7 +258,7 @@ export default function BlogTable({
     };
 
     try {
-      const res = await fetch("http://localhost:5000/api/blogs", {
+      const res = await fetch(`${API_BASE}/api/blogs`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newBlog)
@@ -286,7 +287,7 @@ export default function BlogTable({
     setDeleteConfirm({ show: false, blogId: "", blogTitle: "" });
 
     try {
-      const res = await fetch(`http://localhost:5000/api/blogs/${blogId}`, {
+      const res = await fetch(`${API_BASE}/api/blogs/${blogId}`, {
         method: "DELETE"
       });
       const result = await res.json();
@@ -332,13 +333,13 @@ export default function BlogTable({
     formData.append("image", file);
 
     try {
-      const res = await fetch("http://localhost:5000/api/upload", {
+      const res = await fetch(`${API_BASE}/api/upload`, {
         method: "POST",
         body: formData,
       });
       const result = await res.json();
       if (result.success && result.imagePath) {
-        const fullUrl = "http://localhost:5000" + result.imagePath;
+        const fullUrl = `${API_BASE}${result.imagePath}`;
         if (editorRef.current) {
           editorRef.current.focus();
         }

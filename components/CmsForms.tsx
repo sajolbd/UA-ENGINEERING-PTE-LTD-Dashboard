@@ -1,4 +1,5 @@
 "use client";
+import { API_BASE } from "../lib/api";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -53,7 +54,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     formData.append("image", file);
 
     try {
-      const res = await fetch("http://localhost:5000/api/upload", {
+      const res = await fetch(`${API_BASE}/api/upload`, {
         method: "POST",
         body: formData,
       });
@@ -74,7 +75,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
   const fullImageUrl = value
     ? (value.startsWith("http") || value.startsWith("data")
       ? value
-      : "http://localhost:5000" + value)
+      : `${API_BASE}${value}`)
     : "";
 
   return (

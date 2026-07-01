@@ -1,4 +1,5 @@
 "use client";
+import { API_BASE } from "../lib/api";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -59,7 +60,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     formData.append("image", file);
 
     try {
-      const res = await fetch("http://localhost:5000/api/upload", {
+      const res = await fetch(`${API_BASE}/api/upload`, {
         method: "POST",
         body: formData,
       });
@@ -80,7 +81,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
   const fullImageUrl = value
     ? (value.startsWith("http") || value.startsWith("data")
       ? value
-      : "http://localhost:5000" + value)
+      : `${API_BASE}${value}`)
     : "";
 
   return (
@@ -178,7 +179,7 @@ export default function ServicesListEditor() {
 
   const loadServices = () => {
     setLoading(true);
-    fetch("http://localhost:5000/api/services")
+    fetch(`${API_BASE}/api/services`)
       .then((res) => res.json())
       .then((res) => {
         if (res.success && res.data) {
@@ -284,7 +285,7 @@ export default function ServicesListEditor() {
     });
 
     try {
-      const res = await fetch("http://localhost:5000/api/services", {
+      const res = await fetch(`${API_BASE}/api/services`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ categories: updatedCategories })
@@ -323,7 +324,7 @@ export default function ServicesListEditor() {
     });
 
     try {
-      const res = await fetch("http://localhost:5000/api/services", {
+      const res = await fetch(`${API_BASE}/api/services`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ categories: updatedCategories })
@@ -394,7 +395,7 @@ export default function ServicesListEditor() {
               >
                 <div className="flex items-center gap-4">
                   <img
-                    src={cat.featuredImage.startsWith("/") ? "http://localhost:5000" + cat.featuredImage : cat.featuredImage}
+                    src={cat.featuredImage.startsWith("/") ? `${API_BASE}${cat.featuredImage}` : cat.featuredImage}
                     alt={cat.title}
                     className="w-12 h-12 object-cover rounded-xl border border-slate-100"
                     onError={(e) => {
@@ -451,7 +452,7 @@ export default function ServicesListEditor() {
                         >
                           <div className="flex gap-3">
                             <img
-                              src={service.image.startsWith("/") ? "http://localhost:5000" + service.image : service.image}
+                              src={service.image.startsWith("/") ? `${API_BASE}${service.image}` : service.image}
                               alt={service.title}
                               className="w-14 h-14 object-cover rounded-lg border border-slate-100 shrink-0"
                               onError={(e) => {
