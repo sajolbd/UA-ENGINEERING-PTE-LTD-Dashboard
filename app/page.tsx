@@ -139,6 +139,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
 
 export default function DashboardHome() {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<string>("overview");
   
@@ -622,15 +623,17 @@ export default function DashboardHome() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onLogout={handleLogout}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
       />
 
       {/* MAIN CONTAINER */}
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="flex flex-col flex-1 overflow-hidden min-w-0">
         {/* HEADER BAR */}
-        <Header totalViews={totalViews} />
+        <Header totalViews={totalViews} onMenuClick={() => setMobileOpen(true)} />
 
         {/* PAGE CONTENT CONTAINER */}
-        <main className="flex-1 p-6 overflow-y-auto bg-slate-50/50 thin-scrollbar">
+        <main className="flex-1 p-3 sm:p-6 overflow-y-auto bg-slate-50/50 thin-scrollbar">
           {activeTab === "overview" ? (
             /* OVERVIEW TAB VIEW */
             <div className="space-y-6 animate-fade-in">

@@ -11,7 +11,8 @@ import {
   PhoneCall,
   ChevronLeft,
   ChevronRight,
-  LogOut
+  LogOut,
+  X
 } from "lucide-react";
 
 interface SidebarProps {
@@ -20,6 +21,9 @@ interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onLogout?: () => void;
+  // Mobile drawer
+  mobileOpen?: boolean;
+  setMobileOpen?: (open: boolean) => void;
 }
 
 export default function Sidebar({
@@ -27,10 +31,10 @@ export default function Sidebar({
   setIsCollapsed,
   activeTab,
   setActiveTab,
-  onLogout
+  onLogout,
+  mobileOpen = false,
+  setMobileOpen
 }: SidebarProps) {
-  // Sidebar menu lists
-
   const pagesList = [
     { id: "home", label: "Home Page", icon: HomeIcon },
     { id: "about", label: "About Page", icon: Info },
@@ -40,14 +44,15 @@ export default function Sidebar({
     { id: "contact", label: "Contact Page", icon: PhoneCall },
   ];
 
-  return (
-    <aside
-      className={`hidden md:flex flex-col bg-[#0a1526] text-white shrink-0 shadow-xl border-r border-[#15233c] transition-all duration-300 ${
-        isCollapsed ? "w-20" : "w-64"
-      }`}
-    >
+  const handleTabClick = (tab: string) => {
+    setActiveTab(tab);
+    if (setMobileOpen) setMobileOpen(false);
+  };
+
+  const NavContent = () => (
+    <>
       {/* Sidebar Header */}
-      <div className="relative flex items-center justify-between px-4 py-5 border-b border-[#15233c] h-20 bg-[#070f1c]">
+      <div className="relative flex items-center justify-between px-4 py-5 border-b border-[#15233c] h-20 bg-[#070f1c] shrink-0">
         {!isCollapsed ? (
           <div className="flex items-center justify-center w-full px-2">
             <img
@@ -66,24 +71,32 @@ export default function Sidebar({
           </div>
         )}
 
-        {/* Floating Collapse Toggle Button */}
+        {/* Collapse Toggle Button — desktop only */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3.5 top-1/2 -translate-y-1/2 p-1 bg-primary text-white border border-[#15233c] hover:bg-primary-hover rounded-full shadow-lg transition-transform hover:scale-110 z-10"
+          className="absolute -right-3.5 top-1/2 -translate-y-1/2 p-1 bg-primary text-white border border-[#15233c] hover:bg-primary-hover rounded-full shadow-lg transition-transform hover:scale-110 z-10 hidden md:flex"
           title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
+
+        {/* Close button — mobile only */}
+        {setMobileOpen && (
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-white md:hidden"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
-      {/* Navigation Links Accordion */}
+      {/* Navigation Links */}
       <nav className="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto thin-scrollbar select-none">
-        
+
         {/* Dashboard Overview */}
         <button
-          onClick={() => {
-            setActiveTab("overview");
-          }}
+          onClick={() => handleTabClick("overview")}
           className={`flex items-center justify-between w-full py-2.5 text-xs font-bold rounded-xl transition-all duration-300 group ${
             activeTab === "overview"
               ? "bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]"
@@ -96,7 +109,7 @@ export default function Sidebar({
           </div>
         </button>
 
-        {/* Separator */}
+        {/* Website CMS Sections */}
         <div className="pt-4 pb-1 border-t border-[#15233c] mt-2 mb-1">
           {!isCollapsed ? (
             <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 px-4">
@@ -107,15 +120,14 @@ export default function Sidebar({
           )}
         </div>
 
-        {/* Page CMS Links */}
         {pagesList.map((page) => {
           const PageIcon = page.icon;
           const isActive = activeTab === `${page.id}_content`;
-          
+
           return (
             <button
               key={page.id}
-              onClick={() => setActiveTab(`${page.id}_content`)}
+              onClick={() => handleTabClick(`${page.id}_content`)}
               className={`flex items-center justify-between w-full py-2.5 text-xs font-bold rounded-xl transition-all duration-300 group ${
                 isActive
                   ? "bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]"
@@ -130,7 +142,7 @@ export default function Sidebar({
           );
         })}
 
-        {/* Dynamic Database Lists */}
+        {/* Database Lists */}
         <div className="pt-4 pb-1 border-t border-[#15233c] mt-2 mb-1">
           {!isCollapsed ? (
             <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 px-4">
@@ -142,7 +154,7 @@ export default function Sidebar({
         </div>
 
         <button
-          onClick={() => setActiveTab("services_list")}
+          onClick={() => handleTabClick("services_list")}
           className={`flex items-center justify-between w-full py-2.5 text-xs font-bold rounded-xl transition-all duration-300 group ${
             activeTab === "services_list"
               ? "bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]"
@@ -156,7 +168,7 @@ export default function Sidebar({
         </button>
 
         <button
-          onClick={() => setActiveTab("projects_list")}
+          onClick={() => handleTabClick("projects_list")}
           className={`flex items-center justify-between w-full py-2.5 text-xs font-bold rounded-xl transition-all duration-300 group ${
             activeTab === "projects_list"
               ? "bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]"
@@ -173,7 +185,7 @@ export default function Sidebar({
           <>
             <div className="pt-4 border-t border-[#15233c] mt-2 mb-2" />
             <button
-              onClick={onLogout}
+              onClick={() => { onLogout(); if (setMobileOpen) setMobileOpen(false); }}
               className={`flex items-center justify-between w-full py-2.5 text-xs font-bold rounded-xl transition-all duration-300 text-rose-400 hover:text-rose-200 hover:bg-rose-500/10 ${
                 isCollapsed ? "px-2 justify-center" : "px-4"
               }`}
@@ -186,6 +198,36 @@ export default function Sidebar({
           </>
         )}
       </nav>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* ─── DESKTOP SIDEBAR ─── */}
+      <aside
+        className={`hidden md:flex flex-col bg-[#0a1526] text-white shrink-0 shadow-xl border-r border-[#15233c] transition-all duration-300 ${
+          isCollapsed ? "w-20" : "w-64"
+        }`}
+      >
+        <NavContent />
+      </aside>
+
+      {/* ─── MOBILE DRAWER OVERLAY ─── */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+          onClick={() => setMobileOpen && setMobileOpen(false)}
+        />
+      )}
+
+      {/* ─── MOBILE DRAWER PANEL ─── */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col w-72 bg-[#0a1526] text-white shadow-2xl border-r border-[#15233c] transition-transform duration-300 md:hidden ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <NavContent />
+      </aside>
+    </>
   );
 }
