@@ -1,13 +1,22 @@
 /**
  * Centralized API base URL.
- * - On Vercel: set NEXT_PUBLIC_API_URL in project environment variables
- * - Locally: set in .env.local or falls back to Railway backend
+ * - On Vercel / Production: set NEXT_PUBLIC_API_URL in project environment variables
+ * - Locally: auto-detects localhost:5000 or falls back to Railway backend
  */
-const rawApiUrl =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "https://ua-engineering-pte-ltd-backend-production.up.railway.app";
+const getApiBaseUrl = (): string => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, "");
+  }
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      return "http://localhost:5000";
+    }
+  }
+  return "https://ua-engineering-pte-ltd-backend-production.up.railway.app";
+};
 
-export const API_BASE = rawApiUrl.replace(/\/api\/?$/, "");
+export const API_BASE = getApiBaseUrl();
 
 /**
  * Resolves image paths dynamically for the dashboard.
