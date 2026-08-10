@@ -55,6 +55,7 @@ export interface AboutContent {
   heroHeading: string;
   heroSubheading: string;
   heroImage: string;
+  aboutImage?: string;
   heroImageAlt: string;
   overviewHeading: string;
   overviewText: string;
