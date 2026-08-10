@@ -137,7 +137,7 @@ export const initialCmsData: CmsDatabase = {
       siteLogo: "/images/logo.png",
       footerLogo: "/images/footer-logo.png",
       companyName: "UA ENGINEERING PTE. LTD.",
-      welcomeMessage: "Welcome to UA ENGINEERING PTE. LTD.",
+      welcomeMessage: "Welcome to",
       phone: "+65 9841 1786",
       email: "hello.uaengineering@gmail.com",
       address: "10 Anson Road, Singapore 079903",
