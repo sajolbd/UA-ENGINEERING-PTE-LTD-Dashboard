@@ -21,6 +21,8 @@ interface SubService {
   slug: string;
   title: string;
   image: string;
+  breadcrumbTitle?: string;
+  breadcrumbBg?: string;
   description: string;
   longDescription: string;
   features: string[];
@@ -31,6 +33,7 @@ interface SubService {
 interface ServiceCategory {
   slug: string;
   title: string;
+  breadcrumbTitle?: string;
   shortDescription: string;
   description: string;
   featuredImage: string;
@@ -228,6 +231,7 @@ export default function ServicesListEditor() {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editingCategorySlug, setEditingCategorySlug] = useState<string | null>(null);
   const [catTitle, setCatTitle] = useState("");
+  const [catBreadcrumbTitle, setCatBreadcrumbTitle] = useState("");
   const [catShortDesc, setCatShortDesc] = useState("");
   const [catDesc, setCatDesc] = useState("");
   const [catFeaturedImage, setCatFeaturedImage] = useState("");
@@ -239,7 +243,9 @@ export default function ServicesListEditor() {
   const [editingSubSlug, setEditingSubSlug] = useState<string | null>(null);
   
   const [subTitle, setSubTitle] = useState("");
+  const [subBreadcrumbTitle, setSubBreadcrumbTitle] = useState("");
   const [subImage, setSubImage] = useState("");
+  const [subBreadcrumbBg, setSubBreadcrumbBg] = useState("");
   const [subDesc, setSubDesc] = useState("");
   const [subLongDesc, setSubLongDesc] = useState("");
   const [features, setFeatures] = useState<string[]>([""]);
@@ -320,6 +326,7 @@ export default function ServicesListEditor() {
   const handleOpenAddCategoryModal = () => {
     setEditingCategorySlug(null);
     setCatTitle("");
+    setCatBreadcrumbTitle("");
     setCatShortDesc("");
     setCatDesc("");
     setCatFeaturedImage("/images/services/sanitary-hero.png");
@@ -331,6 +338,7 @@ export default function ServicesListEditor() {
     e.stopPropagation();
     setEditingCategorySlug(cat.slug);
     setCatTitle(cat.title);
+    setCatBreadcrumbTitle(cat.breadcrumbTitle || "");
     setCatShortDesc(cat.shortDescription);
     setCatDesc(cat.description);
     setCatFeaturedImage(cat.featuredImage);
@@ -357,6 +365,7 @@ export default function ServicesListEditor() {
           return {
             ...c,
             title: catTitle.trim(),
+            breadcrumbTitle: catBreadcrumbTitle.trim() || undefined,
             shortDescription: catShortDesc.trim(),
             description: catDesc.trim(),
             featuredImage: catFeaturedImage || "/images/services/sanitary-hero.png",
@@ -370,6 +379,7 @@ export default function ServicesListEditor() {
       const newCategory: ServiceCategory = {
         slug,
         title: catTitle.trim(),
+        breadcrumbTitle: catBreadcrumbTitle.trim() || undefined,
         shortDescription: catShortDesc.trim(),
         description: catDesc.trim(),
         featuredImage: catFeaturedImage || "/images/services/sanitary-hero.png",
@@ -405,7 +415,9 @@ export default function ServicesListEditor() {
     setTargetCategorySlug(catSlug);
     setEditingSubSlug(null);
     setSubTitle("");
+    setSubBreadcrumbTitle("");
     setSubImage("");
+    setSubBreadcrumbBg("");
     setSubDesc("");
     setSubLongDesc("");
     setFeatures([""]);
@@ -419,7 +431,9 @@ export default function ServicesListEditor() {
     setTargetCategorySlug(catSlug);
     setEditingSubSlug(service.slug);
     setSubTitle(service.title);
+    setSubBreadcrumbTitle(service.breadcrumbTitle || "");
     setSubImage(service.image);
+    setSubBreadcrumbBg(service.breadcrumbBg || "");
     setSubDesc(service.description);
     setSubLongDesc(service.longDescription);
     setFeatures(service.features.length > 0 ? service.features : [""]);
@@ -470,7 +484,9 @@ export default function ServicesListEditor() {
     const updatedServiceItem: SubService = {
       slug,
       title: subTitle.trim(),
+      breadcrumbTitle: subBreadcrumbTitle.trim() || undefined,
       image: subImage || "/images/layout/breadcrumb-bg.png",
+      breadcrumbBg: subBreadcrumbBg || undefined,
       description: subDesc.trim(),
       longDescription: subLongDesc.trim(),
       features: features.filter((f) => f.trim() !== ""),
@@ -774,6 +790,19 @@ export default function ServicesListEditor() {
 
               <div>
                 <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Breadcrumb Banner Title (Optional - defaults to Category Title)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Professional Renovation & Upgrading Services"
+                  value={catBreadcrumbTitle}
+                  onChange={(e) => setCatBreadcrumbTitle(e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
                   Short Description (Shown on cards)
                 </label>
                 <input
@@ -865,10 +894,29 @@ export default function ServicesListEditor() {
                 />
               </div>
 
+              <div>
+                <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Breadcrumb Banner Title (Optional - defaults to Service Title)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Professional Floor Renovation & Polishing"
+                  value={subBreadcrumbTitle}
+                  onChange={(e) => setSubBreadcrumbTitle(e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                />
+              </div>
+
               <ImageUploadField
                 label="Service Showcase Image"
                 value={subImage}
                 onChange={setSubImage}
+              />
+
+              <ImageUploadField
+                label="Breadcrumb Banner Background Image (Optional)"
+                value={subBreadcrumbBg}
+                onChange={setSubBreadcrumbBg}
               />
 
               <div>
