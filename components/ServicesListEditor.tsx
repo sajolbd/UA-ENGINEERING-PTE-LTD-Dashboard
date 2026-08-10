@@ -1,16 +1,20 @@
 "use client";
-import { API_BASE } from "../lib/api";
+import { API_BASE, getImageUrl } from "../lib/api";
 
 import React, { useState, useEffect } from "react";
 import {
   Briefcase,
   Plus,
+  Edit,
   Trash2,
   ChevronDown,
   ChevronUp,
   Save,
   CheckCircle,
-  X
+  AlertCircle,
+  X,
+  Layers,
+  Sparkles
 } from "lucide-react";
 
 interface SubService {
@@ -43,6 +47,8 @@ interface ImageUploadFieldProps {
 function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [darkPreview, setDarkPreview] = useState(false);
+  const [fitContain, setFitContain] = useState(true);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -69,57 +75,125 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
       if (result.success && result.imagePath) {
         onChange(result.imagePath);
       } else {
-        setError(result.error || "Upload failed");
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") {
+            onChange(reader.result);
+          }
+        };
+        reader.readAsDataURL(file);
       }
     } catch {
-      setError("Connection to Express server failed.");
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          onChange(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
     } finally {
       setUploading(false);
     }
   };
 
-  const fullImageUrl = value
-    ? (value.startsWith("http") || value.startsWith("data")
-      ? value
-      : `${API_BASE}${value}`)
-    : "";
+  const handleBase64Convert = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === "string") {
+        onChange(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const fullImageUrl = getImageUrl(value);
+  const isBase64 = value.startsWith("data:");
+  const isUploaded = value.startsWith("/images/uploads/") || value.startsWith("http");
 
   return (
-    <div className="space-y-3">
-      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-        {label}
-      </label>
+    <div className="flex flex-col space-y-3 bg-slate-900/60 p-4 rounded-2xl border border-slate-700 shadow-sm hover:shadow-md transition-all duration-300 w-full">
+      <div className="flex items-center justify-between gap-2">
+        <label className="text-xs font-black uppercase tracking-wider text-slate-300 truncate">
+          {label}
+        </label>
+        {value && (
+          <span className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-full shrink-0 ${
+            isBase64 ? "bg-emerald-950 text-emerald-300 border border-emerald-800" : isUploaded ? "bg-blue-950 text-blue-300 border border-blue-800" : "bg-slate-800 text-slate-300 border border-slate-700"
+          }`}>
+            {isBase64 ? "⚡ DB Direct Base64" : isUploaded ? "🌐 DB Uploaded API" : "📁 Local Asset"}
+          </span>
+        )}
+      </div>
 
-      {value && (
-        <div className="relative group max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 aspect-video shadow-sm transition-all duration-300 hover:shadow-md">
+      {value ? (
+        <div className={`relative group w-full h-44 rounded-xl border border-slate-700 overflow-hidden shadow-inner transition-colors duration-300 ${
+          darkPreview ? "bg-slate-950 text-white" : "bg-slate-900 text-slate-200"
+        }`}>
+          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:12px_12px]" />
+          
           <img
             src={fullImageUrl}
             alt="Uploaded Preview"
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className={`relative z-10 w-full h-full p-2 transition-all duration-300 ${
+              fitContain ? "object-contain" : "object-cover"
+            }`}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.src = "/images/footer-logo.png";
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
-            <span className="text-[10px] text-white font-extrabold tracking-widest uppercase">
-              Current Live Preview
-            </span>
+
+          <div className="absolute top-2 right-2 z-20 flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
+            <button
+              type="button"
+              onClick={() => setDarkPreview(!darkPreview)}
+              className="text-[10px] font-bold bg-slate-950/80 hover:bg-slate-950 text-white backdrop-blur px-2 py-1 rounded-lg border border-white/20 transition shadow-sm"
+            >
+              {darkPreview ? "☀️ Light Bg" : "🌙 Dark Bg"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setFitContain(!fitContain)}
+              className="text-[10px] font-bold bg-slate-950/80 hover:bg-slate-950 text-white backdrop-blur px-2 py-1 rounded-lg border border-white/20 transition shadow-sm"
+            >
+              {fitContain ? "🔍 Contain" : "🖼️ Cover"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onChange("")}
+              className="text-[10px] font-bold bg-red-600/90 hover:bg-red-600 text-white px-2 py-1 rounded-lg transition shadow-sm"
+            >
+              ✕ Remove
+            </button>
           </div>
+        </div>
+      ) : (
+        <div className="w-full h-20 rounded-xl border-2 border-dashed border-slate-700 bg-slate-950/40 flex flex-col items-center justify-center text-slate-400 p-3 text-center">
+          <span className="text-xs font-bold">No image selected</span>
         </div>
       )}
       
-      <div className="relative flex items-center bg-white border border-slate-200 rounded-xl focus-within:border-primary focus-within:ring-1 focus-within:ring-primary overflow-hidden transition-all duration-300">
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="/images/placeholder.png"
-          className="flex-1 px-3 py-3 text-sm outline-none bg-white text-slate-950 font-medium font-mono text-xs border-none focus:ring-0 focus:outline-none"
-        />
+      <div className="w-full">
+        <div className="relative flex items-center bg-slate-950 border border-slate-700 rounded-xl focus-within:border-primary focus-within:ring-1 focus-within:ring-primary overflow-hidden transition-all duration-300">
+          <span className="pl-3 text-slate-400 text-xs font-mono font-bold select-none">URL</span>
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="/images/services/sample.png or https://... or data:image/..."
+            className="w-full px-3 py-2 text-xs outline-none bg-slate-950 text-white font-mono font-medium border-none focus:ring-0 placeholder:text-slate-500"
+          />
+        </div>
+      </div>
 
-        <label className="cursor-pointer inline-flex items-center justify-center px-4 py-3 bg-slate-50 hover:bg-slate-100 hover:text-slate-900 text-slate-600 text-xs font-bold transition-all border-l border-slate-200 select-none shrink-0 h-full">
-          {uploading ? "Uploading..." : "Upload Image"}
+      <div className="grid grid-cols-2 gap-2 w-full pt-1">
+        <label className="cursor-pointer inline-flex items-center justify-center px-3 py-2 bg-slate-800 hover:bg-primary text-white text-xs font-bold rounded-xl transition-all duration-200 shadow-sm text-center select-none">
+          {uploading ? "Uploading..." : "📤 Upload File"}
           <input
             type="file"
             accept="image/*"
@@ -128,9 +202,19 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
             className="hidden"
           />
         </label>
+
+        <label className="cursor-pointer inline-flex items-center justify-center px-3 py-2 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition-all duration-200 shadow-sm text-center select-none">
+          ⚡ Save Base64 (DB)
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleBase64Convert}
+            className="hidden"
+          />
+        </label>
       </div>
 
-      {error && <span className="text-[10px] font-bold text-red-600 block mt-1">{error}</span>}
+      {error && <span className="text-[10px] font-bold text-red-400 block mt-1">{error}</span>}
     </div>
   );
 }
@@ -140,9 +224,28 @@ export default function ServicesListEditor() {
   const [loading, setLoading] = useState(true);
   const [expandedCat, setExpandedCat] = useState<string | null>(null);
   
-  // Modal states
-  const [showModal, setShowModal] = useState(false);
+  // Category Modal States (Add & Edit)
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [editingCategorySlug, setEditingCategorySlug] = useState<string | null>(null);
+  const [catTitle, setCatTitle] = useState("");
+  const [catShortDesc, setCatShortDesc] = useState("");
+  const [catDesc, setCatDesc] = useState("");
+  const [catFeaturedImage, setCatFeaturedImage] = useState("");
+  const [catBgImage, setCatBgImage] = useState("");
+
+  // Sub-Service Modal States (Add & Edit)
+  const [showSubModal, setShowSubModal] = useState(false);
   const [targetCategorySlug, setTargetCategorySlug] = useState<string>("");
+  const [editingSubSlug, setEditingSubSlug] = useState<string | null>(null);
+  
+  const [subTitle, setSubTitle] = useState("");
+  const [subImage, setSubImage] = useState("");
+  const [subDesc, setSubDesc] = useState("");
+  const [subLongDesc, setSubLongDesc] = useState("");
+  const [features, setFeatures] = useState<string[]>([""]);
+  const [benefits, setBenefits] = useState<string[]>([""]);
+  const [processList, setProcessList] = useState<string[]>([""]);
+
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Custom Toast State
@@ -156,10 +259,11 @@ export default function ServicesListEditor() {
   // Custom Delete Confirm State
   const [deleteConfirm, setDeleteConfirm] = useState<{
     show: boolean;
+    type: "category" | "service";
     categorySlug: string;
-    serviceSlug: string;
-    serviceTitle: string;
-  }>({ show: false, categorySlug: "", serviceSlug: "", serviceTitle: "" });
+    serviceSlug?: string;
+    title: string;
+  }>({ show: false, type: "service", categorySlug: "", serviceSlug: "", title: "" });
 
   const showToast = (type: "success" | "error" | "warning", title: string, message: string) => {
     setToast({ show: true, type, title, message });
@@ -168,15 +272,6 @@ export default function ServicesListEditor() {
     }, 4000);
   };
 
-  // Form Fields State
-  const [title, setTitle] = useState("");
-  const [image, setImage] = useState("");
-  const [description, setDescription] = useState("");
-  const [longDescription, setLongDescription] = useState("");
-  const [features, setFeatures] = useState<string[]>([""]);
-  const [benefits, setBenefits] = useState<string[]>([""]);
-  const [processList, setProcessList] = useState<string[]>([""]);
-
   const loadServices = () => {
     setLoading(true);
     fetch(`${API_BASE}/api/services`)
@@ -184,7 +279,7 @@ export default function ServicesListEditor() {
       .then((res) => {
         if (res.success && res.data) {
           setCategories(res.data);
-          if (res.data.length > 0) {
+          if (res.data.length > 0 && !expandedCat) {
             setExpandedCat(res.data[0].slug);
           }
         }
@@ -197,16 +292,143 @@ export default function ServicesListEditor() {
     loadServices();
   }, []);
 
-  const handleToggleExpand = (slug: string) => {
-    setExpandedCat(expandedCat === slug ? null : slug);
+  const saveCategoriesToBackend = async (updated: ServiceCategory[], successMsg: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/services`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ categories: updated })
+      });
+      const result = await res.json();
+      if (result.success) {
+        setCategories(updated);
+        setSaveSuccess(true);
+        showToast("success", "Database Saved", successMsg);
+        setTimeout(() => setSaveSuccess(false), 4000);
+        return true;
+      } else {
+        showToast("error", "Save Failed", result.error || "Failed to save services database");
+        return false;
+      }
+    } catch {
+      showToast("error", "Connection Error", "Failed to connect to backend server.");
+      return false;
+    }
   };
 
-  // List Inputs handlers
-  const handleListChange = (
-    index: number,
-    value: string,
-    listType: "features" | "benefits" | "process"
-  ) => {
+  // --- CATEGORY CRUD HANDLERS ---
+  const handleOpenAddCategoryModal = () => {
+    setEditingCategorySlug(null);
+    setCatTitle("");
+    setCatShortDesc("");
+    setCatDesc("");
+    setCatFeaturedImage("/images/services/sanitary-hero.png");
+    setCatBgImage("/images/layout/breadcrumb-bg.png");
+    setShowCategoryModal(true);
+  };
+
+  const handleOpenEditCategoryModal = (cat: ServiceCategory, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingCategorySlug(cat.slug);
+    setCatTitle(cat.title);
+    setCatShortDesc(cat.shortDescription);
+    setCatDesc(cat.description);
+    setCatFeaturedImage(cat.featuredImage);
+    setCatBgImage(cat.bgImage);
+    setShowCategoryModal(true);
+  };
+
+  const handleCategorySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!catTitle.trim()) {
+      showToast("warning", "Title Required", "Please enter a Category Title.");
+      return;
+    }
+
+    const slug = editingCategorySlug
+      ? editingCategorySlug
+      : catTitle.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+    let updated: ServiceCategory[];
+    if (editingCategorySlug) {
+      // Editing existing category
+      updated = categories.map((c) => {
+        if (c.slug === editingCategorySlug) {
+          return {
+            ...c,
+            title: catTitle.trim(),
+            shortDescription: catShortDesc.trim(),
+            description: catDesc.trim(),
+            featuredImage: catFeaturedImage || "/images/services/sanitary-hero.png",
+            bgImage: catBgImage || "/images/layout/breadcrumb-bg.png"
+          };
+        }
+        return c;
+      });
+    } else {
+      // Adding new category
+      const newCategory: ServiceCategory = {
+        slug,
+        title: catTitle.trim(),
+        shortDescription: catShortDesc.trim(),
+        description: catDesc.trim(),
+        featuredImage: catFeaturedImage || "/images/services/sanitary-hero.png",
+        bgImage: catBgImage || "/images/layout/breadcrumb-bg.png",
+        services: []
+      };
+      updated = [...categories, newCategory];
+    }
+
+    const saved = await saveCategoriesToBackend(
+      updated,
+      editingCategorySlug ? `Category "${catTitle.trim()}" updated successfully.` : `New Service Category "${catTitle.trim()}" created!`
+    );
+
+    if (saved) {
+      setShowCategoryModal(false);
+      setExpandedCat(slug);
+    }
+  };
+
+  const handleDeleteCategoryPrompt = (catSlug: string, catTitle: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeleteConfirm({
+      show: true,
+      type: "category",
+      categorySlug: catSlug,
+      title: catTitle
+    });
+  };
+
+  // --- SUB-SERVICE CRUD HANDLERS ---
+  const handleOpenAddSubModal = (catSlug: string) => {
+    setTargetCategorySlug(catSlug);
+    setEditingSubSlug(null);
+    setSubTitle("");
+    setSubImage("");
+    setSubDesc("");
+    setSubLongDesc("");
+    setFeatures([""]);
+    setBenefits([""]);
+    setProcessList([""]);
+    setShowSubModal(true);
+  };
+
+  const handleOpenEditSubModal = (catSlug: string, service: SubService, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setTargetCategorySlug(catSlug);
+    setEditingSubSlug(service.slug);
+    setSubTitle(service.title);
+    setSubImage(service.image);
+    setSubDesc(service.description);
+    setSubLongDesc(service.longDescription);
+    setFeatures(service.features.length > 0 ? service.features : [""]);
+    setBenefits(service.benefits.length > 0 ? service.benefits : [""]);
+    setProcessList(service.process.length > 0 ? service.process : [""]);
+    setShowSubModal(true);
+  };
+
+  const handleListChange = (index: number, value: string, listType: "features" | "benefits" | "process") => {
     if (listType === "features") {
       const copy = [...features];
       copy[index] = value;
@@ -228,117 +450,95 @@ export default function ServicesListEditor() {
     else setProcessList([...processList, ""]);
   };
 
-  const handleRemoveListItem = (
-    index: number,
-    listType: "features" | "benefits" | "process"
-  ) => {
-    if (listType === "features") {
-      setFeatures(features.filter((_, idx) => idx !== index));
-    } else if (listType === "benefits") {
-      setBenefits(benefits.filter((_, idx) => idx !== index));
-    } else {
-      setProcessList(processList.filter((_, idx) => idx !== index));
-    }
+  const handleRemoveListItem = (index: number, listType: "features" | "benefits" | "process") => {
+    if (listType === "features") setFeatures(features.filter((_, idx) => idx !== index));
+    else if (listType === "benefits") setBenefits(benefits.filter((_, idx) => idx !== index));
+    else setProcessList(processList.filter((_, idx) => idx !== index));
   };
 
-  const handleOpenAddModal = (categorySlug: string) => {
-    setTargetCategorySlug(categorySlug);
-    setTitle("");
-    setImage("");
-    setDescription("");
-    setLongDescription("");
-    setFeatures([""]);
-    setBenefits([""]);
-    setProcessList([""]);
-    setShowModal(true);
-  };
-
-  const handleAddServiceSubmit = async (e: React.FormEvent) => {
+  const handleSubServiceSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) {
-      showToast("warning", "Missing Title", "Please enter a service title.");
+    if (!subTitle.trim()) {
+      showToast("warning", "Title Required", "Please enter a Service Title.");
       return;
     }
 
-    const slug = title.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    const slug = editingSubSlug
+      ? editingSubSlug
+      : subTitle.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
-    const newService: SubService = {
+    const updatedServiceItem: SubService = {
       slug,
-      title: title.trim(),
-      image: image || "/images/layout/breadcrumb-bg.png",
-      description: description.trim(),
-      longDescription: longDescription.trim(),
+      title: subTitle.trim(),
+      image: subImage || "/images/layout/breadcrumb-bg.png",
+      description: subDesc.trim(),
+      longDescription: subLongDesc.trim(),
       features: features.filter((f) => f.trim() !== ""),
       benefits: benefits.filter((b) => b.trim() !== ""),
       process: processList.filter((p) => p.trim() !== "")
     };
 
-    // Update locally in the categories tree
     const updatedCategories = categories.map((cat) => {
       if (cat.slug === targetCategorySlug) {
-        return {
-          ...cat,
-          services: [...cat.services, newService]
-        };
+        if (editingSubSlug) {
+          return {
+            ...cat,
+            services: cat.services.map((s) => (s.slug === editingSubSlug ? updatedServiceItem : s))
+          };
+        } else {
+          return {
+            ...cat,
+            services: [...cat.services, updatedServiceItem]
+          };
+        }
       }
       return cat;
     });
 
-    try {
-      const res = await fetch(`${API_BASE}/api/services`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ categories: updatedCategories })
-      });
-      const result = await res.json();
-      if (result.success) {
-        setCategories(updatedCategories);
-        setSaveSuccess(true);
-        setShowModal(false);
-        showToast("success", "Service Added", `"${title.trim()}" has been published successfully.`);
-        setTimeout(() => setSaveSuccess(false), 4000);
-      } else {
-        showToast("error", "Publish Failed", result.error || "Failed to publish service");
-      }
-    } catch {
-      showToast("error", "Connection Error", "Failed to connect to Express REST server.");
+    const saved = await saveCategoriesToBackend(
+      updatedCategories,
+      editingSubSlug ? `Service "${subTitle.trim()}" updated.` : `New Service "${subTitle.trim()}" added.`
+    );
+
+    if (saved) {
+      setShowSubModal(false);
     }
   };
 
-  const handleDeleteSubService = (catSlug: string, servSlug: string, servTitle: string) => {
-    setDeleteConfirm({ show: true, categorySlug: catSlug, serviceSlug: servSlug, serviceTitle: servTitle });
-  };
-
-  const confirmDeleteSubService = async () => {
-    const { categorySlug, serviceSlug, serviceTitle } = deleteConfirm;
-    setDeleteConfirm({ show: false, categorySlug: "", serviceSlug: "", serviceTitle: "" });
-
-    const updatedCategories = categories.map((cat) => {
-      if (cat.slug === categorySlug) {
-        return {
-          ...cat,
-          services: cat.services.filter((s) => s.slug !== serviceSlug)
-        };
-      }
-      return cat;
+  const handleDeleteSubServicePrompt = (catSlug: string, servSlug: string, servTitle: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeleteConfirm({
+      show: true,
+      type: "service",
+      categorySlug: catSlug,
+      serviceSlug: servSlug,
+      title: servTitle
     });
+  };
 
-    try {
-      const res = await fetch(`${API_BASE}/api/services`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ categories: updatedCategories })
+  const confirmDelete = async () => {
+    const { type, categorySlug, serviceSlug, title } = deleteConfirm;
+    setDeleteConfirm({ show: false, type: "service", categorySlug: "", serviceSlug: "", title: "" });
+
+    let updated: ServiceCategory[];
+    if (type === "category") {
+      updated = categories.filter((c) => c.slug !== categorySlug);
+    } else {
+      updated = categories.map((cat) => {
+        if (cat.slug === categorySlug) {
+          return {
+            ...cat,
+            services: cat.services.filter((s) => s.slug !== serviceSlug)
+          };
+        }
+        return cat;
       });
-      const result = await res.json();
-      if (result.success) {
-        setCategories(updatedCategories);
-        showToast("success", "Service Deleted", `"${serviceTitle}" has been removed successfully.`);
-      } else {
-        showToast("error", "Delete Failed", result.error || "Failed to delete service");
-      }
-    } catch {
-      showToast("error", "Connection Error", "Failed to connect to Express REST server.");
     }
+
+    await saveCategoriesToBackend(
+      updated,
+      type === "category" ? `Category "${title}" removed.` : `Service "${title}" removed.`
+    );
   };
 
   if (loading) {
@@ -351,96 +551,138 @@ export default function ServicesListEditor() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto animate-fade-in">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-white border border-slate-100 rounded-2xl shadow-sm">
+    <div className="space-y-6 max-w-4xl mx-auto animate-fade-in pb-12">
+      {/* Toast Notification */}
+      {toast.show && (
+        <div className={`fixed top-5 right-5 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl border backdrop-blur-md animate-slide-in-right ${
+          toast.type === "success" ? "bg-emerald-950/90 border-emerald-700 text-emerald-200" : toast.type === "error" ? "bg-rose-950/90 border-rose-700 text-rose-200" : "bg-amber-950/90 border-amber-700 text-amber-200"
+        }`}>
+          {toast.type === "success" ? <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" /> : <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />}
+          <div>
+            <h5 className="text-xs font-black">{toast.title}</h5>
+            <p className="text-[11px] font-medium opacity-90">{toast.message}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Page Header Bar with ADD CATEGORY Button */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-slate-900 border border-slate-800 rounded-2xl shadow-md">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-primary-light text-primary rounded-2xl border border-primary/5">
-            <Briefcase className="w-6 h-6" />
+          <div className="p-3 bg-primary/20 text-primary rounded-2xl border border-primary/30">
+            <Briefcase className="w-6 h-6 text-primary" />
           </div>
           <div>
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-              Services Database Listing
+              CMS Service Manager
             </span>
-            <h3 className="text-lg font-black text-secondary font-display">
-              Services Directory Manager
+            <h3 className="text-lg font-black text-white font-display">
+              Services & Capabilities Directory
             </h3>
           </div>
         </div>
+
+        <button
+          onClick={handleOpenAddCategoryModal}
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-lg shadow-primary/20 transition-all active:scale-95 self-start sm:self-auto select-none"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add New Service Category</span>
+        </button>
       </div>
 
-      {/* SAVE SUCCESS NOTIFICATION */}
       {saveSuccess && (
-        <div className="flex items-center gap-3 p-4 bg-emerald-50 text-emerald-800 border border-emerald-100 rounded-2xl shadow-sm animate-slide-up">
-          <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+        <div className="flex items-center gap-3 p-4 bg-emerald-950/80 text-emerald-200 border border-emerald-800 rounded-2xl shadow-sm animate-slide-up">
+          <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
           <span className="text-xs font-bold">
-            New service successfully published and synced to MongoDB Atlas!
+            Services database synced to MongoDB Atlas & Website!
           </span>
         </div>
       )}
 
-      {/* Accordion Categories Manager */}
+      {/* Accordion List for Service Categories */}
       <div className="space-y-4">
         {categories.map((cat) => {
           const isExpanded = expandedCat === cat.slug;
           return (
             <div
               key={cat.slug}
-              className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden"
+              className="bg-slate-900 border border-slate-800 rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:border-slate-700"
             >
               {/* Accordion Header */}
               <div
-                onClick={() => handleToggleExpand(cat.slug)}
-                className="flex items-center justify-between p-5 cursor-pointer hover:bg-slate-50/50 select-none transition-colors"
+                onClick={() => setExpandedCat(isExpanded ? null : cat.slug)}
+                className="flex items-center justify-between p-5 cursor-pointer hover:bg-slate-800/60 select-none transition-colors"
               >
                 <div className="flex items-center gap-4">
                   <img
-                    src={cat.featuredImage.startsWith("/") ? `${API_BASE}${cat.featuredImage}` : cat.featuredImage}
+                    src={getImageUrl(cat.featuredImage)}
                     alt={cat.title}
-                    className="w-12 h-12 object-cover rounded-xl border border-slate-100"
+                    className="w-14 h-14 object-cover rounded-xl border border-slate-700 shrink-0"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = "/images/logo.png";
                     }}
                   />
-                  <div>
-                    <h4 className="text-sm font-black text-secondary">
-                      {cat.title}
-                    </h4>
-                    <p className="text-xs text-slate-400 line-clamp-1 font-medium mt-0.5">
-                      {cat.shortDescription}
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-base font-black text-white">
+                        {cat.title}
+                      </h4>
+                      <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 bg-slate-800 text-slate-300 rounded-md border border-slate-700">
+                        {cat.services.length} Services
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 line-clamp-1 font-medium">
+                      {cat.shortDescription || cat.description}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg">
-                    {cat.services.length} Services
-                  </span>
-                  {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={(e) => handleOpenEditCategoryModal(cat, e)}
+                    className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold border border-slate-700 transition"
+                    title="Edit Category Details"
+                  >
+                    <Edit className="w-3.5 h-3.5 text-primary" />
+                    <span>Edit</span>
+                  </button>
+
+                  <button
+                    onClick={(e) => handleDeleteCategoryPrompt(cat.slug, cat.title, e)}
+                    className="p-1.5 bg-slate-800 hover:bg-red-950/80 text-slate-400 hover:text-red-400 rounded-xl border border-slate-700 transition"
+                    title="Delete Category"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+
+                  {isExpanded ? <ChevronUp className="w-5 h-5 text-slate-400 ml-1" /> : <ChevronDown className="w-5 h-5 text-slate-400 ml-1" />}
                 </div>
               </div>
 
-              {/* Accordion Expanded Content */}
+              {/* Expanded Sub-Services Container */}
               {isExpanded && (
-                <div className="border-t border-slate-100 p-5 bg-slate-50/20 space-y-4">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-                      Sub-Services Lists
-                    </span>
+                <div className="border-t border-slate-800 p-5 bg-slate-950/40 space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <Layers className="w-4 h-4 text-primary" />
+                      <span className="text-xs font-extrabold uppercase tracking-wider text-slate-300">
+                        Sub-Services List inside "{cat.title}"
+                      </span>
+                    </div>
                     
                     <button
-                      onClick={() => handleOpenAddModal(cat.slug)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-sm transition-all active:scale-95"
+                      onClick={() => handleOpenAddSubModal(cat.slug)}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-md transition-all active:scale-95"
                     >
                       <Plus className="w-4 h-4" />
-                      <span>Add New Service</span>
+                      <span>Add Sub-Service</span>
                     </button>
                   </div>
 
                   {cat.services.length === 0 ? (
-                    <div className="text-center py-8">
+                    <div className="text-center py-8 bg-slate-900/40 rounded-xl border border-dashed border-slate-800 p-4">
                       <p className="text-xs text-slate-400 font-bold">
-                        No services configured in this category yet. Click above to add one.
+                        No services configured under "{cat.title}" yet. Click above to add your first service item!
                       </p>
                     </div>
                   ) : (
@@ -448,34 +690,43 @@ export default function ServicesListEditor() {
                       {cat.services.map((service) => (
                         <div
                           key={service.slug}
-                          className="flex items-start justify-between p-4 bg-white border border-slate-100 rounded-xl shadow-xs hover:shadow-sm transition-all"
+                          className="flex items-start justify-between p-4 bg-slate-900 border border-slate-800 rounded-2xl shadow-sm hover:border-slate-700 transition-all gap-3"
                         >
                           <div className="flex gap-3">
                             <img
-                              src={service.image.startsWith("/") ? `${API_BASE}${service.image}` : service.image}
+                              src={getImageUrl(service.image)}
                               alt={service.title}
-                              className="w-14 h-14 object-cover rounded-lg border border-slate-100 shrink-0"
+                              className="w-14 h-14 object-cover rounded-xl border border-slate-700 shrink-0"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src = "/images/logo.png";
                               }}
                             />
                             <div className="space-y-1">
-                              <h5 className="text-xs font-bold text-secondary">
+                              <h5 className="text-xs font-bold text-white">
                                 {service.title}
                               </h5>
-                              <p className="text-[10px] text-slate-400 line-clamp-2 leading-relaxed">
+                              <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
                                 {service.description}
                               </p>
                             </div>
                           </div>
 
-                          <button
-                            onClick={() => handleDeleteSubService(cat.slug, service.slug, service.title)}
-                            className="p-1.5 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-lg transition-colors shrink-0"
-                            title="Delete Service"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              onClick={(e) => handleOpenEditSubModal(cat.slug, service, e)}
+                              className="p-1.5 hover:bg-slate-800 text-slate-400 hover:text-white rounded-lg transition-colors"
+                              title="Edit Service Details"
+                            >
+                              <Edit className="w-3.5 h-3.5 text-primary" />
+                            </button>
+                            <button
+                              onClick={(e) => handleDeleteSubServicePrompt(cat.slug, service.slug, service.title, e)}
+                              className="p-1.5 hover:bg-red-950/80 text-slate-400 hover:text-red-400 rounded-lg transition-colors"
+                              title="Delete Service"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -487,50 +738,139 @@ export default function ServicesListEditor() {
         })}
       </div>
 
-      {/* --- ADD SUB-SERVICE MODAL FORM --- */}
-      {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 py-8">
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto thin-scrollbar relative space-y-6 animate-scale-up">
+      {/* --- ADD / EDIT CATEGORY MODAL --- */}
+      {showCategoryModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-slate-950/80 backdrop-blur-md z-50 overflow-y-auto p-4 py-8">
+          <div className="bg-slate-900 rounded-3xl border border-slate-700 shadow-2xl p-6 max-w-xl w-full max-h-[85vh] overflow-y-auto thin-scrollbar relative space-y-5 text-white animate-scale-up">
             
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2">
-                <Plus className="w-5 h-5 text-primary" />
-                <h3 className="text-sm font-black text-secondary">
-                  Add Service to Category
+                <Sparkles className="w-5 h-5 text-primary" />
+                <h3 className="text-sm font-black text-white">
+                  {editingCategorySlug ? "Edit Service Category" : "Add New Top-Level Service Category"}
                 </h3>
               </div>
               <button
-                onClick={() => setShowModal(false)}
-                className="p-1 hover:bg-slate-100 rounded-full text-slate-400 transition-colors"
+                onClick={() => setShowCategoryModal(false)}
+                className="p-1 hover:bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleAddServiceSubmit} className="space-y-5">
-              {/* Title field */}
+            <form onSubmit={handleCategorySubmit} className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Category Title / Header
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Sanitary & Plumbing Work or Solar Panel Solutions"
+                  value={catTitle}
+                  onChange={(e) => setCatTitle(e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Short Description (Shown on cards)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Comprehensive commercial and residential plumbing services..."
+                  value={catShortDesc}
+                  onChange={(e) => setCatShortDesc(e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Detailed Narrative Description (Shown on Category page)
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Provide full description..."
+                  value={catDesc}
+                  onChange={(e) => setCatDesc(e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium resize-none placeholder:text-slate-500"
+                />
+              </div>
+
+              <ImageUploadField
+                label="Featured Showcase Image"
+                value={catFeaturedImage}
+                onChange={setCatFeaturedImage}
+              />
+
+              <ImageUploadField
+                label="Background Banner Image"
+                value={catBgImage}
+                onChange={setCatBgImage}
+              />
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowCategoryModal(false)}
+                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl shadow-md transition"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{editingCategorySlug ? "Update Category" : "Publish Category"}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* --- ADD / EDIT SUB-SERVICE MODAL FORM --- */}
+      {showSubModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-slate-950/80 backdrop-blur-md z-50 overflow-y-auto p-4 py-8">
+          <div className="bg-slate-900 rounded-3xl border border-slate-700 shadow-2xl p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto thin-scrollbar relative space-y-5 text-white animate-scale-up">
+            
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <Plus className="w-5 h-5 text-primary" />
+                <h3 className="text-sm font-black text-white">
+                  {editingSubSlug ? "Edit Service Item" : `Add Service under "${targetCategorySlug}"`}
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowSubModal(false)}
+                className="p-1 hover:bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubServiceSubmit} className="space-y-4">
               <div>
                 <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
                   Service Title / Heading
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Toilet Bowl Plumbing Install"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                  placeholder="e.g. Toilet Bowl Plumbing Install or Pipe Relining"
+                  value={subTitle}
+                  onChange={(e) => setSubTitle(e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
                 />
               </div>
 
-              {/* Banner Image upload */}
               <ImageUploadField
-                label="Service Banner Showcase Image"
-                value={image}
-                onChange={setImage}
+                label="Service Showcase Image"
+                value={subImage}
+                onChange={setSubImage}
               />
 
-              {/* Short Description */}
               <div>
                 <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
                   Short Description (Shown on cards)
@@ -538,28 +878,27 @@ export default function ServicesListEditor() {
                 <textarea
                   rows={2}
                   placeholder="e.g. Custom toilet bowl replacement and leak protection piping..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium resize-none"
+                  value={subDesc}
+                  onChange={(e) => setSubDesc(e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium resize-none placeholder:text-slate-500"
                 />
               </div>
 
-              {/* Long description */}
               <div>
                 <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                  Detailed long Description (Shown on Service page)
+                  Detailed Long Description (Shown on Service page)
                 </label>
                 <textarea
                   rows={4}
                   placeholder="Provide complete engineering overview, specs and masonry work details..."
-                  value={longDescription}
-                  onChange={(e) => setLongDescription(e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium resize-none"
+                  value={subLongDesc}
+                  onChange={(e) => setSubLongDesc(e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium resize-none placeholder:text-slate-500"
                 />
               </div>
 
-              {/* Dynamic list array: features */}
-              <div className="space-y-2.5">
+              {/* Dynamic list: features */}
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
                     Features / Technical Highlights
@@ -579,12 +918,12 @@ export default function ServicesListEditor() {
                       placeholder="Highlight point..."
                       value={item}
                       onChange={(e) => handleListChange(idx, e.target.value, "features")}
-                      className="flex-1 px-4 py-2 text-xs border border-slate-200 rounded-lg bg-white text-slate-950"
+                      className="flex-1 px-4 py-2 text-xs border border-slate-700 rounded-xl bg-slate-950 text-white placeholder:text-slate-500"
                     />
                     <button
                       type="button"
                       onClick={() => handleRemoveListItem(idx, "features")}
-                      className="p-2 text-slate-400 hover:text-red-500"
+                      className="p-2 text-slate-400 hover:text-red-400"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -592,8 +931,8 @@ export default function ServicesListEditor() {
                 ))}
               </div>
 
-              {/* Dynamic list array: benefits */}
-              <div className="space-y-2.5">
+              {/* Dynamic list: benefits */}
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
                     Benefits to Client
@@ -610,15 +949,15 @@ export default function ServicesListEditor() {
                   <div key={idx} className="flex gap-2 items-center">
                     <input
                       type="text"
-                      placeholder="Benefit statement..."
+                      placeholder="Benefit point..."
                       value={item}
                       onChange={(e) => handleListChange(idx, e.target.value, "benefits")}
-                      className="flex-1 px-4 py-2 text-xs border border-slate-200 rounded-lg bg-white text-slate-950"
+                      className="flex-1 px-4 py-2 text-xs border border-slate-700 rounded-xl bg-slate-950 text-white placeholder:text-slate-500"
                     />
                     <button
                       type="button"
                       onClick={() => handleRemoveListItem(idx, "benefits")}
-                      className="p-2 text-slate-400 hover:text-red-500"
+                      className="p-2 text-slate-400 hover:text-red-400"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -626,33 +965,33 @@ export default function ServicesListEditor() {
                 ))}
               </div>
 
-              {/* Dynamic list array: process steps */}
-              <div className="space-y-2.5">
+              {/* Dynamic list: process */}
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-                    Step-by-Step Construction Process
+                    Work Process Steps
                   </label>
                   <button
                     type="button"
                     onClick={() => handleAddListItem("process")}
                     className="text-[10px] font-extrabold text-primary hover:underline inline-flex items-center gap-1"
                   >
-                    <Plus className="w-3.5 h-3.5" /> Add Step Row
+                    <Plus className="w-3.5 h-3.5" /> Add Bullet Row
                   </button>
                 </div>
                 {processList.map((item, idx) => (
                   <div key={idx} className="flex gap-2 items-center">
                     <input
                       type="text"
-                      placeholder={`Step ${idx + 1} description...`}
+                      placeholder="Step description..."
                       value={item}
                       onChange={(e) => handleListChange(idx, e.target.value, "process")}
-                      className="flex-1 px-4 py-2 text-xs border border-slate-200 rounded-lg bg-white text-slate-950"
+                      className="flex-1 px-4 py-2 text-xs border border-slate-700 rounded-xl bg-slate-950 text-white placeholder:text-slate-500"
                     />
                     <button
                       type="button"
                       onClick={() => handleRemoveListItem(idx, "process")}
-                      className="p-2 text-slate-400 hover:text-red-500"
+                      className="p-2 text-slate-400 hover:text-red-400"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -660,22 +999,20 @@ export default function ServicesListEditor() {
                 ))}
               </div>
 
-              {/* Save footer buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
                 <button
                   type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+                  onClick={() => setShowSubModal(false)}
+                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition"
                 >
                   Cancel
                 </button>
-                
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl shadow-md text-xs font-bold transition-all active:scale-95"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl shadow-md transition"
                 >
                   <Save className="w-4 h-4" />
-                  <span>Publish Service</span>
+                  <span>{editingSubSlug ? "Update Service" : "Publish Service"}</span>
                 </button>
               </div>
             </form>
@@ -683,66 +1020,40 @@ export default function ServicesListEditor() {
         </div>
       )}
 
-      {/* Dynamic Slide-in Toast Notification */}
-      {toast.show && (
-        <div className="fixed top-5 right-5 z-[9999] flex items-center gap-3 p-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-100 max-w-sm animate-slide-in-right">
-          <div className={`p-2.5 rounded-xl ${
-            toast.type === "success"
-              ? "bg-emerald-50 text-emerald-600"
-              : toast.type === "error"
-              ? "bg-rose-50 text-rose-600"
-              : "bg-amber-50 text-amber-600"
-          }`}>
-            {toast.type === "success" ? (
-              <CheckCircle className="w-5 h-5" />
-            ) : (
-              <X className="w-5 h-5" />
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="text-xs font-black text-secondary">{toast.title}</h4>
-            <p className="text-[10px] text-slate-500 font-medium leading-relaxed truncate">{toast.message}</p>
-          </div>
-          <button
-            onClick={() => setToast({ ...toast, show: false })}
-            className="p-1 hover:bg-slate-100 rounded-full text-slate-400"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-
-      {/* Custom Delete Confirmation Modal */}
+      {/* --- CONFIRMATION MODAL FOR DELETION --- */}
       {deleteConfirm.show && (
-        <div className="fixed inset-0 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm z-[9998] animate-fade-in">
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl p-6 max-w-sm w-full mx-4 text-center space-y-6 animate-scale-up">
-            <div className="mx-auto w-12 h-12 bg-rose-50 text-rose-600 rounded-full border border-rose-100 flex items-center justify-center shadow-inner">
-              <Trash2 className="w-6 h-6" />
+        <div className="fixed inset-0 flex items-center justify-center bg-slate-950/80 backdrop-blur-md z-50 p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6 max-w-sm w-full text-center space-y-5 animate-scale-up text-white shadow-2xl">
+            <div className="w-14 h-14 bg-red-950 text-red-400 rounded-full border border-red-800 flex items-center justify-center mx-auto">
+              <Trash2 className="w-7 h-7" />
             </div>
+
             <div className="space-y-2">
-              <h3 className="text-sm font-black text-secondary">Delete Service</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Are you sure you want to permanently delete <span className="font-extrabold text-secondary">&ldquo;{deleteConfirm.serviceTitle}&rdquo;</span>? This operation is permanent.
+              <h4 className="text-base font-black">
+                Delete {deleteConfirm.type === "category" ? "Category" : "Service"}?
+              </h4>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Are you sure you want to permanently delete <strong className="text-white">"{deleteConfirm.title}"</strong>?
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-3 pt-2">
+
+            <div className="flex items-center justify-center gap-3 pt-2">
               <button
-                onClick={() => setDeleteConfirm({ show: false, categorySlug: "", serviceSlug: "", serviceTitle: "" })}
-                className="py-2.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+                onClick={() => setDeleteConfirm({ show: false, type: "service", categorySlug: "", title: "" })}
+                className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition"
               >
-                Keep Service
+                Cancel
               </button>
               <button
-                onClick={confirmDeleteSubService}
-                className="py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95"
+                onClick={confirmDelete}
+                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition shadow-md"
               >
-                Delete Service
+                Yes, Delete
               </button>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }

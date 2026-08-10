@@ -1,5 +1,5 @@
 "use client";
-import { API_BASE } from "../lib/api";
+import { API_BASE, getImageUrl } from "../lib/api";
 
 import React, { useState, useRef } from "react";
 import Sidebar from "../components/Sidebar";
@@ -10,6 +10,7 @@ import BlogTable from "../components/BlogTable";
 import CmsForms from "../components/CmsForms";
 import ServicesListEditor from "../components/ServicesListEditor";
 import ProjectsListEditor from "../components/ProjectsListEditor";
+import BreadcrumbEditor from "../components/BreadcrumbEditor";
 import { blogPosts } from "../data/blogData";
 import { initialCmsData, CmsDatabase, CmsContentUnion, PageSeo } from "../data/cmsData";
 import {
@@ -80,11 +81,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     }
   };
 
-  const fullImageUrl = value
-    ? (value.startsWith("http") || value.startsWith("data")
-      ? value
-      : `${API_BASE}${value}`)
-    : "";
+  const fullImageUrl = getImageUrl(value);
 
   return (
     <div className="space-y-3">
@@ -550,7 +547,7 @@ export default function DashboardHome() {
           {/* Logo Header */}
           <div className="space-y-2 flex flex-col items-center">
             <img 
-              src={`${API_BASE}/images/footer-logo.png`} 
+              src={getImageUrl("/images/footer-logo.png")} 
               alt="Logo" 
               className="h-12 w-auto mb-2" 
               onError={(e) => {
@@ -656,6 +653,12 @@ export default function DashboardHome() {
                 onRefresh={fetchBlogs}
               />
             </div>
+          ) : activeTab === "breadcrumbs_editor" ? (
+            /* DYNAMIC BREADCRUMB & HEADER BANNERS EDITOR VIEW */
+            <BreadcrumbEditor
+              cmsData={cmsData}
+              onUpdateCmsData={handleUpdateCmsData}
+            />
           ) : activeTab === "services_list" ? (
             /* DYNAMIC SERVICES LIST EDITOR VIEW */
             <ServicesListEditor />

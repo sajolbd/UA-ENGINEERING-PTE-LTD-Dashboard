@@ -5,20 +5,50 @@ export interface PageSeo {
   schemaJson: string;
 }
 
+export interface SiteContent {
+  siteLogo: string;
+  footerLogo: string;
+  companyName: string;
+  welcomeMessage: string;
+  phone: string;
+  email: string;
+  address: string;
+  workingHours: string;
+  appointmentButtonText: string;
+  footerAboutText: string;
+  facebook: string;
+  instagram: string;
+  linkedin: string;
+  youtube: string;
+  whatsapp: string;
+}
+
 export interface HomeContent {
   heroHeading: string;
   heroSubheading: string;
   heroImage: string;
   heroImageAlt: string;
+  heroCtaText: string;
   aboutHeading: string;
   aboutSubheading: string;
   aboutImage: string;
   aboutImageAlt: string;
   aboutExperience: string;
+  whyChooseBadge: string;
+  whyChooseHeading: string;
+  relyBadge: string;
+  relyHeading: string;
+  relyImage: string;
+  relyButtonText: string;
   callbackHeading: string;
   callbackSubheading: string;
-  relyHeading: string;
-  relySubheading: string;
+  callbackBgImage: string;
+  callbackSupportImage: string;
+  callbackButtonText: string;
+  reviewsBadge: string;
+  reviewsHeading: string;
+  processBadge: string;
+  processHeading: string;
 }
 
 export interface AboutContent {
@@ -30,6 +60,13 @@ export interface AboutContent {
   overviewText: string;
   ehsHeading: string;
   ehsText: string;
+  ehsImage: string;
+  processHeading: string;
+  processSubheading: string;
+  faqHeading: string;
+  faqSubheading: string;
+  residentialHeading: string;
+  residentialSubheading: string;
 }
 
 export interface ServicesContent {
@@ -71,6 +108,7 @@ export interface ContactContent {
 }
 
 export type CmsContentUnion =
+  | SiteContent
   | HomeContent
   | AboutContent
   | ServicesContent
@@ -84,6 +122,7 @@ export interface PageCmsData {
 }
 
 export interface CmsDatabase {
+  site: { content: SiteContent; seo: PageSeo };
   home: { content: HomeContent; seo: PageSeo };
   about: { content: AboutContent; seo: PageSeo };
   services: { content: ServicesContent; seo: PageSeo };
@@ -93,21 +132,62 @@ export interface CmsDatabase {
 }
 
 export const initialCmsData: CmsDatabase = {
+  site: {
+    content: {
+      siteLogo: "/images/logo.png",
+      footerLogo: "/images/footer-logo.png",
+      companyName: "UA ENGINEERING PTE. LTD.",
+      welcomeMessage: "Welcome to UA ENGINEERING PTE. LTD.",
+      phone: "+65 9841 1786",
+      email: "hello.uaengineering@gmail.com",
+      address: "10 Anson Road, Singapore 079903",
+      workingHours: "Mon - Sat: 9:00 AM - 6:00 PM (Emergency 24/7 Support)",
+      appointmentButtonText: "Book An Appointment",
+      footerAboutText: "Professional engineering, renovation, waterproofing, and steel fabrication solutions in Singapore. Licensed, certified, and compliant with BCA standards.",
+      facebook: "https://facebook.com",
+      instagram: "https://instagram.com",
+      linkedin: "https://linkedin.com",
+      youtube: "https://youtube.com",
+      whatsapp: "https://wa.me/6598411786",
+    },
+    seo: {
+      metaTitle: "UA Engineering PTE. LTD. | Singapore Engineering & Renovation",
+      metaDescription: "UA Engineering PTE. LTD. provides renovation, waterproofing, steel works, roofing, electrical, plumbing, aircon, aluminium glazing and maintenance services across Singapore.",
+      metaKeywords: "UA Engineering, Singapore Renovation, Waterproofing Singapore",
+      schemaJson: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "UA Engineering Pte Ltd"
+      }, null, 2)
+    }
+  },
   home: {
     content: {
       heroHeading: "From Renovation to Painting, Roofing, Electrical, Plumbing and Steel Works.",
       heroSubheading: "We handle it all with expertise, reliability, and guaranteed quality.",
       heroImage: "/images/home/hero/hero-bg.png",
       heroImageAlt: "UA Engineering Renovation and Steel Fabrications Banner",
+      heroCtaText: "Book An Appointment",
       aboutHeading: "Your Trusted Partner for High Quality Renovation & Upgrading Services.",
       aboutSubheading: "At UA ENGINEERING PTE. LTD. we deliver reliable Renovation & Upgrading solutions grounded in integrity, expertise, and precision. Our team ensures every project meets high standards of safety, durability, and quality workmanship.",
       aboutImage: "/images/home/about/about-main.jpg",
       aboutImageAlt: "UA Engineering Upgrading Worksite Inspections Team",
       aboutExperience: "15",
-      callbackHeading: "Let's Get Started on Your Next Engineering Project",
-      callbackSubheading: "Call us today to schedule a site inspection, structural audit, or customized renovation quotation.",
-      relyHeading: "Why Property Owners Rely on UA Engineering",
-      relySubheading: "We blend quality craftsmanship with safety protocols and BCA standards to deliver long-lasting engineering solutions in Singapore.",
+      whyChooseBadge: "UA ADVANTAGE",
+      whyChooseHeading: "Why Choose UA Engineering?",
+      relyBadge: "RELIABILITY & TRUST",
+      relyHeading: "Why Do You Rely On Us?",
+      relyImage: "/images/home/rely/rely-main.png",
+      relyButtonText: "Talk to an Expert",
+      callbackHeading: "Let Us Call You",
+      callbackSubheading: "Need help now? Send a few details - we'll call you shortly.",
+      callbackBgImage: "/images/home/call/callback-bg.png",
+      callbackSupportImage: "/images/home/call/call-support.png",
+      callbackButtonText: "Submit Now",
+      reviewsBadge: "CLIENT TESTIMONIALS",
+      reviewsHeading: "What Our Clients Say About UA Engineering",
+      processBadge: "OUR WORK PROCESS",
+      processHeading: "How We Deliver Engineering Excellence"
     },
     seo: {
       metaTitle: "UA Engineering PTE. LTD. | Singapore Engineering & Renovation",
@@ -138,6 +218,13 @@ export const initialCmsData: CmsDatabase = {
       overviewText: "Founded in Singapore, UA Engineering has grown into a leading contractor offering mechanical, electrical, plumbing, waterproofing, and steel fabrication works. Integrity, safety, and client satisfaction drive our operations.",
       ehsHeading: "EHS Safety Policy & Environmental Compliance",
       ehsText: "We maintain a Zero-Accident policy across all site operations. Our EHS compliance officers inspect structural rigs, high-voltage lines, and confined space setups daily to protect our workers and clients.",
+      ehsImage: "/images/home/about/about-main.jpg",
+      processHeading: "Our Engineering Process",
+      processSubheading: "From initial consultation to project completion, we follow standard safety guidelines.",
+      faqHeading: "Frequently Asked Questions",
+      faqSubheading: "Got questions about our engineering & renovation services in Singapore?",
+      residentialHeading: "Residential Renovation & Upgrading Capability",
+      residentialSubheading: "Providing HDB, Condominium, and Landed Home owners with certified renovation solutions."
     },
     seo: {
       metaTitle: "About Us | UA Engineering PTE. LTD.",

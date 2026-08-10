@@ -12,7 +12,8 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
-  X
+  X,
+  Globe
 } from "lucide-react";
 
 interface SidebarProps {
@@ -36,6 +37,7 @@ export default function Sidebar({
   setMobileOpen
 }: SidebarProps) {
   const pagesList = [
+    { id: "site", label: "Global Site Settings", icon: Globe },
     { id: "home", label: "Home Page", icon: HomeIcon },
     { id: "about", label: "About Page", icon: Info },
     { id: "services", label: "Services Page", icon: Briefcase },
@@ -119,6 +121,21 @@ export default function Sidebar({
             <div className="border-b border-[#15233c] mx-4" />
           )}
         </div>
+
+        {/* Dedicated Breadcrumb Banners Button */}
+        <button
+          onClick={() => handleTabClick("breadcrumbs_editor")}
+          className={`flex items-center justify-between w-full py-2.5 text-xs font-bold rounded-xl transition-all duration-300 group ${
+            activeTab === "breadcrumbs_editor"
+              ? "bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]"
+              : "text-slate-400 hover:text-white hover:bg-slate-800/20"
+          } ${isCollapsed ? "px-2 justify-center" : "px-4"}`}
+        >
+          <div className="flex items-center gap-3">
+            <Globe className="w-4 h-4 shrink-0 text-accent group-hover:text-white" />
+            {!isCollapsed && <span>Breadcrumbs & Banners</span>}
+          </div>
+        </button>
 
         {pagesList.map((page) => {
           const PageIcon = page.icon;

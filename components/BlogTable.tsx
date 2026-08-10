@@ -1,5 +1,5 @@
 "use client";
-import { API_BASE } from "../lib/api";
+import { API_BASE, getImageUrl } from "../lib/api";
 
 import React, { useState, useRef } from "react";
 import {
@@ -88,11 +88,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     }
   };
 
-  const fullImageUrl = value
-    ? (value.startsWith("http") || value.startsWith("data")
-      ? value
-      : `${API_BASE}${value}`)
-    : "";
+  const fullImageUrl = getImageUrl(value);
 
   return (
     <div className="space-y-3">

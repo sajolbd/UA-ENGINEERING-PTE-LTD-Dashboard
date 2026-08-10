@@ -1,5 +1,5 @@
 "use client";
-import { API_BASE } from "../lib/api";
+import { API_BASE, getImageUrl } from "../lib/api";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -9,7 +9,9 @@ import {
   CheckCircle,
   AlertCircle,
   Database,
-  Code
+  Code,
+  Sliders,
+  Image as ImageIcon
 } from "lucide-react";
 import {
   CmsDatabase,
@@ -37,6 +39,8 @@ interface ImageUploadFieldProps {
 function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [darkPreview, setDarkPreview] = useState(false);
+  const [fitContain, setFitContain] = useState(true);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -63,65 +67,155 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
       if (result.success && result.imagePath) {
         onChange(result.imagePath);
       } else {
-        setError(result.error || "Upload failed");
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") {
+            onChange(reader.result);
+          }
+        };
+        reader.readAsDataURL(file);
       }
     } catch {
-      setError("Connection to Express server failed.");
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          onChange(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
     } finally {
       setUploading(false);
     }
   };
 
-  const fullImageUrl = value
-    ? (value.startsWith("http") || value.startsWith("data")
-      ? value
-      : `${API_BASE}${value}`)
-    : "";
+  const handleBase64Convert = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === "string") {
+        onChange(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const fullImageUrl = getImageUrl(value);
+  const isBase64 = value.startsWith("data:");
+  const isUploaded = value.startsWith("/images/uploads/") || value.startsWith("http");
 
   return (
-    <div className="space-y-3">
-      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-        {label}
-      </label>
+    <div className="flex flex-col space-y-3 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 w-full">
+      {/* Field Label & Type Badge */}
+      <div className="flex items-center justify-between gap-2">
+        <label className="text-xs font-black uppercase tracking-wider text-slate-700 truncate">
+          {label}
+        </label>
+        {value && (
+          <span className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-full shrink-0 ${
+            isBase64 ? "bg-emerald-100 text-emerald-800 border border-emerald-200" : isUploaded ? "bg-blue-100 text-blue-800 border border-blue-200" : "bg-slate-100 text-slate-700 border border-slate-200"
+          }`}>
+            {isBase64 ? "⚡ DB Direct Base64" : isUploaded ? "🌐 DB Uploaded API" : "📁 Local Asset"}
+          </span>
+        )}
+      </div>
 
-      {/* Large Framed Preview Box */}
-      {value && (
-        <div className="relative group max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 aspect-video shadow-sm transition-all duration-300 hover:shadow-md">
+      {/* Large Framed Live Image Preview Box */}
+      {value ? (
+        <div className={`relative group w-full h-48 rounded-xl border border-slate-200/80 overflow-hidden shadow-inner transition-colors duration-300 ${
+          darkPreview ? "bg-slate-950 text-white" : "bg-slate-50 text-slate-800"
+        }`}>
+          {/* Background grid pattern for transparency */}
+          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:12px_12px]" />
+          
           <img
             src={fullImageUrl}
             alt="Uploaded Preview"
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className={`relative z-10 w-full h-full p-2 transition-all duration-300 ${
+              fitContain ? "object-contain" : "object-cover"
+            }`}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.src = "/images/footer-logo.png";
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
-            <span className="text-[10px] text-white font-extrabold tracking-widest uppercase">
-              Current Live Preview
+
+          {/* Quick Floating Controls (Dark/Light Canvas Toggle, Crop/Contain Toggle, Clear Button) */}
+          <div className="absolute top-2 right-2 z-20 flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
+            <button
+              type="button"
+              onClick={() => setDarkPreview(!darkPreview)}
+              className="text-[10px] font-bold bg-slate-900/80 hover:bg-slate-900 text-white backdrop-blur px-2 py-1 rounded-lg border border-white/20 transition shadow-sm"
+              title="Toggle Dark / Light canvas background for transparent white logos"
+            >
+              {darkPreview ? "☀️ Light Bg" : "🌙 Dark Bg"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setFitContain(!fitContain)}
+              className="text-[10px] font-bold bg-slate-900/80 hover:bg-slate-900 text-white backdrop-blur px-2 py-1 rounded-lg border border-white/20 transition shadow-sm"
+              title="Toggle Contain (full view) or Cover (fill frame)"
+            >
+              {fitContain ? "🔍 Contain" : "🖼️ Cover"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onChange("")}
+              className="text-[10px] font-bold bg-red-600/90 hover:bg-red-600 text-white px-2 py-1 rounded-lg transition shadow-sm"
+            >
+              ✕ Remove
+            </button>
+          </div>
+
+          <div className="absolute bottom-2 left-2 z-20">
+            <span className="text-[9px] font-bold bg-black/60 text-white backdrop-blur px-2 py-0.5 rounded uppercase tracking-wider">
+              Live Preview
             </span>
           </div>
         </div>
+      ) : (
+        <div className="w-full h-24 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
+          <span className="text-xs font-bold">No image selected</span>
+          <span className="text-[10px] text-slate-400 mt-1">Upload a file or enter an image URL below</span>
+        </div>
       )}
       
-      <div className="relative flex items-center bg-white border border-slate-200 rounded-xl focus-within:border-primary focus-within:ring-1 focus-within:ring-primary overflow-hidden transition-all duration-300">
-        {/* Center: Text Input for Path */}
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="/images/placeholder.png"
-          className="flex-1 px-3 py-3 text-sm outline-none bg-white text-slate-950 font-medium font-mono text-xs border-none focus:ring-0 focus:outline-none"
-        />
+      {/* Path / URL Input Box */}
+      <div className="w-full">
+        <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl focus-within:border-primary focus-within:ring-1 focus-within:ring-primary overflow-hidden transition-all duration-300">
+          <span className="pl-3 text-slate-400 text-xs font-mono font-bold select-none">URL</span>
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="/images/logo.png or https://... or data:image/..."
+            className="w-full px-3 py-2.5 text-xs outline-none bg-slate-900 text-white font-mono font-medium border-none focus:ring-0 placeholder:text-slate-500"
+          />
+        </div>
+      </div>
 
-        {/* Right: Embedded Upload Button */}
-        <label className="cursor-pointer inline-flex items-center justify-center px-4 py-3 bg-slate-50 hover:bg-slate-100 hover:text-slate-900 text-slate-600 text-xs font-bold transition-all border-l border-slate-200 select-none shrink-0 h-full">
-          {uploading ? "Uploading..." : "Upload Image"}
+      {/* Action Buttons Grid (Upload Server API & Save Base64 DB) */}
+      <div className="grid grid-cols-2 gap-2 w-full pt-1">
+        <label className="cursor-pointer inline-flex items-center justify-center px-3 py-2 bg-slate-900 hover:bg-primary text-white text-xs font-bold rounded-xl transition-all duration-200 shadow-sm hover:shadow text-center select-none">
+          {uploading ? "Uploading..." : "📤 Upload File"}
           <input
             type="file"
             accept="image/*"
             onChange={handleFileChange}
             disabled={uploading}
+            className="hidden"
+          />
+        </label>
+
+        <label className="cursor-pointer inline-flex items-center justify-center px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all duration-200 shadow-sm hover:shadow text-center select-none" title="Save image directly inside Database document">
+          ⚡ Save as Base64 (DB)
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleBase64Convert}
             className="hidden"
           />
         </label>
@@ -164,10 +258,10 @@ export default function CmsForms({
     const contentMap = { ...(pageData.content as unknown as Record<string, string>) };
     setLocalContent(contentMap);
     setLocalSeo({
-      metaTitle: pageData.seo.metaTitle || "",
-      metaDescription: pageData.seo.metaDescription || "",
-      metaKeywords: pageData.seo.metaKeywords || "",
-      schemaJson: pageData.seo.schemaJson || "",
+      metaTitle: pageData.seo?.metaTitle || "",
+      metaDescription: pageData.seo?.metaDescription || "",
+      metaKeywords: pageData.seo?.metaKeywords || "",
+      schemaJson: pageData.seo?.schemaJson || "",
     });
   }, [pageId, cmsData]);
 
@@ -215,7 +309,7 @@ export default function CmsForms({
 
   if (!pageId || !cmsData[pageId]) return null;
 
-  const pageDisplayName = pageId.toUpperCase() + " PAGE";
+  const pageDisplayName = pageId === "site" ? "GLOBAL SITE SETTINGS" : pageId.toUpperCase() + " PAGE";
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto animate-fade-in">
@@ -288,7 +382,7 @@ export default function CmsForms({
         <div className="flex items-center gap-3 p-4 bg-emerald-50 text-emerald-800 border border-emerald-100 rounded-2xl shadow-sm animate-slide-up">
           <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
           <span className="text-xs font-bold">
-            Changes saved successfully! The MongoDB database is updated.
+            Changes saved successfully! Database and Website dynamic files updated.
           </span>
         </div>
       )}
@@ -312,54 +406,228 @@ export default function CmsForms({
           {formType === "content" ? (
             <div className="space-y-6">
               
-              {/* --- HERO SECTION FIELDS --- */}
-              <div className="space-y-4 border-b border-slate-100 pb-5">
-                <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
-                  1. Page Hero Banner Section
-                </h4>
-                <div>
-                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                    Hero Section Main Title / Heading
-                  </label>
-                  <input
-                    type="text"
-                    value={localContent.heroHeading || ""}
-                    onChange={(e) => handleFieldChange("heroHeading", e.target.value)}
-                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                    Hero Section Subheading / Description
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={localContent.heroSubheading || ""}
-                    onChange={(e) => handleFieldChange("heroSubheading", e.target.value)}
-                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium resize-none"
-                  />
-                </div>
-                
-                {/* Hero Image upload */}
-                <ImageUploadField
-                  label="Hero Section Background Image"
-                  value={localContent.heroImage || ""}
-                  onChange={(val) => handleFieldChange("heroImage", val)}
-                />
+              {/* --- SITE GLOBAL SETTINGS --- */}
+              {pageId === "site" && (
+                <div className="space-y-6">
+                  <div className="space-y-4 border-b border-slate-100 pb-5">
+                    <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                      1. Brand Logos & Company Name
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <ImageUploadField
+                        label="Header Navbar Logo"
+                        value={localContent.siteLogo || ""}
+                        onChange={(val) => handleFieldChange("siteLogo", val)}
+                      />
+                      <ImageUploadField
+                        label="Footer Branding Logo"
+                        value={localContent.footerLogo || ""}
+                        onChange={(val) => handleFieldChange("footerLogo", val)}
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Company Name
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.companyName || ""}
+                          onChange={(e) => handleFieldChange("companyName", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Top Bar Welcome Message
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.welcomeMessage || ""}
+                          onChange={(e) => handleFieldChange("welcomeMessage", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
 
-                {/* Hero Image Alt Tag */}
-                <div>
-                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                    Hero Section Image Alt tag (for SEO compliance)
-                  </label>
-                  <input
-                    type="text"
-                    value={localContent.heroImageAlt || ""}
-                    onChange={(e) => handleFieldChange("heroImageAlt", e.target.value)}
-                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
-                  />
+                  <div className="space-y-4 border-b border-slate-100 pb-5">
+                    <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                      2. Global Contact Information
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Primary Phone Number
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.phone || ""}
+                          onChange={(e) => handleFieldChange("phone", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Primary Email Address
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.email || ""}
+                          onChange={(e) => handleFieldChange("email", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium font-mono text-xs placeholder:text-slate-500"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Office Physical Address
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.address || ""}
+                          onChange={(e) => handleFieldChange("address", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Operating Hours
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.workingHours || ""}
+                          onChange={(e) => handleFieldChange("workingHours", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 border-b border-slate-100 pb-5">
+                    <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                      3. Footer Description & CTA Buttons
+                    </h4>
+                    <div>
+                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                        Header Appointment Button Label
+                      </label>
+                      <input
+                        type="text"
+                        value={localContent.appointmentButtonText || ""}
+                        onChange={(e) => handleFieldChange("appointmentButtonText", e.target.value)}
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                        Footer About Paragraph
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={localContent.footerAboutText || ""}
+                        onChange={(e) => handleFieldChange("footerAboutText", e.target.value)}
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium resize-none placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                      4. Social Media Links
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Facebook URL</label>
+                        <input
+                          type="text"
+                          value={localContent.facebook || ""}
+                          onChange={(e) => handleFieldChange("facebook", e.target.value)}
+                          className="w-full px-4 py-2 text-xs border border-slate-700 rounded-xl font-mono bg-slate-900 text-white placeholder:text-slate-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Instagram URL</label>
+                        <input
+                          type="text"
+                          value={localContent.instagram || ""}
+                          onChange={(e) => handleFieldChange("instagram", e.target.value)}
+                          className="w-full px-4 py-2 text-xs border border-slate-700 rounded-xl font-mono bg-slate-900 text-white placeholder:text-slate-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">LinkedIn URL</label>
+                        <input
+                          type="text"
+                          value={localContent.linkedin || ""}
+                          onChange={(e) => handleFieldChange("linkedin", e.target.value)}
+                          className="w-full px-4 py-2 text-xs border border-slate-700 rounded-xl font-mono bg-slate-900 text-white placeholder:text-slate-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">WhatsApp Direct Link / Phone</label>
+                        <input
+                          type="text"
+                          value={localContent.whatsapp || ""}
+                          onChange={(e) => handleFieldChange("whatsapp", e.target.value)}
+                          className="w-full px-4 py-2 text-xs border border-slate-700 rounded-xl font-mono bg-slate-900 text-white placeholder:text-slate-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* --- HERO SECTION FIELDS FOR PAGES --- */}
+              {pageId !== "site" && (
+                <div className="space-y-4 border-b border-slate-100 pb-5">
+                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                    1. Page Hero Banner Section
+                  </h4>
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                      Hero Section Main Title / Heading
+                    </label>
+                    <input
+                      type="text"
+                      value={localContent.heroHeading || ""}
+                      onChange={(e) => handleFieldChange("heroHeading", e.target.value)}
+                      className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                      Hero Section Subheading / Description
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={localContent.heroSubheading || ""}
+                      onChange={(e) => handleFieldChange("heroSubheading", e.target.value)}
+                      className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium resize-none placeholder:text-slate-500"
+                    />
+                  </div>
+                  
+                  {/* Hero Image upload */}
+                  <ImageUploadField
+                    label="Hero Section Background Image"
+                    value={localContent.heroImage || ""}
+                    onChange={(val) => handleFieldChange("heroImage", val)}
+                  />
+
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                      Hero Section Image Alt tag (for SEO compliance)
+                    </label>
+                    <input
+                      type="text"
+                      value={localContent.heroImageAlt || ""}
+                      onChange={(e) => handleFieldChange("heroImageAlt", e.target.value)}
+                      className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* --- HOME PAGE SECTIONS --- */}
               {pageId === "home" && (
@@ -376,7 +644,7 @@ export default function CmsForms({
                         type="text"
                         value={localContent.aboutHeading || ""}
                         onChange={(e) => handleFieldChange("aboutHeading", e.target.value)}
-                        className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
                       />
                     </div>
                     <div>
@@ -387,12 +655,10 @@ export default function CmsForms({
                         rows={3}
                         value={localContent.aboutSubheading || ""}
                         onChange={(e) => handleFieldChange("aboutSubheading", e.target.value)}
-                        className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium resize-none"
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium resize-none placeholder:text-slate-500"
                       />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      
-                      {/* About Showcase Image upload */}
                       <ImageUploadField
                         label="Featured Showcase Image"
                         value={localContent.aboutImage || ""}
@@ -407,77 +673,128 @@ export default function CmsForms({
                           type="text"
                           value={localContent.aboutExperience || ""}
                           onChange={(e) => handleFieldChange("aboutExperience", e.target.value)}
-                          className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
                         />
                       </div>
-                    </div>
-
-                    {/* About Image Alt Tag */}
-                    <div>
-                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                        Showcase Image Alt tag (for SEO compliance)
-                      </label>
-                      <input
-                        type="text"
-                        value={localContent.aboutImageAlt || ""}
-                        onChange={(e) => handleFieldChange("aboutImageAlt", e.target.value)}
-                        className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
-                      />
                     </div>
                   </div>
 
                   <div className="space-y-4 border-b border-slate-100 pb-5">
                     <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
-                      3. Call to Action / Inspection Request Section
+                      3. Why Choose Section (UA Advantage)
                     </h4>
-                    <div>
-                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                        Request Block Title
-                      </label>
-                      <input
-                        type="text"
-                        value={localContent.callbackHeading || ""}
-                        onChange={(e) => handleFieldChange("callbackHeading", e.target.value)}
-                        className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                        Request Block Subtitle
-                      </label>
-                      <input
-                        type="text"
-                        value={localContent.callbackSubheading || ""}
-                        onChange={(e) => handleFieldChange("callbackSubheading", e.target.value)}
-                        className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Sub-Badge Text
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.whyChooseBadge || ""}
+                          onChange={(e) => handleFieldChange("whyChooseBadge", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Main Title / Heading
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.whyChooseHeading || ""}
+                          onChange={(e) => handleFieldChange("whyChooseHeading", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                        />
+                      </div>
                     </div>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-4 border-b border-slate-100 pb-5">
                     <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
-                      4. Rely On / Brand Core Values Section
+                      4. Why Rely On Us Section
                     </h4>
-                    <div>
-                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                        Rely Block Title
-                      </label>
-                      <input
-                        type="text"
-                        value={localContent.relyHeading || ""}
-                        onChange={(e) => handleFieldChange("relyHeading", e.target.value)}
-                        className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Badge Label
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.relyBadge || ""}
+                          onChange={(e) => handleFieldChange("relyBadge", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Rely Heading
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.relyHeading || ""}
+                          onChange={(e) => handleFieldChange("relyHeading", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                        Rely Block Subtitle / Summary
-                      </label>
-                      <input
-                        type="text"
-                        value={localContent.relySubheading || ""}
-                        onChange={(e) => handleFieldChange("relySubheading", e.target.value)}
-                        className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <ImageUploadField
+                        label="Rely Feature Showcase Image"
+                        value={localContent.relyImage || ""}
+                        onChange={(val) => handleFieldChange("relyImage", val)}
+                      />
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          CTA Button Label
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.relyButtonText || ""}
+                          onChange={(e) => handleFieldChange("relyButtonText", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 border-b border-slate-100 pb-5">
+                    <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                      5. Callback Request Section
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Callback Title
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.callbackHeading || ""}
+                          onChange={(e) => handleFieldChange("callbackHeading", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Callback Subtitle
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.callbackSubheading || ""}
+                          onChange={(e) => handleFieldChange("callbackSubheading", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <ImageUploadField
+                        label="Callback Banner Background Image"
+                        value={localContent.callbackBgImage || ""}
+                        onChange={(val) => handleFieldChange("callbackBgImage", val)}
+                      />
+                      <ImageUploadField
+                        label="Call Support Mascot Graphic Image"
+                        value={localContent.callbackSupportImage || ""}
+                        onChange={(val) => handleFieldChange("callbackSupportImage", val)}
                       />
                     </div>
                   </div>
@@ -499,7 +816,7 @@ export default function CmsForms({
                         type="text"
                         value={localContent.overviewHeading || ""}
                         onChange={(e) => handleFieldChange("overviewHeading", e.target.value)}
-                        className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
                       />
                     </div>
                     <div>
@@ -510,7 +827,7 @@ export default function CmsForms({
                         rows={4}
                         value={localContent.overviewText || ""}
                         onChange={(e) => handleFieldChange("overviewText", e.target.value)}
-                        className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium resize-none"
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium resize-none placeholder:text-slate-500"
                       />
                     </div>
                   </div>
@@ -527,7 +844,7 @@ export default function CmsForms({
                         type="text"
                         value={localContent.ehsHeading || ""}
                         onChange={(e) => handleFieldChange("ehsHeading", e.target.value)}
-                        className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
                       />
                     </div>
                     <div>
@@ -538,9 +855,14 @@ export default function CmsForms({
                         rows={3}
                         value={localContent.ehsText || ""}
                         onChange={(e) => handleFieldChange("ehsText", e.target.value)}
-                        className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium resize-none"
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium resize-none placeholder:text-slate-500"
                       />
                     </div>
+                    <ImageUploadField
+                      label="EHS Safety Showcase Image"
+                      value={localContent.ehsImage || ""}
+                      onChange={(val) => handleFieldChange("ehsImage", val)}
+                    />
                   </div>
                 </div>
               )}
@@ -559,7 +881,7 @@ export default function CmsForms({
                       type="text"
                       value={localContent.servicesHeading || ""}
                       onChange={(e) => handleFieldChange("servicesHeading", e.target.value)}
-                      className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                      className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
                     />
                   </div>
                   <div>
@@ -570,7 +892,7 @@ export default function CmsForms({
                       type="text"
                       value={localContent.servicesSubheading || ""}
                       onChange={(e) => handleFieldChange("servicesSubheading", e.target.value)}
-                      className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                      className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
                     />
                   </div>
                 </div>
@@ -590,7 +912,7 @@ export default function CmsForms({
                       type="text"
                       value={localContent.portfolioHeading || ""}
                       onChange={(e) => handleFieldChange("portfolioHeading", e.target.value)}
-                      className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                      className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
                     />
                   </div>
                   <div>
@@ -601,7 +923,7 @@ export default function CmsForms({
                       type="text"
                       value={localContent.portfolioSubheading || ""}
                       onChange={(e) => handleFieldChange("portfolioSubheading", e.target.value)}
-                      className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                      className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
                     />
                   </div>
                 </div>
@@ -621,7 +943,7 @@ export default function CmsForms({
                       type="text"
                       value={localContent.blogHeading || ""}
                       onChange={(e) => handleFieldChange("blogHeading", e.target.value)}
-                      className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                      className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
                     />
                   </div>
                   <div>
@@ -632,7 +954,7 @@ export default function CmsForms({
                       type="text"
                       value={localContent.blogSubheading || ""}
                       onChange={(e) => handleFieldChange("blogSubheading", e.target.value)}
-                      className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                      className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
                     />
                   </div>
                 </div>
@@ -653,7 +975,7 @@ export default function CmsForms({
                         type="text"
                         value={localContent.contactAddress || ""}
                         onChange={(e) => handleFieldChange("contactAddress", e.target.value)}
-                        className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
                       />
                     </div>
                     <div>
@@ -664,7 +986,7 @@ export default function CmsForms({
                         type="text"
                         value={localContent.contactPhone || ""}
                         onChange={(e) => handleFieldChange("contactPhone", e.target.value)}
-                        className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
                       />
                     </div>
                   </div>
@@ -677,7 +999,7 @@ export default function CmsForms({
                         type="text"
                         value={localContent.contactEmail || ""}
                         onChange={(e) => handleFieldChange("contactEmail", e.target.value)}
-                        className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium font-mono text-xs"
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium font-mono text-xs placeholder:text-slate-500"
                       />
                     </div>
                     <div>
@@ -688,7 +1010,7 @@ export default function CmsForms({
                         type="text"
                         value={localContent.contactHours || ""}
                         onChange={(e) => handleFieldChange("contactHours", e.target.value)}
-                        className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
                       />
                     </div>
                   </div>
@@ -708,7 +1030,7 @@ export default function CmsForms({
                     placeholder="e.g. UA Engineering | BCA Certified Plumber"
                     value={localSeo.metaTitle}
                     onChange={(e) => handleSeoChange("metaTitle", e.target.value)}
-                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
                   />
                 </div>
                 <div>
@@ -720,7 +1042,7 @@ export default function CmsForms({
                     placeholder="e.g. engineering, substation, plumbing"
                     value={localSeo.metaKeywords}
                     onChange={(e) => handleSeoChange("metaKeywords", e.target.value)}
-                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
                   />
                 </div>
               </div>
@@ -734,7 +1056,7 @@ export default function CmsForms({
                   placeholder="e.g. UA Engineering provides..."
                   value={localSeo.metaDescription}
                   onChange={(e) => handleSeoChange("metaDescription", e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium resize-none"
+                  className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium resize-none placeholder:text-slate-500"
                 />
               </div>
 
@@ -754,10 +1076,10 @@ export default function CmsForms({
                   placeholder={`{\n  "@context": "https://schema.org",\n  "@type": "LocalBusiness"\n}`}
                   value={localSeo.schemaJson}
                   onChange={(e) => handleSeoChange("schemaJson", e.target.value)}
-                  className={`w-full px-4 py-3 text-xs border rounded-xl outline-none font-mono resize-none bg-white text-slate-950 font-medium focus:ring-1 ${
+                  className={`w-full px-4 py-3 text-xs border rounded-xl outline-none font-mono resize-none bg-slate-900 text-white font-medium placeholder:text-slate-500 focus:ring-1 ${
                     jsonError
                       ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                      : "border-slate-200 focus:border-primary focus:ring-primary"
+                      : "border-slate-700 focus:border-primary focus:ring-primary"
                   }`}
                 />
                 {jsonError && (
@@ -772,7 +1094,7 @@ export default function CmsForms({
           {/* Form Actions Footer */}
           <div className="flex items-center justify-between pt-4 border-t border-slate-100">
             <span className="text-[10px] text-slate-400 font-bold">
-              Updates sync to MongoDB Database instantly
+              Updates sync to Database & Website dynamically
             </span>
             <button
               type="submit"
@@ -801,7 +1123,7 @@ export default function CmsForms({
                 Publish Successful!
               </h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                All changes have been successfully saved, updated, and synchronized to your MongoDB Database cluster.
+                All changes have been successfully saved, updated, and synchronized to your Database & Website.
               </p>
             </div>
 
@@ -832,7 +1154,7 @@ export default function CmsForms({
                 Publish Failed!
               </h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                We encountered an error while communicating with the MongoDB Database server. Please check your network connection or backend state.
+                We encountered an error while communicating with the server. Please check your backend connection.
               </p>
             </div>
 

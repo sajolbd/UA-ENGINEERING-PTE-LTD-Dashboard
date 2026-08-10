@@ -1,15 +1,18 @@
 "use client";
-import { API_BASE } from "../lib/api";
+import { API_BASE, getImageUrl } from "../lib/api";
 
 import React, { useState, useEffect } from "react";
 import {
   FolderGit,
   Plus,
+  Edit,
   Trash2,
   Save,
   CheckCircle,
+  AlertCircle,
   X,
-  MapPin
+  MapPin,
+  Image as ImageIcon
 } from "lucide-react";
 
 interface ProjectItem {
@@ -32,6 +35,8 @@ interface ImageUploadFieldProps {
 function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [darkPreview, setDarkPreview] = useState(false);
+  const [fitContain, setFitContain] = useState(true);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -58,57 +63,125 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
       if (result.success && result.imagePath) {
         onChange(result.imagePath);
       } else {
-        setError(result.error || "Upload failed");
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") {
+            onChange(reader.result);
+          }
+        };
+        reader.readAsDataURL(file);
       }
     } catch {
-      setError("Connection to Express server failed.");
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          onChange(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
     } finally {
       setUploading(false);
     }
   };
 
-  const fullImageUrl = value
-    ? (value.startsWith("http") || value.startsWith("data")
-      ? value
-      : `${API_BASE}${value}`)
-    : "";
+  const handleBase64Convert = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === "string") {
+        onChange(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const fullImageUrl = getImageUrl(value);
+  const isBase64 = value.startsWith("data:");
+  const isUploaded = value.startsWith("/images/uploads/") || value.startsWith("http");
 
   return (
-    <div className="space-y-3">
-      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-        {label}
-      </label>
+    <div className="flex flex-col space-y-3 bg-slate-900/60 p-4 rounded-2xl border border-slate-700 shadow-sm hover:shadow-md transition-all duration-300 w-full">
+      <div className="flex items-center justify-between gap-2">
+        <label className="text-xs font-black uppercase tracking-wider text-slate-300 truncate">
+          {label}
+        </label>
+        {value && (
+          <span className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-full shrink-0 ${
+            isBase64 ? "bg-emerald-950 text-emerald-300 border border-emerald-800" : isUploaded ? "bg-blue-950 text-blue-300 border border-blue-800" : "bg-slate-800 text-slate-300 border border-slate-700"
+          }`}>
+            {isBase64 ? "⚡ DB Direct Base64" : isUploaded ? "🌐 DB Uploaded API" : "📁 Local Asset"}
+          </span>
+        )}
+      </div>
 
-      {value && (
-        <div className="relative group max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 aspect-video shadow-sm transition-all duration-300 hover:shadow-md">
+      {value ? (
+        <div className={`relative group w-full h-44 rounded-xl border border-slate-700 overflow-hidden shadow-inner transition-colors duration-300 ${
+          darkPreview ? "bg-slate-950 text-white" : "bg-slate-900 text-slate-200"
+        }`}>
+          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:12px_12px]" />
+          
           <img
             src={fullImageUrl}
             alt="Uploaded Preview"
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className={`relative z-10 w-full h-full p-2 transition-all duration-300 ${
+              fitContain ? "object-contain" : "object-cover"
+            }`}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.src = "/images/footer-logo.png";
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
-            <span className="text-[10px] text-white font-extrabold tracking-widest uppercase">
-              Current Live Preview
-            </span>
+
+          <div className="absolute top-2 right-2 z-20 flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
+            <button
+              type="button"
+              onClick={() => setDarkPreview(!darkPreview)}
+              className="text-[10px] font-bold bg-slate-950/80 hover:bg-slate-950 text-white backdrop-blur px-2 py-1 rounded-lg border border-white/20 transition shadow-sm"
+            >
+              {darkPreview ? "☀️ Light Bg" : "🌙 Dark Bg"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setFitContain(!fitContain)}
+              className="text-[10px] font-bold bg-slate-950/80 hover:bg-slate-950 text-white backdrop-blur px-2 py-1 rounded-lg border border-white/20 transition shadow-sm"
+            >
+              {fitContain ? "🔍 Contain" : "🖼️ Cover"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onChange("")}
+              className="text-[10px] font-bold bg-red-600/90 hover:bg-red-600 text-white px-2 py-1 rounded-lg transition shadow-sm"
+            >
+              ✕ Remove
+            </button>
           </div>
         </div>
+      ) : (
+        <div className="w-full h-20 rounded-xl border-2 border-dashed border-slate-700 bg-slate-950/40 flex flex-col items-center justify-center text-slate-400 p-3 text-center">
+          <span className="text-xs font-bold">No image selected</span>
+        </div>
       )}
+      
+      <div className="w-full">
+        <div className="relative flex items-center bg-slate-950 border border-slate-700 rounded-xl focus-within:border-primary focus-within:ring-1 focus-within:ring-primary overflow-hidden transition-all duration-300">
+          <span className="pl-3 text-slate-400 text-xs font-mono font-bold select-none">URL</span>
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="/images/projects/sample.png or https://... or data:image/..."
+            className="w-full px-3 py-2 text-xs outline-none bg-slate-950 text-white font-mono font-medium border-none focus:ring-0 placeholder:text-slate-500"
+          />
+        </div>
+      </div>
 
-      <div className="relative flex items-center bg-white border border-slate-200 rounded-xl focus-within:border-primary focus-within:ring-1 focus-within:ring-primary overflow-hidden transition-all duration-300">
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="/images/placeholder.png"
-          className="flex-1 px-3 py-3 text-sm outline-none bg-white text-slate-950 font-medium font-mono text-xs border-none focus:ring-0 focus:outline-none"
-        />
-
-        <label className="cursor-pointer inline-flex items-center justify-center px-4 py-3 bg-slate-50 hover:bg-slate-100 hover:text-slate-900 text-slate-600 text-xs font-bold transition-all border-l border-slate-200 select-none shrink-0 h-full">
-          {uploading ? "Uploading..." : "Upload Image"}
+      <div className="grid grid-cols-2 gap-2 w-full pt-1">
+        <label className="cursor-pointer inline-flex items-center justify-center px-3 py-2 bg-slate-800 hover:bg-primary text-white text-xs font-bold rounded-xl transition-all duration-200 shadow-sm text-center select-none">
+          {uploading ? "Uploading..." : "📤 Upload File"}
           <input
             type="file"
             accept="image/*"
@@ -117,9 +190,19 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
             className="hidden"
           />
         </label>
+
+        <label className="cursor-pointer inline-flex items-center justify-center px-3 py-2 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition-all duration-200 shadow-sm text-center select-none">
+          ⚡ Save Base64 (DB)
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleBase64Convert}
+            className="hidden"
+          />
+        </label>
       </div>
 
-      {error && <span className="text-[10px] font-bold text-red-600 block mt-1">{error}</span>}
+      {error && <span className="text-[10px] font-bold text-red-400 block mt-1">{error}</span>}
     </div>
   );
 }
@@ -131,6 +214,7 @@ export default function ProjectsListEditor() {
 
   // Modal states
   const [showModal, setShowModal] = useState(false);
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Custom Toast State
@@ -164,6 +248,7 @@ export default function ProjectsListEditor() {
   const [gallery, setGallery] = useState<string[]>([""]);
 
   const CATEGORIES = [
+    "Sanitary & Plumbing",
     "Painting & Waterproofing",
     "Renovation & Tiling",
     "Structural & Steel",
@@ -203,23 +288,37 @@ export default function ProjectsListEditor() {
   };
 
   const handleOpenAddModal = () => {
+    setEditingProjectId(null);
     setTitle("");
     setCategory("Painting & Waterproofing");
-    setImage("");
+    setImage("/images/projects/project1.png");
     setDescription("");
-    setLocation("");
+    setLocation("Singapore");
     setGallery([""]);
     setShowModal(true);
   };
 
-  const handleAddProjectSubmit = async (e: React.FormEvent) => {
+  const handleOpenEditModal = (p: ProjectItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const id = p.id || p._id || "";
+    setEditingProjectId(id);
+    setTitle(p.title);
+    setCategory(p.category || "Painting & Waterproofing");
+    setImage(p.image || "");
+    setDescription(p.description || "");
+    setLocation(p.location || "Singapore");
+    setGallery(p.gallery && p.gallery.length > 0 ? p.gallery : [""]);
+    setShowModal(true);
+  };
+
+  const handleAddOrEditProjectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
       showToast("warning", "Missing Title", "Please enter a project title.");
       return;
     }
 
-    const newProject: ProjectItem = {
+    const payload: ProjectItem = {
       title: title.trim(),
       category,
       image: image || "/images/layout/breadcrumb-bg.png",
@@ -229,27 +328,32 @@ export default function ProjectsListEditor() {
     };
 
     try {
-      const res = await fetch(`${API_BASE}/api/projects`, {
-        method: "POST",
+      const isEdit = !!editingProjectId;
+      const url = isEdit ? `${API_BASE}/api/projects/${editingProjectId}` : `${API_BASE}/api/projects`;
+      const method = isEdit ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newProject)
+        body: JSON.stringify(payload)
       });
       const result = await res.json();
       if (result.success) {
         setSaveSuccess(true);
         setShowModal(false);
-        loadProjects(); // Reload list
-        showToast("success", "Project Published", `"${title.trim()}" has been published successfully.`);
+        loadProjects();
+        showToast("success", isEdit ? "Project Updated" : "Project Published", `"${title.trim()}" has been saved successfully.`);
         setTimeout(() => setSaveSuccess(false), 4000);
       } else {
-        showToast("error", "Publish Failed", result.error || "Failed to publish project");
+        showToast("error", "Save Failed", result.error || "Failed to save project");
       }
     } catch {
-      showToast("error", "Connection Error", "Failed to connect to Express REST server.");
+      showToast("error", "Connection Error", "Failed to connect to backend server.");
     }
   };
 
-  const handleDeleteProject = (projectId: string, projectTitle: string) => {
+  const handleDeleteProjectPrompt = (projectId: string, projectTitle: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     setDeleteConfirm({ show: true, projectId, projectTitle });
   };
 
@@ -257,7 +361,6 @@ export default function ProjectsListEditor() {
     const { projectId, projectTitle } = deleteConfirm;
     setDeleteConfirm({ show: false, projectId: "", projectTitle: "" });
 
-    // Filter out the project from the current list
     const updatedProjects = projects.filter((p) => (p.id || p._id) !== projectId);
 
     try {
@@ -272,7 +375,7 @@ export default function ProjectsListEditor() {
         showToast("error", "Delete Failed", result.error || "Failed to delete project");
       }
     } catch {
-      showToast("error", "Connection Error", "Failed to connect to Express REST server.");
+      showToast("error", "Connection Error", "Failed to connect to backend server.");
     }
   };
 
@@ -293,343 +396,324 @@ export default function ProjectsListEditor() {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto animate-fade-in">
+    <div className="space-y-6 max-w-5xl mx-auto animate-fade-in pb-12">
+      {/* Toast Notification */}
+      {toast.show && (
+        <div className={`fixed top-5 right-5 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl border backdrop-blur-md animate-slide-in-right ${
+          toast.type === "success" ? "bg-emerald-950/90 border-emerald-700 text-emerald-200" : toast.type === "error" ? "bg-rose-950/90 border-rose-700 text-rose-200" : "bg-amber-950/90 border-amber-700 text-amber-200"
+        }`}>
+          {toast.type === "success" ? <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" /> : <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />}
+          <div>
+            <h5 className="text-xs font-black">{toast.title}</h5>
+            <p className="text-[11px] font-medium opacity-90">{toast.message}</p>
+          </div>
+        </div>
+      )}
+
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-white border border-slate-100 rounded-2xl shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-slate-900 border border-slate-800 rounded-2xl shadow-md">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-primary-light text-primary rounded-2xl border border-primary/5">
-            <FolderGit className="w-6 h-6" />
+          <div className="p-3 bg-primary/20 text-primary rounded-2xl border border-primary/30">
+            <FolderGit className="w-6 h-6 text-primary" />
           </div>
           <div>
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
               Completed Works Portfolio
             </span>
-            <h3 className="text-lg font-black text-secondary font-display">
-              Projects Portfolio Manager
+            <h3 className="text-lg font-black text-white font-display">
+              Projects Showcase Manager
             </h3>
           </div>
         </div>
 
         <button
           onClick={handleOpenAddModal}
-          className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-sm transition-all active:scale-95 self-start sm:self-auto"
+          className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-lg shadow-primary/20 transition-all active:scale-95 self-start sm:self-auto select-none"
         >
-          <Plus className="w-4.5 h-4.5" />
+          <Plus className="w-4 h-4" />
           <span>Add New Project</span>
         </button>
       </div>
 
       {/* SAVE SUCCESS NOTIFICATION */}
       {saveSuccess && (
-        <div className="flex items-center gap-3 p-4 bg-emerald-50 text-emerald-800 border border-emerald-100 rounded-2xl shadow-sm animate-slide-up">
-          <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+        <div className="flex items-center gap-3 p-4 bg-emerald-950/80 text-emerald-200 border border-emerald-800 rounded-2xl shadow-sm animate-slide-up">
+          <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
           <span className="text-xs font-bold">
-            New project successfully published and synced to Website gallery!
+            Project portfolio successfully saved and synced to Website gallery!
           </span>
         </div>
       )}
 
-      {/* Search Input Filter bar */}
+      {/* Search Filter input */}
       <div className="relative">
         <input
           type="text"
           placeholder="Filter portfolio by title, category, or location..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full px-4 py-3 pl-10 border border-slate-200 rounded-2xl outline-none bg-white text-slate-900 text-xs font-bold focus:border-primary transition-all duration-300"
+          className="w-full px-4 py-3 pl-10 border border-slate-700 rounded-2xl outline-none bg-slate-900 text-white text-xs font-bold focus:border-primary transition-all duration-300 placeholder:text-slate-500"
         />
-
-
+        <FolderGit className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
       </div>
 
       {/* Projects Grid Display List */}
-      {
-        filteredProjects.length === 0 ? (
-          <div className="text-center py-16 bg-white border border-slate-100 rounded-2xl">
-            <p className="text-sm font-bold text-slate-400">
-              No projects found matching the filter query.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProjects.map((p) => {
-              const id = p.id || p._id || "";
-              return (
-                <div
-                  key={id}
-                  className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
-                >
-                  <div>
-                    {/* Thumbnail Banner */}
-                    <div className="relative aspect-video w-full bg-slate-50 border-b border-slate-50">
-                      <img
-                        src={p.image.startsWith("/") ? `${API_BASE}${p.image}` : p.image}
-                        alt={p.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = "/images/footer-logo.png";
-                        }}
-                      />
-                      <span className="absolute top-3 left-3 bg-secondary text-white text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md tracking-wider">
-                        {p.category}
-                      </span>
-                    </div>
-
-                    <div className="p-4 space-y-2">
-                      <div className="flex items-center gap-1 text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">
-                        <MapPin className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-                        <span>{p.location}</span>
-                      </div>
-
-                      <h4 className="text-xs font-black text-secondary leading-snug line-clamp-1">
-                        {p.title}
-                      </h4>
-
-                      <p className="text-[10px] text-slate-400 line-clamp-2 leading-relaxed">
-                        {p.description}
-                      </p>
-                    </div>
+      {filteredProjects.length === 0 ? (
+        <div className="text-center py-16 bg-slate-900 border border-slate-800 rounded-2xl p-6">
+          <p className="text-sm font-bold text-slate-400">
+            No projects found matching the filter query.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProjects.map((p) => {
+            const id = p.id || p._id || "";
+            return (
+              <div
+                key={id}
+                className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md hover:border-slate-700 transition-all flex flex-col justify-between"
+              >
+                <div>
+                  {/* Thumbnail Banner */}
+                  <div className="relative aspect-video w-full bg-slate-950 border-b border-slate-800">
+                    <img
+                      src={getImageUrl(p.image)}
+                      alt={p.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "/images/footer-logo.png";
+                      }}
+                    />
+                    <span className="absolute top-3 left-3 bg-primary text-white text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md tracking-wider shadow-sm">
+                      {p.category}
+                    </span>
                   </div>
 
-                  <div className="p-4 pt-0 flex justify-between items-center border-t border-slate-50/50 mt-2">
-                    <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">
-                      {p.gallery?.length || 0} Gallery Items
-                    </span>
+                  <div className="p-4 space-y-2">
+                    <div className="flex items-center gap-1 text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">
+                      <MapPin className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                      <span>{p.location}</span>
+                    </div>
+
+                    <h4 className="text-sm font-black text-white leading-snug line-clamp-1">
+                      {p.title}
+                    </h4>
+
+                    <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                      {p.description}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-4 pt-3 flex justify-between items-center border-t border-slate-800 bg-slate-950/40">
+                  <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">
+                    {p.gallery?.length || 0} Gallery Items
+                  </span>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={(e) => handleOpenEditModal(p, e)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold border border-slate-700 transition"
+                      title="Edit Project Details"
+                    >
+                      <Edit className="w-3.5 h-3.5 text-primary" />
+                      <span>Edit</span>
+                    </button>
 
                     <button
-                      onClick={() => handleDeleteProject(id, p.title)}
-                      className="p-1.5 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-lg transition-colors"
+                      onClick={(e) => handleDeleteProjectPrompt(id, p.title, e)}
+                      className="p-1.5 bg-slate-800 hover:bg-red-950/80 text-slate-400 hover:text-red-400 rounded-xl border border-slate-700 transition"
                       title="Delete Project"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )
-      }
-
-      {/* --- ADD NEW PROJECT MODAL DIALOG --- */}
-      {
-        showModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm z-50 overflow-y-auto p-4 py-8">
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto thin-scrollbar relative space-y-6 animate-scale-up">
-
-              {/* Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <Plus className="w-5 h-5 text-primary" />
-                  <h3 className="text-sm font-black text-secondary">
-                    Add Completed Project
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="p-1 hover:bg-slate-100 rounded-full text-slate-400 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
               </div>
+            );
+          })}
+        </div>
+      )}
 
-              <form onSubmit={handleAddProjectSubmit} className="space-y-5">
+      {/* --- ADD / EDIT PROJECT MODAL FORM --- */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-slate-950/80 backdrop-blur-md z-50 overflow-y-auto p-4 py-8">
+          <div className="bg-slate-900 rounded-3xl border border-slate-700 shadow-2xl p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto thin-scrollbar relative space-y-5 text-white animate-scale-up">
+            
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <FolderGit className="w-5 h-5 text-primary" />
+                <h3 className="text-sm font-black text-white">
+                  {editingProjectId ? "Edit Project Portfolio Details" : "Add New Completed Project"}
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowModal(false)}
+                className="p-1 hover:bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-                {/* Grid 2 Cols */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Title */}
-                  <div>
-                    <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                      Project Title
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Roof Tile Waterproofing Coating"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
-                      required
-                    />
-                  </div>
-
-                  {/* Category Selector */}
-                  <div>
-                    <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                      Project Category
-                    </label>
-                    <select
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
-                      className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-bold"
-                    >
-                      {CATEGORIES.map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Location */}
+            <form onSubmit={handleAddOrEditProjectSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                    Project Location (Singapore Area)
+                    Project Title / Header
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Sembawang, Singapore"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium"
-                    required
+                    placeholder="e.g. Controlled Concrete Demolition"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
                   />
                 </div>
 
-                {/* Featured Image */}
-                <ImageUploadField
-                  label="Featured Project Cover Image"
-                  value={image}
-                  onChange={setImage}
-                />
-
-                {/* Description */}
                 <div>
                   <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                    Description Narrative
+                    Service Category Tag
                   </label>
-                  <textarea
-                    rows={3}
-                    placeholder="Description of concrete works, painting application coatings or solar structures..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white text-slate-950 font-medium resize-none"
-                    required
-                  />
-                </div>
-
-                {/* Dynamic Project gallery image uploads list */}
-                <div className="space-y-4 border-t border-slate-100 pt-4">
-                  <div className="flex items-center justify-between">
-                    <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-                      Additional Gallery Images
-                    </label>
-                    <button
-                      type="button"
-                      onClick={handleAddGalleryItem}
-                      className="text-[10px] font-extrabold text-primary hover:underline inline-flex items-center gap-1"
-                    >
-                      <Plus className="w-3.5 h-3.5" /> Add Gallery Row
-                    </button>
-                  </div>
-
-                  <div className="space-y-3">
-                    {gallery.map((item, idx) => (
-                      <div key={idx} className="flex gap-2 items-start bg-slate-50/50 p-3 rounded-2xl border border-slate-100 relative">
-                        <div className="flex-1 space-y-2">
-                          <ImageUploadField
-                            label={`Gallery Image #${idx + 1}`}
-                            value={item}
-                            onChange={(val) => handleGalleryChange(idx, val)}
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveGalleryItem(idx)}
-                          className="p-1.5 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-lg transition-colors self-start mt-4"
-                        >
-                          <Trash2 className="w-4.5 h-4.5" />
-                        </button>
-                      </div>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium"
+                  >
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
                     ))}
-                  </div>
+                  </select>
                 </div>
+              </div>
 
-                {/* Save footer buttons */}
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+              <div>
+                <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Location / Site Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Bedok Mall, Singapore"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                />
+              </div>
+
+              <ImageUploadField
+                label="Featured Showcase Image"
+                value={image}
+                onChange={setImage}
+              />
+
+              <div>
+                <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Project Description / Engineering Summary
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Controlled hacking and demolition of reinforced concrete partition walls..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium resize-none placeholder:text-slate-500"
+                />
+              </div>
+
+              {/* Dynamic Gallery List */}
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                    Project Image Gallery Photos
+                  </label>
                   <button
                     type="button"
-                    onClick={() => setShowModal(false)}
-                    className="px-4 py-2.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+                    onClick={handleAddGalleryItem}
+                    className="text-[10px] font-extrabold text-primary hover:underline inline-flex items-center gap-1"
                   >
-                    Cancel
-                  </button>
-
-                  <button
-                    type="submit"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl shadow-md text-xs font-bold transition-all active:scale-95"
-                  >
-                    <Save className="w-4 h-4" />
-                    <span>Publish Project</span>
+                    <Plus className="w-3.5 h-3.5" /> Add Gallery Image
                   </button>
                 </div>
 
-              </form>
-            </div>
-          </div>
-        )
-      }
+                {gallery.map((gItem, idx) => (
+                  <div key={idx} className="p-3 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-extrabold text-slate-400 uppercase">
+                        Gallery Image #{idx + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveGalleryItem(idx)}
+                        className="text-[10px] font-bold text-red-400 hover:text-red-300"
+                      >
+                        Remove
+                      </button>
+                    </div>
 
-      {/* Dynamic Slide-in Toast Notification */}
-      {toast.show && (
-        <div className="fixed top-5 right-5 z-[9999] flex items-center gap-3 p-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-100 max-w-sm animate-slide-in-right">
-          <div className={`p-2.5 rounded-xl ${
-            toast.type === "success"
-              ? "bg-emerald-50 text-emerald-600"
-              : toast.type === "error"
-              ? "bg-rose-50 text-rose-600"
-              : "bg-amber-50 text-amber-600"
-          }`}>
-            {toast.type === "success" ? (
-              <CheckCircle className="w-5 h-5" />
-            ) : (
-              <X className="w-5 h-5" />
-            )}
+                    <ImageUploadField
+                      label=""
+                      value={gItem}
+                      onChange={(val) => handleGalleryChange(idx, val)}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl shadow-md transition"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{editingProjectId ? "Update Project" : "Publish Project"}</span>
+                </button>
+              </div>
+            </form>
           </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="text-xs font-black text-secondary">{toast.title}</h4>
-            <p className="text-[10px] text-slate-500 font-medium leading-relaxed truncate">{toast.message}</p>
-          </div>
-          <button
-            onClick={() => setToast({ ...toast, show: false })}
-            className="p-1 hover:bg-slate-100 rounded-full text-slate-400"
-          >
-            <X className="w-4 h-4" />
-          </button>
         </div>
       )}
 
-      {/* Custom Delete Confirmation Modal */}
+      {/* --- CONFIRMATION MODAL FOR DELETION --- */}
       {deleteConfirm.show && (
-        <div className="fixed inset-0 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm z-[9998] animate-fade-in">
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl p-6 max-w-sm w-full mx-4 text-center space-y-6 animate-scale-up">
-            <div className="mx-auto w-12 h-12 bg-rose-50 text-rose-600 rounded-full border border-rose-100 flex items-center justify-center shadow-inner">
-              <Trash2 className="w-6 h-6" />
+        <div className="fixed inset-0 flex items-center justify-center bg-slate-950/80 backdrop-blur-md z-50 p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6 max-w-sm w-full text-center space-y-5 animate-scale-up text-white shadow-2xl">
+            <div className="w-14 h-14 bg-red-950 text-red-400 rounded-full border border-red-800 flex items-center justify-center mx-auto">
+              <Trash2 className="w-7 h-7" />
             </div>
+
             <div className="space-y-2">
-              <h3 className="text-sm font-black text-secondary">Delete Project</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Are you sure you want to permanently delete <span className="font-extrabold text-secondary">&ldquo;{deleteConfirm.projectTitle}&rdquo;</span>? This operation is permanent.
+              <h4 className="text-base font-black">
+                Delete Project?
+              </h4>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Are you sure you want to permanently delete <strong className="text-white">"{deleteConfirm.projectTitle}"</strong>?
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-3 pt-2">
+
+            <div className="flex items-center justify-center gap-3 pt-2">
               <button
                 onClick={() => setDeleteConfirm({ show: false, projectId: "", projectTitle: "" })}
-                className="py-2.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+                className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition"
               >
-                Keep Project
+                Cancel
               </button>
               <button
                 onClick={confirmDeleteProject}
-                className="py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95"
+                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition shadow-md"
               >
-                Delete Project
+                Yes, Delete
               </button>
             </div>
           </div>
         </div>
       )}
-
-    </div >
+    </div>
   );
 }
