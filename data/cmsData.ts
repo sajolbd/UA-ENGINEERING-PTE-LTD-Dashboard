@@ -63,6 +63,7 @@ export interface HomeContent {
   reviewsHeading: string;
   processBadge: string;
   processHeading: string;
+  [key: string]: any;
 }
 
 export interface AboutContent {
@@ -204,10 +205,32 @@ export const initialCmsData: CmsDatabase = {
       aboutExperience: "15",
       whyChooseBadge: "UA ADVANTAGE",
       whyChooseHeading: "Why Choose UA Engineering?",
+      whyCard1Title: "Complete Building Solutions",
+      whyCard1Desc: "From renovation and structural works to M&E, glazing, waterproofing, and solar, one trusted team handles every project.",
+      whyCard2Title: "Quality Workmanship",
+      whyCard2Desc: "Every project is completed with skilled workmanship, quality materials, and attention to detail for lasting performance.",
+      whyCard3Title: "Honest & Transparent Pricing",
+      whyCard3Desc: "Clear quotations, fair pricing, and no hidden costs, so you can plan your project with confidence.",
+      whyCard4Title: "Reliable Project Management",
+      whyCard4Desc: "We coordinate every stage efficiently, keeping projects organized, on schedule, and completed to high standards.",
+      issue1Title: "Multiple Contractors to Manage",
+      issue1Desc: "Hiring separate contractors often leads to delays, communication gaps, and inconsistent workmanship across different stages of the project.",
+      issue2Title: "Poor Workmanship",
+      issue2Desc: "Low-quality materials and rushed installation can result in recurring repairs, higher maintenance costs, and reduced durability.",
+      issue3Title: "Unclear Pricing",
+      issue3Desc: "Unexpected charges and incomplete quotations can increase project costs and create unnecessary stress during construction.",
+      issue4Title: "Delays & Poor Communication",
+      issue4Desc: "Lack of planning and communication often causes missed deadlines, project disruptions, and uncertainty throughout the construction process.",
       relyBadge: "RELIABILITY & TRUST",
       relyHeading: "Why Do You Rely On Us?",
       relyImage: "/images/home/rely/rely-main.png",
       relyButtonText: "Talk to an Expert",
+      relyFeature1Title: "Honest & Transparent Pricing",
+      relyFeature1Desc: "Receive clear, detailed quotations with fair pricing and no hidden costs, so you know exactly what to expect before work begins.",
+      relyFeature2Title: "Quality Work That Lasts",
+      relyFeature2Desc: "We focus on quality materials, skilled workmanship, and proper installation to deliver durable solutions you can depend on for years.",
+      relyFeature3Title: "Reliable Service, Every Step",
+      relyFeature3Desc: "From the first site visit to project handover, we keep you informed, stay on schedule, and ensure a smooth experience.",
       callbackHeading: "Let Us Call You",
       callbackSubheading: "Need help now? Send a few details - we'll call you shortly.",
       callbackBgImage: "/images/home/call/callback-bg.png",
@@ -215,8 +238,21 @@ export const initialCmsData: CmsDatabase = {
       callbackButtonText: "Submit Now",
       reviewsBadge: "CLIENT TESTIMONIALS",
       reviewsHeading: "What Our Clients Say About UA Engineering",
-      processBadge: "OUR WORK PROCESS",
-      processHeading: "How We Deliver Engineering Excellence"
+      processBadge: "HOW IT WORKS",
+      processHeading: "Our Simple & Transparent Work Process",
+      processSubheading: "From site inspection and quotation to professional installation and project handover, we ensure quality, transparency, and customer satisfaction at every stage.",
+      processStep1Title: "Free Consultation & Site Visit",
+      processStep1Desc: "We assess your requirements, inspect the site, discuss solutions, and understand your project goals.",
+      processStep1Image: "/images/home/process/assessment.png",
+      processStep2Title: "Quotation & Project Planning",
+      processStep2Desc: "Provide a detailed quotation, project scope, material recommendations, timeline, and execution plan with transparent pricing.",
+      processStep2Image: "/images/home/process/planning.png",
+      processStep3Title: "Professional Execution",
+      processStep3Desc: "Our skilled team completes every project using quality materials, safe practices, and strict workmanship standards.",
+      processStep3Image: "/images/home/process/execution.png",
+      processStep4Title: "Final Inspection & Handover",
+      processStep4Desc: "We conduct final quality checks, ensure everything meets expectations, and hand over your completed project with confidence.",
+      processStep4Image: "/images/home/process/handover.png"
     },
     seo: {
       metaTitle: "UA Engineering PTE. LTD. | Singapore Engineering & Renovation",
