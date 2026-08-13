@@ -72,22 +72,58 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
       if (result.success && result.imagePath) {
         onChange(result.imagePath);
       } else {
-        setError(result.error || "Upload failed");
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") {
+            onChange(reader.result);
+          }
+        };
+        reader.readAsDataURL(file);
       }
     } catch {
-      setError("Connection to Express server failed.");
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          onChange(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
     } finally {
       setUploading(false);
     }
   };
 
+  const handleBase64Convert = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === "string") {
+        onChange(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   const fullImageUrl = getImageUrl(value);
+  const isBase64 = value.startsWith("data:");
+  const isUploaded = value.startsWith("/images/uploads/") || value.startsWith("http");
 
   return (
     <div className="space-y-3">
-      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-        {label}
-      </label>
+      <div className="flex items-center justify-between gap-2">
+        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+          {label}
+        </label>
+        {value && (
+          <span className={`text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full shrink-0 ${
+            isBase64 ? "bg-emerald-100 text-emerald-800" : isUploaded ? "bg-blue-100 text-blue-800" : "bg-slate-100 text-slate-700"
+          }`}>
+            {isBase64 ? "⚡ Direct Base64" : isUploaded ? "🌐 Server Upload" : "📁 Local Asset"}
+          </span>
+        )}
+      </div>
 
       {value && (
         <div className="relative group max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 aspect-video shadow-sm transition-all duration-300 hover:shadow-md">
@@ -100,10 +136,17 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
               target.src = "/images/footer-logo.png";
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between p-3">
             <span className="text-[10px] text-white font-extrabold tracking-widest uppercase">
               Current Live Preview
             </span>
+            <button
+              type="button"
+              onClick={() => onChange("")}
+              className="text-[10px] font-bold bg-rose-600 hover:bg-rose-700 text-white px-2 py-0.5 rounded-md shadow-sm"
+            >
+              Remove
+            </button>
           </div>
         </div>
       )}
@@ -113,17 +156,27 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="/images/placeholder.png"
+          placeholder="/images/placeholder.png or data:image/..."
           className="flex-1 px-3 py-3 text-sm outline-none bg-white text-slate-950 font-medium font-mono text-xs border-none focus:ring-0 focus:outline-none"
         />
 
-        <label className="cursor-pointer inline-flex items-center justify-center px-4 py-3 bg-slate-50 hover:bg-slate-100 hover:text-slate-900 text-slate-600 text-xs font-bold transition-all border-l border-slate-200 select-none shrink-0 h-full">
-          {uploading ? "Uploading..." : "Upload Image"}
+        <label className="cursor-pointer inline-flex items-center justify-center px-3 py-3 bg-slate-50 hover:bg-slate-100 hover:text-slate-900 text-slate-600 text-xs font-bold transition-all border-l border-slate-200 select-none shrink-0 h-full">
+          {uploading ? "Uploading..." : "📤 Upload File"}
           <input
             type="file"
             accept="image/*"
             onChange={handleFileChange}
             disabled={uploading}
+            className="hidden"
+          />
+        </label>
+
+        <label className="cursor-pointer inline-flex items-center justify-center px-3 py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold transition-all border-l border-slate-200 select-none shrink-0 h-full">
+          ⚡ Base64
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleBase64Convert}
             className="hidden"
           />
         </label>
