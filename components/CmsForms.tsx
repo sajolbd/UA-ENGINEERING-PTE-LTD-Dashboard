@@ -629,6 +629,63 @@ export default function CmsForms({
                 </div>
               )}
 
+              {/* --- HOME HERO CAROUSEL SLIDERS EDITOR (7 SLIDERS) --- */}
+              {pageId === "home" && (
+                <div className="space-y-4 border-b border-slate-100 pb-5">
+                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                    1.1 Hero Carousel Sliders (7 Interactive Sliders Control)
+                  </h4>
+                  <p className="text-[11px] text-slate-400 font-medium pb-2">
+                    Customize titles and descriptions for each of the 7 automatic rotating hero banner slides displayed on the website homepage.
+                  </p>
+                  <div className="space-y-4">
+                    {[
+                      { id: 1, title: "Slide 1: General & Renovation Services" },
+                      { id: 2, title: "Slide 2: Comprehensive Engineering Team" },
+                      { id: 3, title: "Slide 3: Painting & Surface Protection" },
+                      { id: 4, title: "Slide 4: Roof Repairs & Waterproofing" },
+                      { id: 5, title: "Slide 5: Electrical Solutions & Rewiring" },
+                      { id: 6, title: "Slide 6: Plumbing & Sanitary Services" },
+                      { id: 7, title: "Slide 7: Custom Steel Fabrication" },
+                    ].map((slide) => {
+                      const headingKey = `heroSlide${slide.id}Heading`;
+                      const subheadingKey = `heroSlide${slide.id}Subheading`;
+                      return (
+                        <div key={slide.id} className="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl space-y-3">
+                          <span className="text-[10px] font-black uppercase text-primary tracking-wider">
+                            {slide.title}
+                          </span>
+                          <div>
+                            <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
+                              Slide {slide.id} Main Title / Heading
+                            </label>
+                            <input
+                              type="text"
+                              value={localContent[headingKey] || ""}
+                              onChange={(e) => handleFieldChange(headingKey, e.target.value)}
+                              placeholder={`Enter main heading for slide ${slide.id}...`}
+                              className="w-full px-4 py-2 text-xs border border-slate-700 rounded-xl focus:border-primary outline-none bg-slate-900 text-white font-medium"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
+                              Slide {slide.id} Subheading / Description
+                            </label>
+                            <textarea
+                              rows={2}
+                              value={localContent[subheadingKey] || ""}
+                              onChange={(e) => handleFieldChange(subheadingKey, e.target.value)}
+                              placeholder={`Enter description for slide ${slide.id}...`}
+                              className="w-full px-4 py-2 text-xs border border-slate-700 rounded-xl focus:border-primary outline-none bg-slate-900 text-white font-medium resize-none"
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* --- HOME PAGE SECTIONS --- */}
               {pageId === "home" && (
                 <div className="space-y-6">

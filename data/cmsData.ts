@@ -26,6 +26,20 @@ export interface SiteContent {
 export interface HomeContent {
   heroHeading: string;
   heroSubheading: string;
+  heroSlide1Heading?: string;
+  heroSlide1Subheading?: string;
+  heroSlide2Heading?: string;
+  heroSlide2Subheading?: string;
+  heroSlide3Heading?: string;
+  heroSlide3Subheading?: string;
+  heroSlide4Heading?: string;
+  heroSlide4Subheading?: string;
+  heroSlide5Heading?: string;
+  heroSlide5Subheading?: string;
+  heroSlide6Heading?: string;
+  heroSlide6Subheading?: string;
+  heroSlide7Heading?: string;
+  heroSlide7Subheading?: string;
   heroImage: string;
   heroImageAlt: string;
   heroCtaText: string;
@@ -166,6 +180,20 @@ export const initialCmsData: CmsDatabase = {
     content: {
       heroHeading: "From Renovation to Painting, Roofing, Electrical, Plumbing and Steel Works.",
       heroSubheading: "We handle it all with expertise, reliability, and guaranteed quality.",
+      heroSlide1Heading: "From Renovation to Painting, Roofing, Electrical, Plumbing and Steel Works.",
+      heroSlide1Subheading: "We handle it all with expertise, reliability, and guaranteed quality.",
+      heroSlide2Heading: "Everything Your Property Needs. One Trusted Engineering Team.",
+      heroSlide2Subheading: "From renovations and reinstatement to electrical, plumbing, painting, roofing, steel fabrication, waterproofing, and maintenance - we handle every project with precision and professionalism.",
+      heroSlide3Heading: "Fresh Paint. Lasting Protection. Stunning Results.",
+      heroSlide3Subheading: "Interior and exterior painting services that enhance appearance, protect surfaces, and increase the value of your property.",
+      heroSlide4Heading: "Roof Problems? We Fix Them Before They Cost You More.",
+      heroSlide4Subheading: "Professional roof repairs, waterproofing, leak prevention, and complete roofing solutions to keep your property safe in every season.",
+      heroSlide5Heading: "Safe, Reliable Electrical Solutions for Every Building",
+      heroSlide5Subheading: "From new installations and rewiring to troubleshooting and upgrades, we deliver electrical work that keeps your property running safely.",
+      heroSlide6Heading: "Professional Plumbing Services Without the Hassle",
+      heroSlide6Subheading: "Leak repairs, pipe replacement, drainage solutions, sanitary installations, and preventive maintenance-all completed with quality workmanship.",
+      heroSlide7Heading: "Custom Steel Fabrication Built for Strength & Precision",
+      heroSlide7Subheading: "We design, fabricate, and install steel structures, staircases, platforms, railings, and custom metal works for commercial and industrial projects.",
       heroImage: "/images/home/hero/hero-bg.png",
       heroImageAlt: "UA Engineering Renovation and Steel Fabrications Banner",
       heroCtaText: "Book An Appointment",
