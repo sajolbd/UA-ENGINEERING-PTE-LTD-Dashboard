@@ -420,7 +420,7 @@ export default function CmsForms({
   const pageId = activeTab.split("_")[0] as keyof CmsDatabase;
   const [formType, setFormType] = useState<"content" | "seo">("content");
 
-  const [localContent, setLocalContent] = useState<Record<string, string>>({});
+  const [localContent, setLocalContent] = useState<Record<string, any>>({});
   const [localSeo, setLocalSeo] = useState<PageSeo>({
     metaTitle: "",
     metaDescription: "",
@@ -441,7 +441,7 @@ export default function CmsForms({
     if (!pageId || !cmsData[pageId]) return;
 
     const pageData = cmsData[pageId];
-    const contentMap = { ...(pageData.content as unknown as Record<string, string>) };
+    const contentMap = { ...(pageData.content as unknown as Record<string, any>) };
 
     // Fill defaults for 7 Hero Sliders on Home Page
     if (pageId === "home") {
@@ -474,7 +474,7 @@ export default function CmsForms({
     });
   }, [pageId, cmsData]);
 
-  const handleFieldChange = (field: string, value: string) => {
+  const handleFieldChange = (field: string, value: any) => {
     setLocalContent((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -1437,69 +1437,209 @@ export default function CmsForms({
                       />
                     </div>
 
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-300 pt-2">
-                      7.1 Video Testimonials Cards (3 Client Cards)
-                    </h5>
+                    <div className="flex items-center justify-between pt-2">
+                      <h5 className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                        7.1 Dynamic Video Testimonials List Manager
+                      </h5>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentList = Array.isArray(localContent.testimonials) ? [...localContent.testimonials] : [
+                            {
+                              id: "1",
+                              name: localContent.testimonial1Name || "Marcus Tan",
+                              role: localContent.testimonial1Role || "Property Manager, CapitaLand",
+                              project: localContent.testimonial1Project || "Commercial Waterproofing",
+                              quote: localContent.testimonial1Quote || "UA Engineering did an outstanding job waterproofing our commercial facade and basement...",
+                              thumbnail: localContent.testimonial1Thumbnail || "/images/home/projects/project-waterproofing.png",
+                              videoId: localContent.testimonial1VideoId || "A2y8jK-iGSw",
+                            },
+                            {
+                              id: "2",
+                              name: localContent.testimonial2Name || "Sarah Lim",
+                              role: localContent.testimonial2Role || "Homeowner, Sentosa Cove",
+                              project: localContent.testimonial2Project || "Premium Renovation & Fit-out",
+                              quote: localContent.testimonial2Quote || "Their attention to detail during our home renovation was exceptional...",
+                              thumbnail: localContent.testimonial2Thumbnail || "/images/home/projects/project-drywall.png",
+                              videoId: localContent.testimonial2VideoId || "G5-o475Xz1Y",
+                            },
+                            {
+                              id: "3",
+                              name: localContent.testimonial3Name || "David Hendricks",
+                              role: localContent.testimonial3Role || "Facilities Director, Jurong Hub",
+                              project: localContent.testimonial3Project || "Industrial Electrical Upgrade",
+                              quote: localContent.testimonial3Quote || "Superb coordination and safety protocol adherence...",
+                              thumbnail: localContent.testimonial3Thumbnail || "/images/home/projects/project-electrical.png",
+                              videoId: localContent.testimonial3VideoId || "yY19i3889p4",
+                            },
+                          ];
+                          const newItem = {
+                            id: Date.now().toString(),
+                            name: "New Client Name",
+                            role: "Client Role / Company",
+                            project: "Project Title",
+                            quote: "Write client testimonial review quote here...",
+                            thumbnail: "/images/home/projects/project-waterproofing.png",
+                            videoId: "A2y8jK-iGSw",
+                          };
+                          handleFieldChange("testimonials", [...currentList, newItem]);
+                        }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-primary hover:bg-primary/90 text-white rounded-lg transition-all duration-300 shadow-sm"
+                      >
+                        <span>+ Add New Testimonial</span>
+                      </button>
+                    </div>
+
                     <div className="space-y-4">
-                      {[1, 2, 3].map((num) => (
-                        <div key={num} className="p-4 bg-slate-950/70 border border-slate-800 rounded-xl space-y-3">
-                          <span className="text-xs font-black uppercase text-primary">Client Video Testimonial #{num}</span>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <div>
-                              <label className="block text-[9px] font-extrabold uppercase text-slate-400">Client Name</label>
-                              <input
-                                type="text"
-                                value={localContent[`testimonial${num}Name`] || ""}
-                                onChange={(e) => handleFieldChange(`testimonial${num}Name`, e.target.value)}
-                                className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
-                              />
+                      {((Array.isArray(localContent.testimonials) && localContent.testimonials.length > 0)
+                        ? localContent.testimonials
+                        : [
+                            {
+                              id: "1",
+                              name: localContent.testimonial1Name || "Marcus Tan",
+                              role: localContent.testimonial1Role || "Property Manager, CapitaLand",
+                              project: localContent.testimonial1Project || "Commercial Waterproofing",
+                              quote: localContent.testimonial1Quote || "UA Engineering did an outstanding job waterproofing our commercial facade and basement. Excellent workmanship, clean execution, and no water leaks since completion!",
+                              thumbnail: localContent.testimonial1Thumbnail || "/images/home/projects/project-waterproofing.png",
+                              videoId: localContent.testimonial1VideoId || "A2y8jK-iGSw",
+                            },
+                            {
+                              id: "2",
+                              name: localContent.testimonial2Name || "Sarah Lim",
+                              role: localContent.testimonial2Role || "Homeowner, Sentosa Cove",
+                              project: localContent.testimonial2Project || "Premium Renovation & Fit-out",
+                              quote: localContent.testimonial2Quote || "Their attention to detail during our home renovation was exceptional. From hacking to false ceiling installation, they delivered premium quality on schedule.",
+                              thumbnail: localContent.testimonial2Thumbnail || "/images/home/projects/project-drywall.png",
+                              videoId: localContent.testimonial2VideoId || "G5-o475Xz1Y",
+                            },
+                            {
+                              id: "3",
+                              name: localContent.testimonial3Name || "David Hendricks",
+                              role: localContent.testimonial3Role || "Facilities Director, Jurong Hub",
+                              project: localContent.testimonial3Project || "Industrial Electrical Upgrade",
+                              quote: localContent.testimonial3Quote || "Superb coordination and safety protocol adherence during our substation electrical works. The project was completed efficiently and complied with all regulations.",
+                              thumbnail: localContent.testimonial3Thumbnail || "/images/home/projects/project-electrical.png",
+                              videoId: localContent.testimonial3VideoId || "yY19i3889p4",
+                            },
+                          ]
+                      ).map((item: any, idx: number) => {
+                        const updateTestimonialItem = (field: string, val: string) => {
+                          const currentList = Array.isArray(localContent.testimonials)
+                            ? [...localContent.testimonials]
+                            : [
+                                {
+                                  id: "1",
+                                  name: localContent.testimonial1Name || "Marcus Tan",
+                                  role: localContent.testimonial1Role || "Property Manager, CapitaLand",
+                                  project: localContent.testimonial1Project || "Commercial Waterproofing",
+                                  quote: localContent.testimonial1Quote || "UA Engineering did an outstanding job waterproofing...",
+                                  thumbnail: localContent.testimonial1Thumbnail || "/images/home/projects/project-waterproofing.png",
+                                  videoId: localContent.testimonial1VideoId || "A2y8jK-iGSw",
+                                },
+                                {
+                                  id: "2",
+                                  name: localContent.testimonial2Name || "Sarah Lim",
+                                  role: localContent.testimonial2Role || "Homeowner, Sentosa Cove",
+                                  project: localContent.testimonial2Project || "Premium Renovation & Fit-out",
+                                  quote: localContent.testimonial2Quote || "Their attention to detail...",
+                                  thumbnail: localContent.testimonial2Thumbnail || "/images/home/projects/project-drywall.png",
+                                  videoId: localContent.testimonial2VideoId || "G5-o475Xz1Y",
+                                },
+                                {
+                                  id: "3",
+                                  name: localContent.testimonial3Name || "David Hendricks",
+                                  role: localContent.testimonial3Role || "Facilities Director, Jurong Hub",
+                                  project: localContent.testimonial3Project || "Industrial Electrical Upgrade",
+                                  quote: localContent.testimonial3Quote || "Superb coordination...",
+                                  thumbnail: localContent.testimonial3Thumbnail || "/images/home/projects/project-electrical.png",
+                                  videoId: localContent.testimonial3VideoId || "yY19i3889p4",
+                                },
+                              ];
+                          
+                          const listCopy = [...currentList];
+                          listCopy[idx] = { ...listCopy[idx], [field]: val };
+                          handleFieldChange("testimonials", listCopy);
+                        };
+
+                        const deleteTestimonialItem = () => {
+                          const currentList = Array.isArray(localContent.testimonials)
+                            ? [...localContent.testimonials]
+                            : [];
+                          const updatedList = currentList.filter((_, i) => i !== idx);
+                          handleFieldChange("testimonials", updatedList);
+                        };
+
+                        return (
+                          <div key={item.id || idx} className="p-4 bg-slate-950/70 border border-slate-800 rounded-xl space-y-3 relative group">
+                            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                              <span className="text-xs font-black uppercase text-primary">
+                                Testimonial #{idx + 1} - {item.name}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={deleteTestimonialItem}
+                                className="px-2 py-1 text-[10px] font-extrabold bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white rounded transition-colors"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                              <div>
+                                <label className="block text-[9px] font-extrabold uppercase text-slate-400">Client Name</label>
+                                <input
+                                  type="text"
+                                  value={item.name || ""}
+                                  onChange={(e) => updateTestimonialItem("name", e.target.value)}
+                                  className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[9px] font-extrabold uppercase text-slate-400">Role & Organization</label>
+                                <input
+                                  type="text"
+                                  value={item.role || ""}
+                                  onChange={(e) => updateTestimonialItem("role", e.target.value)}
+                                  className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[9px] font-extrabold uppercase text-slate-400">Project Name</label>
+                                <input
+                                  type="text"
+                                  value={item.project || ""}
+                                  onChange={(e) => updateTestimonialItem("project", e.target.value)}
+                                  className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
+                                />
+                              </div>
                             </div>
                             <div>
-                              <label className="block text-[9px] font-extrabold uppercase text-slate-400">Role & Organization</label>
-                              <input
-                                type="text"
-                                value={localContent[`testimonial${num}Role`] || ""}
-                                onChange={(e) => handleFieldChange(`testimonial${num}Role`, e.target.value)}
-                                className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
+                              <label className="block text-[9px] font-extrabold uppercase text-slate-400">Review Quote Text</label>
+                              <textarea
+                                rows={2}
+                                value={item.quote || ""}
+                                onChange={(e) => updateTestimonialItem("quote", e.target.value)}
+                                className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium resize-none"
                               />
                             </div>
-                            <div>
-                              <label className="block text-[9px] font-extrabold uppercase text-slate-400">Project Name</label>
-                              <input
-                                type="text"
-                                value={localContent[`testimonial${num}Project`] || ""}
-                                onChange={(e) => handleFieldChange(`testimonial${num}Project`, e.target.value)}
-                                className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <ImageUploadField
+                                label="Video Cover / Thumbnail Image"
+                                value={item.thumbnail || ""}
+                                onChange={(val) => updateTestimonialItem("thumbnail", val)}
                               />
+                              <div>
+                                <label className="block text-[9px] font-extrabold uppercase text-slate-400">YouTube Video ID (e.g. A2y8jK-iGSw)</label>
+                                <input
+                                  type="text"
+                                  value={item.videoId || ""}
+                                  onChange={(e) => updateTestimonialItem("videoId", e.target.value)}
+                                  className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
+                                />
+                              </div>
                             </div>
                           </div>
-                          <div>
-                            <label className="block text-[9px] font-extrabold uppercase text-slate-400">Review Quote Text</label>
-                            <textarea
-                              rows={2}
-                              value={localContent[`testimonial${num}Quote`] || ""}
-                              onChange={(e) => handleFieldChange(`testimonial${num}Quote`, e.target.value)}
-                              className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium resize-none"
-                            />
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <ImageUploadField
-                              label="Video Cover / Thumbnail Image"
-                              value={localContent[`testimonial${num}Thumbnail`] || ""}
-                              onChange={(val) => handleFieldChange(`testimonial${num}Thumbnail`, val)}
-                            />
-                            <div>
-                              <label className="block text-[9px] font-extrabold uppercase text-slate-400">YouTube Video ID (e.g. A2y8jK-iGSw)</label>
-                              <input
-                                type="text"
-                                value={localContent[`testimonial${num}VideoId`] || ""}
-                                onChange={(e) => handleFieldChange(`testimonial${num}VideoId`, e.target.value)}
-                                className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
