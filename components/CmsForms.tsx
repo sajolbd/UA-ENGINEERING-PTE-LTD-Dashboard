@@ -465,6 +465,41 @@ export default function CmsForms({
       }
     });
 
+    // Ensure testimonials array is initialized for home page
+    if (pageId === "home") {
+      if (!Array.isArray(contentMap.testimonials) || contentMap.testimonials.length === 0) {
+        contentMap.testimonials = [
+          {
+            id: "1",
+            name: contentMap.testimonial1Name || "Marcus Tan",
+            role: contentMap.testimonial1Role || "Property Manager, CapitaLand",
+            project: contentMap.testimonial1Project || "Commercial Waterproofing",
+            quote: contentMap.testimonial1Quote || "UA Engineering did an outstanding job waterproofing our commercial facade and basement. Excellent workmanship, clean execution, and no water leaks since completion!",
+            thumbnail: contentMap.testimonial1Thumbnail || "/images/home/projects/project-waterproofing.png",
+            videoId: contentMap.testimonial1VideoId || "A2y8jK-iGSw",
+          },
+          {
+            id: "2",
+            name: contentMap.testimonial2Name || "Sarah Lim",
+            role: contentMap.testimonial2Role || "Homeowner, Sentosa Cove",
+            project: contentMap.testimonial2Project || "Premium Renovation & Fit-out",
+            quote: contentMap.testimonial2Quote || "Their attention to detail during our home renovation was exceptional. From hacking to false ceiling installation, they delivered premium quality on schedule.",
+            thumbnail: contentMap.testimonial2Thumbnail || "/images/home/projects/project-drywall.png",
+            videoId: contentMap.testimonial2VideoId || "G5-o475Xz1Y",
+          },
+          {
+            id: "3",
+            name: contentMap.testimonial3Name || "David Hendricks",
+            role: contentMap.testimonial3Role || "Facilities Director, Jurong Hub",
+            project: contentMap.testimonial3Project || "Industrial Electrical Upgrade",
+            quote: contentMap.testimonial3Quote || "Superb coordination and safety protocol adherence during our substation electrical works. The project was completed efficiently and complied with all regulations.",
+            thumbnail: contentMap.testimonial3Thumbnail || "/images/home/projects/project-electrical.png",
+            videoId: contentMap.testimonial3VideoId || "yY19i3889p4",
+          },
+        ];
+      }
+    }
+
     setLocalContent(contentMap);
     setLocalSeo({
       metaTitle: pageData.seo?.metaTitle || "",
@@ -1444,35 +1479,7 @@ export default function CmsForms({
                       <button
                         type="button"
                         onClick={() => {
-                          const currentList = Array.isArray(localContent.testimonials) ? [...localContent.testimonials] : [
-                            {
-                              id: "1",
-                              name: localContent.testimonial1Name || "Marcus Tan",
-                              role: localContent.testimonial1Role || "Property Manager, CapitaLand",
-                              project: localContent.testimonial1Project || "Commercial Waterproofing",
-                              quote: localContent.testimonial1Quote || "UA Engineering did an outstanding job waterproofing our commercial facade and basement...",
-                              thumbnail: localContent.testimonial1Thumbnail || "/images/home/projects/project-waterproofing.png",
-                              videoId: localContent.testimonial1VideoId || "A2y8jK-iGSw",
-                            },
-                            {
-                              id: "2",
-                              name: localContent.testimonial2Name || "Sarah Lim",
-                              role: localContent.testimonial2Role || "Homeowner, Sentosa Cove",
-                              project: localContent.testimonial2Project || "Premium Renovation & Fit-out",
-                              quote: localContent.testimonial2Quote || "Their attention to detail during our home renovation was exceptional...",
-                              thumbnail: localContent.testimonial2Thumbnail || "/images/home/projects/project-drywall.png",
-                              videoId: localContent.testimonial2VideoId || "G5-o475Xz1Y",
-                            },
-                            {
-                              id: "3",
-                              name: localContent.testimonial3Name || "David Hendricks",
-                              role: localContent.testimonial3Role || "Facilities Director, Jurong Hub",
-                              project: localContent.testimonial3Project || "Industrial Electrical Upgrade",
-                              quote: localContent.testimonial3Quote || "Superb coordination and safety protocol adherence...",
-                              thumbnail: localContent.testimonial3Thumbnail || "/images/home/projects/project-electrical.png",
-                              videoId: localContent.testimonial3VideoId || "yY19i3889p4",
-                            },
-                          ];
+                          const currentList = Array.isArray(localContent.testimonials) ? [...localContent.testimonials] : [];
                           const newItem = {
                             id: Date.now().toString(),
                             name: "New Client Name",
@@ -1484,87 +1491,33 @@ export default function CmsForms({
                           };
                           handleFieldChange("testimonials", [...currentList, newItem]);
                         }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-primary hover:bg-primary/90 text-white rounded-lg transition-all duration-300 shadow-sm"
+                        className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-primary hover:bg-primary/90 text-white rounded-xl transition-all duration-300 shadow-md cursor-pointer active:scale-95"
                       >
                         <span>+ Add New Testimonial</span>
                       </button>
                     </div>
 
                     <div className="space-y-4">
-                      {((Array.isArray(localContent.testimonials) && localContent.testimonials.length > 0)
-                        ? localContent.testimonials
-                        : [
-                            {
-                              id: "1",
-                              name: localContent.testimonial1Name || "Marcus Tan",
-                              role: localContent.testimonial1Role || "Property Manager, CapitaLand",
-                              project: localContent.testimonial1Project || "Commercial Waterproofing",
-                              quote: localContent.testimonial1Quote || "UA Engineering did an outstanding job waterproofing our commercial facade and basement. Excellent workmanship, clean execution, and no water leaks since completion!",
-                              thumbnail: localContent.testimonial1Thumbnail || "/images/home/projects/project-waterproofing.png",
-                              videoId: localContent.testimonial1VideoId || "A2y8jK-iGSw",
-                            },
-                            {
-                              id: "2",
-                              name: localContent.testimonial2Name || "Sarah Lim",
-                              role: localContent.testimonial2Role || "Homeowner, Sentosa Cove",
-                              project: localContent.testimonial2Project || "Premium Renovation & Fit-out",
-                              quote: localContent.testimonial2Quote || "Their attention to detail during our home renovation was exceptional. From hacking to false ceiling installation, they delivered premium quality on schedule.",
-                              thumbnail: localContent.testimonial2Thumbnail || "/images/home/projects/project-drywall.png",
-                              videoId: localContent.testimonial2VideoId || "G5-o475Xz1Y",
-                            },
-                            {
-                              id: "3",
-                              name: localContent.testimonial3Name || "David Hendricks",
-                              role: localContent.testimonial3Role || "Facilities Director, Jurong Hub",
-                              project: localContent.testimonial3Project || "Industrial Electrical Upgrade",
-                              quote: localContent.testimonial3Quote || "Superb coordination and safety protocol adherence during our substation electrical works. The project was completed efficiently and complied with all regulations.",
-                              thumbnail: localContent.testimonial3Thumbnail || "/images/home/projects/project-electrical.png",
-                              videoId: localContent.testimonial3VideoId || "yY19i3889p4",
-                            },
-                          ]
-                      ).map((item: any, idx: number) => {
+                      {(Array.isArray(localContent.testimonials) ? localContent.testimonials : []).map((item: any, idx: number) => {
                         const updateTestimonialItem = (field: string, val: string) => {
-                          const currentList = Array.isArray(localContent.testimonials)
-                            ? [...localContent.testimonials]
-                            : [
-                                {
-                                  id: "1",
-                                  name: localContent.testimonial1Name || "Marcus Tan",
-                                  role: localContent.testimonial1Role || "Property Manager, CapitaLand",
-                                  project: localContent.testimonial1Project || "Commercial Waterproofing",
-                                  quote: localContent.testimonial1Quote || "UA Engineering did an outstanding job waterproofing...",
-                                  thumbnail: localContent.testimonial1Thumbnail || "/images/home/projects/project-waterproofing.png",
-                                  videoId: localContent.testimonial1VideoId || "A2y8jK-iGSw",
-                                },
-                                {
-                                  id: "2",
-                                  name: localContent.testimonial2Name || "Sarah Lim",
-                                  role: localContent.testimonial2Role || "Homeowner, Sentosa Cove",
-                                  project: localContent.testimonial2Project || "Premium Renovation & Fit-out",
-                                  quote: localContent.testimonial2Quote || "Their attention to detail...",
-                                  thumbnail: localContent.testimonial2Thumbnail || "/images/home/projects/project-drywall.png",
-                                  videoId: localContent.testimonial2VideoId || "G5-o475Xz1Y",
-                                },
-                                {
-                                  id: "3",
-                                  name: localContent.testimonial3Name || "David Hendricks",
-                                  role: localContent.testimonial3Role || "Facilities Director, Jurong Hub",
-                                  project: localContent.testimonial3Project || "Industrial Electrical Upgrade",
-                                  quote: localContent.testimonial3Quote || "Superb coordination...",
-                                  thumbnail: localContent.testimonial3Thumbnail || "/images/home/projects/project-electrical.png",
-                                  videoId: localContent.testimonial3VideoId || "yY19i3889p4",
-                                },
-                              ];
-                          
+                          const currentList = Array.isArray(localContent.testimonials) ? [...localContent.testimonials] : [];
                           const listCopy = [...currentList];
                           listCopy[idx] = { ...listCopy[idx], [field]: val };
+                          
+                          // Also sync single fields if first item for backward compatibility
+                          if (idx === 0) {
+                            if (field === "name") handleFieldChange("testimonial1Name", val);
+                            if (field === "role") handleFieldChange("testimonial1Role", val);
+                            if (field === "project") handleFieldChange("testimonial1Project", val);
+                            if (field === "quote") handleFieldChange("testimonial1Quote", val);
+                            if (field === "thumbnail") handleFieldChange("testimonial1Thumbnail", val);
+                            if (field === "videoId") handleFieldChange("testimonial1VideoId", val);
+                          }
                           handleFieldChange("testimonials", listCopy);
                         };
 
                         const deleteTestimonialItem = () => {
-                          const currentList = Array.isArray(localContent.testimonials)
-                            ? [...localContent.testimonials]
-                            : [];
+                          const currentList = Array.isArray(localContent.testimonials) ? [...localContent.testimonials] : [];
                           const updatedList = currentList.filter((_, i) => i !== idx);
                           handleFieldChange("testimonials", updatedList);
                         };
@@ -1578,7 +1531,7 @@ export default function CmsForms({
                               <button
                                 type="button"
                                 onClick={deleteTestimonialItem}
-                                className="px-2 py-1 text-[10px] font-extrabold bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white rounded transition-colors"
+                                className="px-2.5 py-1 text-[10px] font-extrabold bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white rounded-lg transition-colors cursor-pointer"
                               >
                                 Delete
                               </button>
