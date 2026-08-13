@@ -257,6 +257,104 @@ const DEFAULT_HERO_SLIDES: Record<number, { heading: string; subheading: string 
   },
 };
 
+const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
+  home: {
+    heroHeading: "From Renovation to Painting, Roofing, Electrical, Plumbing and Steel Works.",
+    heroSubheading: "We handle it all with expertise, reliability, and guaranteed quality.",
+    heroCtaText: "Book An Appointment",
+    heroImage: "/images/home/hero/hero-bg.png",
+    heroImageAlt: "UA Engineering Renovation and Steel Fabrications Banner",
+    aboutHeading: "Your Trusted Partner for High Quality Renovation & Upgrading Services.",
+    aboutSubheading: "At UA ENGINEERING PTE. LTD. we deliver reliable Renovation & Upgrading solutions grounded in integrity, expertise, and precision. Our team ensures every project meets high standards of safety, durability, and quality workmanship.",
+    aboutImage: "/images/home/about/about-main.jpg",
+    aboutImageAlt: "UA Engineering Upgrading Worksite Inspections Team",
+    aboutExperience: "15",
+    whyChooseBadge: "UA ADVANTAGE",
+    whyChooseHeading: "Why Choose UA Engineering?",
+    relyBadge: "RELIABILITY & TRUST",
+    relyHeading: "Why Do You Rely On Us?",
+    relyImage: "/images/home/rely/rely-main.png",
+    relyButtonText: "Talk to an Expert",
+    callbackHeading: "Let Us Call You",
+    callbackSubheading: "Need help now? Send a few details - we'll call you shortly.",
+    callbackBgImage: "/images/home/call/callback-bg.png",
+    callbackSupportImage: "/images/home/call/call-support.png",
+    callbackButtonText: "Submit Now",
+    reviewsBadge: "CLIENT TESTIMONIALS",
+    reviewsHeading: "What Our Clients Say About UA Engineering",
+    processBadge: "OUR WORK PROCESS",
+    processHeading: "How We Deliver Engineering Excellence",
+  },
+  about: {
+    heroHeading: "About UA Engineering",
+    heroSubheading: "A dedicated team of licensed professional engineers and certified EHS compliance officers delivering high-quality construction works.",
+    heroImage: "/images/layout/about-bg.png",
+    heroImageAlt: "UA Engineering Commercial Facility Builders",
+    overviewHeading: "Company History & Core Values",
+    overviewText: "Founded in Singapore, UA Engineering has grown into a leading contractor offering mechanical, electrical, plumbing, waterproofing, and steel fabrication works. Integrity, safety, and client satisfaction drive our operations.",
+    ehsHeading: "EHS Safety Policy & Environmental Compliance",
+    ehsText: "We maintain a Zero-Accident policy across all site operations. Our EHS compliance officers inspect structural rigs, high-voltage lines, and confined space setups daily to protect our workers and clients.",
+    ehsImage: "/images/home/about/about-main.jpg",
+    processHeading: "Our Engineering Process",
+    processSubheading: "From initial consultation to project completion, we follow standard safety guidelines.",
+    faqHeading: "Frequently Asked Questions",
+    faqSubheading: "Got questions about our engineering & renovation services in Singapore?",
+    residentialHeading: "Residential Renovation & Upgrading Capability",
+    residentialSubheading: "Providing HDB, Condominium, and Landed Home owners with certified renovation solutions.",
+  },
+  services: {
+    heroHeading: "Our Engineering Services",
+    heroSubheading: "Professional solutions covering plumbing, substation electrical networks, waterproofing membranes, drywall, tiling, hacking, and solar panels.",
+    heroImage: "/images/services/services-bg.jpg",
+    heroImageAlt: "UA Engineering Substation Electrical Rewiring Grid",
+    servicesHeading: "Singapore Building and Construction Capability",
+    servicesSubheading: "We handle commercial, industrial, and residential upgrades. All works are certified by BCA registered professional engineers.",
+  },
+  projects: {
+    heroHeading: "Our Completed Projects",
+    heroSubheading: "A catalog of successfully delivered commercial, retail, and residential projects reflecting structural engineering precision and quality.",
+    heroImage: "/images/projects/projects-bg.jpg",
+    heroImageAlt: "UA Engineering Commercial Drywall Alteration Project",
+    portfolioHeading: "Featured Engineering Contracts",
+    portfolioSubheading: "Review our portfolio of successfully delivered projects in Singapore, including shopping mall drywalls, substation setups, and waterproofing flat roofs.",
+  },
+  blog: {
+    heroHeading: "Engineering & Safety Resources",
+    heroSubheading: "Professional insights, building codes, EHS checklists, and tips on flat roof waterproofing and electrical safety upgrades in HDBs.",
+    heroImage: "/images/blog/blog-bg.jpg",
+    heroImageAlt: "UA Engineering BTO Renovation Checklist Documents",
+    blogHeading: "Latest Insights & Field Manuals",
+    blogSubheading: "Stay up-to-date with Singapore BCA and HDB guidelines. Our registered engineers share field checklists, tips, and safety articles.",
+  },
+  contact: {
+    heroHeading: "Contact UA Engineering",
+    heroSubheading: "Get in touch for commercial quotations, structural surveys, emergency substation audits, or custom plumbing design layout consultations.",
+    heroImage: "/images/contact/contact-bg.jpg",
+    heroImageAlt: "UA Engineering Singapore Customer Support Center",
+    contactAddress: "10 Anson Road, Singapore 079903",
+    contactPhone: "+65 9841 1786",
+    contactEmail: "info@ua-engineering.com",
+    contactHours: "Mon - Sat: 9:00 AM - 6:00 PM (Emergency 24/7 Support)",
+  },
+  site: {
+    siteLogo: "/images/logo.png",
+    footerLogo: "/images/footer-logo.png",
+    companyName: "UA ENGINEERING PTE. LTD.",
+    welcomeMessage: "Welcome to UA Engineering",
+    phone: "+65 9841 1786",
+    email: "hello.uaengineering@gmail.com",
+    address: "10 Anson Road, Singapore 079903",
+    workingHours: "Mon - Sat: 9:00 AM - 6:00 PM (Emergency 24/7 Support)",
+    appointmentButtonText: "Book An Appointment",
+    footerAboutText: "Professional engineering, renovation, waterproofing, and steel fabrication solutions in Singapore. Licensed, certified, and compliant with BCA standards.",
+    facebook: "https://facebook.com",
+    instagram: "https://instagram.com",
+    linkedin: "https://linkedin.com",
+    youtube: "https://youtube.com",
+    whatsapp: "https://wa.me/6598411786",
+  },
+};
+
 export default function CmsForms({
   activeTab,
   cmsData,
@@ -289,6 +387,7 @@ export default function CmsForms({
     const pageData = cmsData[pageId];
     const contentMap = { ...(pageData.content as unknown as Record<string, string>) };
 
+    // Fill defaults for 7 Hero Sliders on Home Page
     if (pageId === "home") {
       [1, 2, 3, 4, 5, 6, 7].forEach((num) => {
         const hKey = `heroSlide${num}Heading`;
@@ -301,6 +400,14 @@ export default function CmsForms({
         }
       });
     }
+
+    // Fill page section defaults if missing
+    const pageDefaults = DEFAULT_PAGE_CONTENT[pageId] || {};
+    Object.keys(pageDefaults).forEach((key) => {
+      if (contentMap[key] === undefined || contentMap[key] === "") {
+        contentMap[key] = pageDefaults[key];
+      }
+    });
 
     setLocalContent(contentMap);
     setLocalSeo({
