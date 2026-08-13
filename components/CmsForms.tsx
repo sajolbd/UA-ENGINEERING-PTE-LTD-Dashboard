@@ -498,6 +498,67 @@ export default function CmsForms({
           },
         ];
       }
+
+      if (!Array.isArray(contentMap.googleReviews) || contentMap.googleReviews.length === 0) {
+        contentMap.googleReviews = [
+          {
+            id: "1",
+            name: "Majidul Islam Majidul",
+            time: "1 year ago",
+            stars: 5,
+            avatar: "/images/home/reviews/google-majidul.png",
+            text: "UA Engineering workmanship and investigation of existing building leaking very good. They have done waterproofing leaking rectification work for The American Club Singapore so far no leaking last few weeks I monitoring. Thanks, UA Engineering team members and workers."
+          },
+          {
+            id: "2",
+            name: "Cyril Wood",
+            time: "1 year ago",
+            stars: 5,
+            avatar: "/images/home/reviews/google-cyril.png",
+            text: "The team at UA Engineering were very efficient. They worked well to do the job in an awkward place. Even repainted an area affected by water damage at no extra cost. I would recommend this service."
+          },
+          {
+            "id": "3",
+            name: "James Lim",
+            time: "2 years ago",
+            stars: 5,
+            avatar: "/images/home/reviews/google-james.png",
+            text: "Very good! Solved my problem which others cannot solve. Thank you! Highly recommended."
+          },
+          {
+            "id": "4",
+            name: "Eugene T",
+            time: "2 years ago",
+            stars: 5,
+            avatar: "/images/home/reviews/google-eugene.png",
+            text: "Engaged UA Engineering for my roof and RC waterproofing. The workers handled the works relatively well and were receptive to our inputs. They are responsive and returned on a few times when we noticed areas that the paint was not even. Overall, happy to recommend to ask for a quote if you are looking for good works at competitive rates."
+          },
+          {
+            "id": "5",
+            name: "Atik Tamim",
+            time: "2 years ago",
+            stars: 5,
+            avatar: "/images/home/reviews/google-atik.png",
+            text: "You saved my structure. Thanks for your quality work."
+          },
+          {
+            "id": "6",
+            name: "Yong Huat Ng",
+            time: "2 years ago",
+            stars: 5,
+            avatar: "/images/home/reviews/google-yonghuat.png",
+            text: "Willingness to listen, give no excuses, and very committed to doing a complete job is the key characteristics and strength of this vendor. As waterproofing can be a progressive trial process. This vendor response fast to feedback and comeback quickly to complete the coverage of the fixes. I am particularly impressed with the positive attitude of the lead worker. He is friendly, attentive, welcome feedback and committed to delivering a quality work (which he did). A vendor that I am very happy with and will recommend to anyone that need to have the waterproofing services."
+          },
+          {
+            "id": "7",
+            name: "Joo Goh",
+            time: "3 years ago",
+            stars: 5,
+            avatar: "/images/home/reviews/google-joogoh.png",
+            text: "Am very pleased with the work done by UA Engineering Pte Ltd few months back and no further leakage or mould were detected to date. The previous contractor (Flux Solutions Pte Ltd) was very unresponsive and rude to after sales service and I decided to terminate them in favour for UA Engineering. I hope UA Engineering will continue with its responsive after sales service that I've experienced and recommend this company after the bad experience I had with Flux Solutions."
+          }
+        ];
+      }
     }
 
     setLocalContent(contentMap);
@@ -1590,6 +1651,143 @@ export default function CmsForms({
                                 />
                               </div>
                             </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 8. Google Customer Reviews (5-Star Happy Customer Reviews) Section */}
+                  <div className="space-y-4 border-b border-slate-100 pb-5">
+                    <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                      8. Google Customer Reviews Section (5-Star Happy Customer Reviews)
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Section Badge Tag
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.reviewBadge || ""}
+                          onChange={(e) => handleFieldChange("reviewBadge", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl bg-slate-900 text-white font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Section Main Title ("5-Star Happy Customer Reviews")
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.reviewHeading || ""}
+                          onChange={(e) => handleFieldChange("reviewHeading", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl bg-slate-900 text-white font-medium"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2">
+                      <h5 className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                        8.1 Dynamic Google Reviews List Manager
+                      </h5>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentList = Array.isArray(localContent.googleReviews) ? [...localContent.googleReviews] : [];
+                          const newItem = {
+                            id: Date.now().toString(),
+                            name: "New Customer Name",
+                            time: "Just now",
+                            stars: 5,
+                            avatar: "/images/home/reviews/google-majidul.png",
+                            text: "Write customer Google review text here...",
+                          };
+                          handleFieldChange("googleReviews", [...currentList, newItem]);
+                        }}
+                        className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-primary hover:bg-primary/90 text-white rounded-xl transition-all duration-300 shadow-md cursor-pointer active:scale-95"
+                      >
+                        <span>+ Add New Review</span>
+                      </button>
+                    </div>
+
+                    <div className="space-y-4">
+                      {(Array.isArray(localContent.googleReviews) ? localContent.googleReviews : []).map((item: any, idx: number) => {
+                        const updateReviewItem = (field: string, val: any) => {
+                          const currentList = Array.isArray(localContent.googleReviews) ? [...localContent.googleReviews] : [];
+                          const listCopy = [...currentList];
+                          listCopy[idx] = { ...listCopy[idx], [field]: val };
+                          handleFieldChange("googleReviews", listCopy);
+                        };
+
+                        const deleteReviewItem = () => {
+                          const currentList = Array.isArray(localContent.googleReviews) ? [...localContent.googleReviews] : [];
+                          const updatedList = currentList.filter((_, i) => i !== idx);
+                          handleFieldChange("googleReviews", updatedList);
+                        };
+
+                        return (
+                          <div key={item.id || idx} className="p-4 bg-slate-950/70 border border-slate-800 rounded-xl space-y-3 relative group">
+                            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                              <span className="text-xs font-black uppercase text-primary">
+                                Review #{idx + 1} - {item.name} ({item.stars || 5} Stars)
+                              </span>
+                              <button
+                                type="button"
+                                onClick={deleteReviewItem}
+                                className="px-2.5 py-1 text-[10px] font-extrabold bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white rounded-lg transition-colors cursor-pointer"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                              <div>
+                                <label className="block text-[9px] font-extrabold uppercase text-slate-400">Customer Name</label>
+                                <input
+                                  type="text"
+                                  value={item.name || ""}
+                                  onChange={(e) => updateReviewItem("name", e.target.value)}
+                                  className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[9px] font-extrabold uppercase text-slate-400">Time Ago String (e.g. 1 year ago)</label>
+                                <input
+                                  type="text"
+                                  value={item.time || ""}
+                                  onChange={(e) => updateReviewItem("time", e.target.value)}
+                                  className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[9px] font-extrabold uppercase text-slate-400">Star Rating (1 - 5)</label>
+                                <select
+                                  value={item.stars || 5}
+                                  onChange={(e) => updateReviewItem("stars", Number(e.target.value))}
+                                  className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium outline-none"
+                                >
+                                  <option value={5}>5 Stars ★★★★★</option>
+                                  <option value={4}>4 Stars ★★★★☆</option>
+                                  <option value={3}>3 Stars ★★★☆☆</option>
+                                  <option value={2}>2 Stars ★★☆☆☆</option>
+                                  <option value={1}>1 Star ★☆☆☆☆</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-[9px] font-extrabold uppercase text-slate-400">Review Text Quote</label>
+                              <textarea
+                                rows={2}
+                                value={item.text || ""}
+                                onChange={(e) => updateReviewItem("text", e.target.value)}
+                                className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium resize-none"
+                              />
+                            </div>
+                            <ImageUploadField
+                              label="Customer Profile Avatar Photo"
+                              value={item.avatar || ""}
+                              onChange={(val) => updateReviewItem("avatar", val)}
+                            />
                           </div>
                         );
                       })}
