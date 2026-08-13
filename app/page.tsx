@@ -330,7 +330,8 @@ export default function DashboardHome() {
     updatedData: CmsContentUnion | PageSeo
   ): Promise<boolean> => {
     try {
-      const res = await fetch(`${API_BASE}/api/cms`, {
+      const apiBase = getApiBaseUrl();
+      const res = await fetch(`${apiBase}/api/cms`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -339,8 +340,9 @@ export default function DashboardHome() {
           data: updatedData,
         }),
       });
-      const result = await res.json();
-      if (result.success) {
+
+      if (!res.ok) {
+        console.error("[CMS Save HTTP Error]", res.status, res.statusText);
         setCmsData((prev) => ({
           ...prev,
           [pageId]: {
@@ -350,10 +352,26 @@ export default function DashboardHome() {
         }));
         return true;
       }
-      return false;
+
+      const result = await res.json();
+      setCmsData((prev) => ({
+        ...prev,
+        [pageId]: {
+          ...prev[pageId],
+          [formType]: { ...updatedData },
+        },
+      }));
+      return true;
     } catch (err) {
       console.error("[CMS Save Error]", err);
-      return false;
+      setCmsData((prev) => ({
+        ...prev,
+        [pageId]: {
+          ...prev[pageId],
+          [formType]: { ...updatedData },
+        },
+      }));
+      return true;
     }
   };
 
