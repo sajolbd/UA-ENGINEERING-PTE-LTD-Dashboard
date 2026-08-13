@@ -189,8 +189,14 @@ export default function BlogTable({
   const CATEGORIES = [
     "Renovation & Upgrading",
     "Structural & Construction",
+    "Structural & Exterior Works",
+    "Painting & Waterproofing",
+    "Aluminium & Glazing Works",
+    "Electrical, Plumbing & Aircon",
+    "Solar Panel Installation",
     "Industrial Engineering",
-    "Commercial Fit-out"
+    "Commercial Fit-out",
+    "Others"
   ];
 
   const BG_COLORS = [
