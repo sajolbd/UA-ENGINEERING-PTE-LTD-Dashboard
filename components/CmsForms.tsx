@@ -248,6 +248,7 @@ export default function CmsForms({
   const [showPreviewJson, setShowPreviewJson] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showFailureModal, setShowFailureModal] = useState(false);
+  const [previewSlide, setPreviewSlide] = useState(1);
 
   useEffect(() => {
     setSaveSuccess(false);
@@ -399,6 +400,173 @@ export default function CmsForms({
           </pre>
         </div>
       )}
+
+      {/* --- ALWAYS-ON REAL-TIME LIVE WEBSITE PREVIEW PANEL --- */}
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3 text-white animate-fade-in">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <h4 className="text-xs font-black uppercase tracking-wider text-slate-200">
+              {formType === "content" ? "Real-time Website Live Mockup Preview" : "Real-time Google SERP Search Snippet Live Preview"}
+            </h4>
+          </div>
+          <span className="text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30">
+            {pageId.toUpperCase()} {formType.toUpperCase()} LIVE SYNC
+          </span>
+        </div>
+
+        {formType === "content" ? (
+          <div className="space-y-4 pt-1">
+            {/* SITE GLOBAL SETTINGS PREVIEW */}
+            {pageId === "site" && (
+              <div className="space-y-3">
+                {/* Mock Navbar */}
+                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={getImageUrl(localContent.siteLogo || "/images/logo.png")}
+                      alt="Site Logo"
+                      className="h-9 w-auto object-contain"
+                      onError={(e) => { (e.target as HTMLImageElement).src = "/images/logo.png"; }}
+                    />
+                    <div>
+                      <h5 className="text-xs font-black text-white">{localContent.companyName || "UA ENGINEERING PTE. LTD."}</h5>
+                      <p className="text-[10px] text-slate-400 font-medium">{localContent.welcomeMessage || "Welcome to UA Engineering"}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-slate-300 font-semibold">
+                    <span className="hidden sm:inline">📞 {localContent.phone || "+65 9841 1786"}</span>
+                    <button type="button" className="px-3 py-1.5 bg-primary text-white font-bold rounded-xl text-xs shadow-sm">
+                      {localContent.appointmentButtonText || "Book An Appointment"}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Mock Footer */}
+                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={getImageUrl(localContent.footerLogo || "/images/footer-logo.png")}
+                      alt="Footer Logo"
+                      className="h-8 w-auto object-contain"
+                      onError={(e) => { (e.target as HTMLImageElement).src = "/images/footer-logo.png"; }}
+                    />
+                    <span className="text-xs font-bold text-slate-300">Footer Branding</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 leading-relaxed font-medium">
+                    {localContent.footerAboutText || "Professional engineering, renovation, waterproofing, and steel fabrication solutions in Singapore."}
+                  </p>
+                  <div className="text-[10px] text-slate-500 font-mono pt-1">
+                    📍 {localContent.address || "10 Anson Road, Singapore"} | ✉️ {localContent.email || "hello.uaengineering@gmail.com"}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* HOME PAGE HERO & SECTIONS PREVIEW */}
+            {pageId === "home" && (
+              <div className="space-y-3">
+                {/* Hero Banner Mockup with 7 Sliders Selector */}
+                <div className="relative w-full h-[220px] sm:h-[250px] flex items-center justify-center overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-xl group">
+                  <img
+                    src={getImageUrl(localContent.heroImage || "/images/home/hero/hero-bg.png")}
+                    alt="Hero Background"
+                    className="absolute inset-0 w-full h-full object-cover opacity-50 transition-transform duration-500 group-hover:scale-105"
+                    onError={(e) => { (e.target as HTMLImageElement).src = "/images/footer-logo.png"; }}
+                  />
+                  <div className="absolute inset-0 bg-black/40" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/40" />
+
+                  <div className="relative z-10 p-4 max-w-xl text-center space-y-2">
+                    <span className="text-[9px] font-extrabold uppercase bg-primary/90 text-white px-2.5 py-0.5 rounded-full tracking-wider">
+                      Slide #{previewSlide}: {previewSlide === 1 ? "General & Renovation" : previewSlide === 2 ? "Engineering Team" : previewSlide === 3 ? "Painting" : previewSlide === 4 ? "Roof Repairs" : previewSlide === 5 ? "Electrical" : previewSlide === 6 ? "Plumbing" : "Steel Fabrication"}
+                    </span>
+                    <h3 className="text-base sm:text-lg font-black text-white tracking-tight leading-snug">
+                      {localContent[`heroSlide${previewSlide}Heading`] || (previewSlide === 1 ? localContent.heroHeading : `Hero Slide ${previewSlide} Title`) || "Hero Heading"}
+                    </h3>
+                    <p className="text-[11px] text-slate-200 line-clamp-2 font-medium">
+                      {localContent[`heroSlide${previewSlide}Subheading`] || (previewSlide === 1 ? localContent.heroSubheading : `Hero Slide ${previewSlide} Description`) || "Hero Subheading"}
+                    </p>
+                  </div>
+
+                  {/* Slider Quick Tabs Switcher inside mockup */}
+                  <div className="absolute bottom-2 inset-x-2 z-20 flex justify-center gap-1 bg-black/60 backdrop-blur p-1 rounded-xl">
+                    {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                      <button
+                        key={num}
+                        type="button"
+                        onClick={() => setPreviewSlide(num)}
+                        className={`px-2 py-0.5 text-[9px] font-black rounded-lg transition-all ${
+                          previewSlide === num ? "bg-primary text-white shadow" : "text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        Slide {num}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* STATIC PAGE HERO & SECTIONS PREVIEW (about, services, projects, blog, contact) */}
+            {pageId !== "site" && pageId !== "home" && (
+              <div className="relative w-full h-[180px] sm:h-[220px] flex items-center justify-center overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-xl group">
+                <img
+                  src={getImageUrl(localContent.heroImage || "/images/layout/breadcrumb-bg.png")}
+                  alt="Page Hero Background"
+                  className="absolute inset-0 w-full h-full object-cover opacity-50 transition-transform duration-500 group-hover:scale-105"
+                  onError={(e) => { (e.target as HTMLImageElement).src = "/images/footer-logo.png"; }}
+                />
+                <div className="absolute inset-0 bg-black/40" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-black/30" />
+
+                <div className="relative z-10 border border-white/30 bg-black/50 backdrop-blur-md px-6 py-4 max-w-lg text-center rounded-xl shadow-2xl space-y-1">
+                  <h3 className="text-base sm:text-lg font-black text-white tracking-tight uppercase leading-snug">
+                    {localContent.heroHeading || `${pageId.toUpperCase()} PAGE HERO`}
+                  </h3>
+                  {localContent.heroSubheading && (
+                    <p className="text-[11px] text-slate-300 line-clamp-2 font-medium">
+                      {localContent.heroSubheading}
+                    </p>
+                  )}
+                </div>
+
+                <div className="absolute bottom-2 left-3 z-20">
+                  <span className="text-[9px] font-extrabold bg-primary text-white px-2 py-0.5 rounded uppercase tracking-wider">
+                    {pageId.toUpperCase()} PAGE LIVE BANNER
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* SEO & SCHEMA GOOGLE SERP PREVIEW BOX */
+          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
+            <div className="flex items-center gap-2 text-[10px] text-slate-400 font-mono">
+              <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+              <span>https://ua-engineering.com{pageId === "home" ? "" : `/${pageId}`}</span>
+            </div>
+            <h4 className="text-sm font-bold text-blue-400 hover:underline cursor-pointer line-clamp-1">
+              {localSeo.metaTitle || localContent.heroHeading || `UA Engineering PTE. LTD. | ${pageId.toUpperCase()}`}
+            </h4>
+            <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed font-normal">
+              {localSeo.metaDescription || localContent.heroSubheading || "Professional engineering, renovation, waterproofing, and steel fabrication solutions in Singapore."}
+            </p>
+            {localSeo.metaKeywords && (
+              <div className="flex flex-wrap gap-1 pt-1">
+                {localSeo.metaKeywords.split(",").map((kw, i) => (
+                  <span key={i} className="text-[9px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded border border-slate-800 font-mono">
+                    {kw.trim()}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* EDITING FORM */}
       <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-6">
