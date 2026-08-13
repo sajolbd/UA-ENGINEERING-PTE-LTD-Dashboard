@@ -226,6 +226,37 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
   );
 }
 
+const DEFAULT_HERO_SLIDES: Record<number, { heading: string; subheading: string }> = {
+  1: {
+    heading: "From Renovation to Painting, Roofing, Electrical, Plumbing and Steel Works.",
+    subheading: "We handle it all with expertise, reliability, and guaranteed quality.",
+  },
+  2: {
+    heading: "Everything Your Property Needs. One Trusted Engineering Team.",
+    subheading: "From renovations and reinstatement to electrical, plumbing, painting, roofing, steel fabrication, waterproofing, and maintenance - we handle every project with precision and professionalism.",
+  },
+  3: {
+    heading: "Fresh Paint. Lasting Protection. Stunning Results.",
+    subheading: "Interior and exterior painting services that enhance appearance, protect surfaces, and increase the value of your property.",
+  },
+  4: {
+    heading: "Roof Problems? We Fix Them Before They Cost You More.",
+    subheading: "Professional roof repairs, waterproofing, leak prevention, and complete roofing solutions to keep your property safe in every season.",
+  },
+  5: {
+    heading: "Safe, Reliable Electrical Solutions for Every Building",
+    subheading: "From new installations and rewiring to troubleshooting and upgrades, we deliver electrical work that keeps your property running safely.",
+  },
+  6: {
+    heading: "Professional Plumbing Services Without the Hassle",
+    subheading: "Leak repairs, pipe replacement, drainage solutions, sanitary installations, and preventive maintenance-all completed with quality workmanship.",
+  },
+  7: {
+    heading: "Custom Steel Fabrication Built for Strength & Precision",
+    subheading: "We design, fabricate, and install steel structures, staircases, platforms, railings, and custom metal works for commercial and industrial projects.",
+  },
+};
+
 export default function CmsForms({
   activeTab,
   cmsData,
@@ -257,6 +288,20 @@ export default function CmsForms({
 
     const pageData = cmsData[pageId];
     const contentMap = { ...(pageData.content as unknown as Record<string, string>) };
+
+    if (pageId === "home") {
+      [1, 2, 3, 4, 5, 6, 7].forEach((num) => {
+        const hKey = `heroSlide${num}Heading`;
+        const sKey = `heroSlide${num}Subheading`;
+        if (!contentMap[hKey]) {
+          contentMap[hKey] = DEFAULT_HERO_SLIDES[num].heading;
+        }
+        if (!contentMap[sKey]) {
+          contentMap[sKey] = DEFAULT_HERO_SLIDES[num].subheading;
+        }
+      });
+    }
+
     setLocalContent(contentMap);
     setLocalSeo({
       metaTitle: pageData.seo?.metaTitle || "",
@@ -818,6 +863,10 @@ export default function CmsForms({
                     ].map((slide) => {
                       const headingKey = `heroSlide${slide.id}Heading`;
                       const subheadingKey = `heroSlide${slide.id}Subheading`;
+                      const slideDefault = DEFAULT_HERO_SLIDES[slide.id] || { heading: "", subheading: "" };
+                      const headingVal = localContent[headingKey] !== undefined ? localContent[headingKey] : slideDefault.heading;
+                      const subheadingVal = localContent[subheadingKey] !== undefined ? localContent[subheadingKey] : slideDefault.subheading;
+
                       return (
                         <div key={slide.id} className="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl space-y-3">
                           <span className="text-[10px] font-black uppercase text-primary tracking-wider">
@@ -829,7 +878,7 @@ export default function CmsForms({
                             </label>
                             <input
                               type="text"
-                              value={localContent[headingKey] || ""}
+                              value={headingVal}
                               onChange={(e) => handleFieldChange(headingKey, e.target.value)}
                               placeholder={`Enter main heading for slide ${slide.id}...`}
                               className="w-full px-4 py-2 text-xs border border-slate-700 rounded-xl focus:border-primary outline-none bg-slate-900 text-white font-medium"
@@ -841,7 +890,7 @@ export default function CmsForms({
                             </label>
                             <textarea
                               rows={2}
-                              value={localContent[subheadingKey] || ""}
+                              value={subheadingVal}
                               onChange={(e) => handleFieldChange(subheadingKey, e.target.value)}
                               placeholder={`Enter description for slide ${slide.id}...`}
                               className="w-full px-4 py-2 text-xs border border-slate-700 rounded-xl focus:border-primary outline-none bg-slate-900 text-white font-medium resize-none"
