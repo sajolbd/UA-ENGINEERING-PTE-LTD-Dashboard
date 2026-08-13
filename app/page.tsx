@@ -1,5 +1,5 @@
 "use client";
-import { API_BASE, getImageUrl } from "../lib/api";
+import { API_BASE, getApiBaseUrl, getImageUrl } from "../lib/api";
 
 import React, { useState, useRef } from "react";
 import Sidebar from "../components/Sidebar";
