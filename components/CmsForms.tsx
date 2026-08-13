@@ -559,6 +559,31 @@ export default function CmsForms({
           }
         ];
       }
+
+      if (!Array.isArray(contentMap.regions) || contentMap.regions.length === 0) {
+        contentMap.regions = [
+          {
+            name: "Central",
+            areas: ["Orchard Road", "Marina Bay", "Bugis", "Raffles Place", "Tanjong Pagar", "Clarke Quay"]
+          },
+          {
+            name: "East",
+            areas: ["Bedok", "Tampines", "Pasir Ris", "Changi", "Marine Parade"]
+          },
+          {
+            name: "West",
+            areas: ["Jurong East", "Jurong West", "Bukit Batok", "Clementi", "Boon Lay"]
+          },
+          {
+            name: "North",
+            areas: ["Woodlands", "Yishun", "Sembawang", "Admiralty"]
+          },
+          {
+            name: "North-East",
+            areas: ["Hougang", "Punggol", "Sengkang", "Serangoon"]
+          }
+        ];
+      }
     }
 
     setLocalContent(contentMap);
@@ -1788,6 +1813,132 @@ export default function CmsForms({
                               value={item.avatar || ""}
                               onChange={(val) => updateReviewItem("avatar", val)}
                             />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 9. Service Areas Section (Reliable Engineering & Renovation Solutions Near You!) */}
+                  <div className="space-y-4 border-b border-slate-100 pb-5">
+                    <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                      9. Service Areas Section (Reliable Engineering & Renovation Solutions Near You!)
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Section Badge Tag
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.areaBadge || ""}
+                          onChange={(e) => handleFieldChange("areaBadge", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl bg-slate-900 text-white font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Section Main Heading ("Reliable Engineering & Renovation Solutions Near You!")
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.areaHeading || ""}
+                          onChange={(e) => handleFieldChange("areaHeading", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl bg-slate-900 text-white font-medium"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                        Section Description Text
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={localContent.areaSubheading || ""}
+                        onChange={(e) => handleFieldChange("areaSubheading", e.target.value)}
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl bg-slate-900 text-white font-medium resize-none"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2">
+                      <h5 className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                        9.1 Dynamic Service Regions & Locations Manager
+                      </h5>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentList = Array.isArray(localContent.regions) ? [...localContent.regions] : [];
+                          const newRegion = {
+                            name: "New Region Name",
+                            areas: ["Location 1", "Location 2", "Location 3"],
+                          };
+                          handleFieldChange("regions", [...currentList, newRegion]);
+                        }}
+                        className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-primary hover:bg-primary/90 text-white rounded-xl transition-all duration-300 shadow-md cursor-pointer active:scale-95"
+                      >
+                        <span>+ Add New Region</span>
+                      </button>
+                    </div>
+
+                    <div className="space-y-4">
+                      {(Array.isArray(localContent.regions) ? localContent.regions : []).map((region: any, idx: number) => {
+                        const updateRegion = (field: string, val: any) => {
+                          const currentList = Array.isArray(localContent.regions) ? [...localContent.regions] : [];
+                          const listCopy = [...currentList];
+                          listCopy[idx] = { ...listCopy[idx], [field]: val };
+                          handleFieldChange("regions", listCopy);
+                        };
+
+                        const deleteRegion = () => {
+                          const currentList = Array.isArray(localContent.regions) ? [...localContent.regions] : [];
+                          const updatedList = currentList.filter((_, i) => i !== idx);
+                          handleFieldChange("regions", updatedList);
+                        };
+
+                        const areasString = Array.isArray(region.areas)
+                          ? region.areas.join(", ")
+                          : typeof region.areas === "string"
+                          ? region.areas
+                          : "";
+
+                        return (
+                          <div key={idx} className="p-4 bg-slate-950/70 border border-slate-800 rounded-xl space-y-3 relative group">
+                            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                              <span className="text-xs font-black uppercase text-primary">
+                                Region #{idx + 1} - {region.name}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={deleteRegion}
+                                className="px-2.5 py-1 text-[10px] font-extrabold bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white rounded-lg transition-colors cursor-pointer"
+                              >
+                                Delete Region
+                              </button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <div>
+                                <label className="block text-[9px] font-extrabold uppercase text-slate-400">Region Name (e.g. Central, East, North)</label>
+                                <input
+                                  type="text"
+                                  value={region.name || ""}
+                                  onChange={(e) => updateRegion("name", e.target.value)}
+                                  className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[9px] font-extrabold uppercase text-slate-400">Service Locations (Comma-separated)</label>
+                                <input
+                                  type="text"
+                                  value={areasString}
+                                  onChange={(e) => {
+                                    const arrayVal = e.target.value.split(",").map((s) => s.trimStart());
+                                    updateRegion("areas", arrayVal);
+                                  }}
+                                  placeholder="e.g. Orchard Road, Marina Bay, Bugis, Raffles Place"
+                                  className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
+                                />
+                              </div>
+                            </div>
                           </div>
                         );
                       })}
