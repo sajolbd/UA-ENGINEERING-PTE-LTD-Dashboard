@@ -319,6 +319,27 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     processStep4Title: "Final Inspection & Handover",
     processStep4Desc: "We conduct final quality checks, ensure everything meets expectations, and hand over your completed project with confidence.",
     processStep4Image: "/images/home/process/handover.png",
+    testimonialBadge: "TESTIMONIALS",
+    testimonialHeading: "Hear out From our clients",
+    testimonialSubheading: "See what our clients has to say about our services and experience.",
+    testimonial1Name: "Marcus Tan",
+    testimonial1Role: "Property Manager, CapitaLand",
+    testimonial1Project: "Commercial Waterproofing",
+    testimonial1Quote: "UA Engineering did an outstanding job waterproofing our commercial facade and basement. Excellent workmanship, clean execution, and no water leaks since completion!",
+    testimonial1Thumbnail: "/images/home/projects/project-waterproofing.png",
+    testimonial1VideoId: "A2y8jK-iGSw",
+    testimonial2Name: "Sarah Lim",
+    testimonial2Role: "Homeowner, Sentosa Cove",
+    testimonial2Project: "Premium Renovation & Fit-out",
+    testimonial2Quote: "Their attention to detail during our home renovation was exceptional. From hacking to false ceiling installation, they delivered premium quality on schedule.",
+    testimonial2Thumbnail: "/images/home/projects/project-drywall.png",
+    testimonial2VideoId: "G5-o475Xz1Y",
+    testimonial3Name: "David Hendricks",
+    testimonial3Role: "Facilities Director, Jurong Hub",
+    testimonial3Project: "Industrial Electrical Upgrade",
+    testimonial3Quote: "Superb coordination and safety protocol adherence during our substation electrical works. The project was completed efficiently and complied with all regulations.",
+    testimonial3Thumbnail: "/images/home/projects/project-electrical.png",
+    testimonial3VideoId: "yY19i3889p4",
   },
   about: {
     heroHeading: "About UA Engineering",
@@ -1372,6 +1393,113 @@ export default function CmsForms({
                         value={localContent.callbackSupportImage || ""}
                         onChange={(val) => handleFieldChange("callbackSupportImage", val)}
                       />
+                    </div>
+                  </div>
+
+                  {/* 7. Video Testimonials (Hear out From our clients) Section */}
+                  <div className="space-y-4 border-b border-slate-100 pb-5">
+                    <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                      7. Video Testimonials Section (Hear out From our clients)
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Section Sub-Badge Label
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.testimonialBadge || ""}
+                          onChange={(e) => handleFieldChange("testimonialBadge", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl bg-slate-900 text-white font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Section Heading ("Hear out From our clients")
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.testimonialHeading || ""}
+                          onChange={(e) => handleFieldChange("testimonialHeading", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl bg-slate-900 text-white font-medium"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                        Section Subtitle / Description
+                      </label>
+                      <input
+                        type="text"
+                        value={localContent.testimonialSubheading || ""}
+                        onChange={(e) => handleFieldChange("testimonialSubheading", e.target.value)}
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl bg-slate-900 text-white font-medium"
+                      />
+                    </div>
+
+                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-300 pt-2">
+                      7.1 Video Testimonials Cards (3 Client Cards)
+                    </h5>
+                    <div className="space-y-4">
+                      {[1, 2, 3].map((num) => (
+                        <div key={num} className="p-4 bg-slate-950/70 border border-slate-800 rounded-xl space-y-3">
+                          <span className="text-xs font-black uppercase text-primary">Client Video Testimonial #{num}</span>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div>
+                              <label className="block text-[9px] font-extrabold uppercase text-slate-400">Client Name</label>
+                              <input
+                                type="text"
+                                value={localContent[`testimonial${num}Name`] || ""}
+                                onChange={(e) => handleFieldChange(`testimonial${num}Name`, e.target.value)}
+                                className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[9px] font-extrabold uppercase text-slate-400">Role & Organization</label>
+                              <input
+                                type="text"
+                                value={localContent[`testimonial${num}Role`] || ""}
+                                onChange={(e) => handleFieldChange(`testimonial${num}Role`, e.target.value)}
+                                className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[9px] font-extrabold uppercase text-slate-400">Project Name</label>
+                              <input
+                                type="text"
+                                value={localContent[`testimonial${num}Project`] || ""}
+                                onChange={(e) => handleFieldChange(`testimonial${num}Project`, e.target.value)}
+                                className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-[9px] font-extrabold uppercase text-slate-400">Review Quote Text</label>
+                            <textarea
+                              rows={2}
+                              value={localContent[`testimonial${num}Quote`] || ""}
+                              onChange={(e) => handleFieldChange(`testimonial${num}Quote`, e.target.value)}
+                              className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium resize-none"
+                            />
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <ImageUploadField
+                              label="Video Cover / Thumbnail Image"
+                              value={localContent[`testimonial${num}Thumbnail`] || ""}
+                              onChange={(val) => handleFieldChange(`testimonial${num}Thumbnail`, val)}
+                            />
+                            <div>
+                              <label className="block text-[9px] font-extrabold uppercase text-slate-400">YouTube Video ID (e.g. A2y8jK-iGSw)</label>
+                              <input
+                                type="text"
+                                value={localContent[`testimonial${num}VideoId`] || ""}
+                                onChange={(e) => handleFieldChange(`testimonial${num}VideoId`, e.target.value)}
+                                className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
