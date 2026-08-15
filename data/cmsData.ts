@@ -87,6 +87,7 @@ export interface AboutContent {
   processSubheading: string;
   faqHeading: string;
   faqSubheading: string;
+  faqsJson?: string;
   residentialHeading: string;
   residentialSubheading: string;
 }
@@ -299,8 +300,26 @@ export const initialCmsData: CmsDatabase = {
       ehsImage: "/images/home/about/about-main.jpg",
       processHeading: "Our Engineering Process",
       processSubheading: "From initial consultation to project completion, we follow standard safety guidelines.",
-      faqHeading: "Frequently Asked Questions",
+      faqHeading: "FAQ's: Looking for Answers?",
       faqSubheading: "Got questions about our engineering & renovation services in Singapore?",
+      faqsJson: JSON.stringify([
+        {
+          question: "How long has UA Engineering PTE. LTD. been serving Singapore?",
+          answer: "UA Engineering PTE. LTD. has been a trusted contractor in Singapore's renovation and engineering industry for over 15 years. Over the years, we've built a strong reputation for delivering high-quality renovation, partition, waterproofing, and structural upgrades for residential, commercial, and industrial properties."
+        },
+        {
+          question: "What sets UA Engineering apart from other contractors in Singapore?",
+          answer: "What sets us apart is our professional specialization, certified engineering teams (such as EMA-certified electricians), transparency in quoting, and adherence to Singapore building safety guidelines (HDB/BCA). We provide turnkey project execution from minor handyman repairs to full landed house addition & alteration (A&A)."
+        },
+        {
+          question: "Do you offer free site inspections and consultations?",
+          answer: "Yes, we believe in empowering our clients with the information they need to make informed decisions. We offer free, no-obligation site assessments and detailed consultations. This allows us to inspect your property (e.g., for roof leakages or renovation layout plans) and provide a transparent, upfront quotation."
+        },
+        {
+          question: "How do you ensure safety and quality control on site?",
+          answer: "Safety is our absolute priority and is non-negotiable. We strictly follow Workplace Safety and Health (WSH) guidelines on all project sites. Our teams are equipped with certified personal protective equipment (PPE) and undergo regular risk assessments. For quality control, we utilize premium, Singapore-certified materials and conduct strict supervision at every project phase."
+        }
+      ]),
       residentialHeading: "Residential Renovation & Upgrading Capability",
       residentialSubheading: "Providing HDB, Condominium, and Landed Home owners with certified renovation solutions."
     },
