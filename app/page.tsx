@@ -360,17 +360,15 @@ export default function DashboardHome() {
 
       if (!res.ok) {
         console.error("[CMS Save HTTP Error]", res.status, res.statusText);
-        setCmsData((prev) => ({
-          ...prev,
-          [pageId]: {
-            ...prev[pageId],
-            [formType]: { ...updatedData },
-          },
-        }));
-        return true;
+        return false;
       }
 
       const result = await res.json();
+      if (!result.success) {
+        console.error("[CMS Save API Error]", result.error);
+        return false;
+      }
+
       setCmsData((prev) => ({
         ...prev,
         [pageId]: {
@@ -381,14 +379,7 @@ export default function DashboardHome() {
       return true;
     } catch (err) {
       console.error("[CMS Save Error]", err);
-      setCmsData((prev) => ({
-        ...prev,
-        [pageId]: {
-          ...prev[pageId],
-          [formType]: { ...updatedData },
-        },
-      }));
-      return true;
+      return false;
     }
   };
 
