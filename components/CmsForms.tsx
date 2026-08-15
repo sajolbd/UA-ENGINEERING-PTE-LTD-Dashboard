@@ -1147,15 +1147,24 @@ export default function CmsForms({
                     ].map((slide) => {
                       const headingKey = `heroSlide${slide.id}Heading`;
                       const subheadingKey = `heroSlide${slide.id}Subheading`;
+                      const bgKey = `heroSlide${slide.id}Bg`;
                       const slideDefault = DEFAULT_HERO_SLIDES[slide.id] || { heading: "", subheading: "" };
                       const headingVal = localContent[headingKey] !== undefined ? localContent[headingKey] : slideDefault.heading;
                       const subheadingVal = localContent[subheadingKey] !== undefined ? localContent[subheadingKey] : slideDefault.subheading;
+                      const bgVal = localContent[bgKey] || localContent.heroImage || "/images/home/hero/hero-bg.png";
 
                       return (
                         <div key={slide.id} className="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl space-y-3">
                           <span className="text-[10px] font-black uppercase text-primary tracking-wider">
                             {slide.title}
                           </span>
+                          <div>
+                            <ImageUploadField
+                              label={`Slide ${slide.id} Background Image`}
+                              value={bgVal}
+                              onChange={(val) => handleFieldChange(bgKey, val)}
+                            />
+                          </div>
                           <div>
                             <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
                               Slide {slide.id} Main Title / Heading

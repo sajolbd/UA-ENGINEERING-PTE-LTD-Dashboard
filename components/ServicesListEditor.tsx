@@ -38,6 +38,7 @@ interface ServiceCategory {
   description: string;
   featuredImage: string;
   bgImage: string;
+  icon?: string;
   services: SubService[];
 }
 
@@ -236,6 +237,7 @@ export default function ServicesListEditor() {
   const [catDesc, setCatDesc] = useState("");
   const [catFeaturedImage, setCatFeaturedImage] = useState("");
   const [catBgImage, setCatBgImage] = useState("");
+  const [catIcon, setCatIcon] = useState("");
 
   // Sub-Service Modal States (Add & Edit)
   const [showSubModal, setShowSubModal] = useState(false);
@@ -331,6 +333,7 @@ export default function ServicesListEditor() {
     setCatDesc("");
     setCatFeaturedImage("/images/services/sanitary-hero.png");
     setCatBgImage("/images/layout/breadcrumb-bg.png");
+    setCatIcon("");
     setShowCategoryModal(true);
   };
 
@@ -343,6 +346,7 @@ export default function ServicesListEditor() {
     setCatDesc(cat.description);
     setCatFeaturedImage(cat.featuredImage);
     setCatBgImage(cat.bgImage);
+    setCatIcon(cat.icon || "");
     setShowCategoryModal(true);
   };
 
@@ -369,7 +373,8 @@ export default function ServicesListEditor() {
             shortDescription: catShortDesc.trim(),
             description: catDesc.trim(),
             featuredImage: catFeaturedImage || "/images/services/sanitary-hero.png",
-            bgImage: catBgImage || "/images/layout/breadcrumb-bg.png"
+            bgImage: catBgImage || "/images/layout/breadcrumb-bg.png",
+            icon: catIcon || ""
           };
         }
         return c;
@@ -384,6 +389,7 @@ export default function ServicesListEditor() {
         description: catDesc.trim(),
         featuredImage: catFeaturedImage || "/images/services/sanitary-hero.png",
         bgImage: catBgImage || "/images/layout/breadcrumb-bg.png",
+        icon: catIcon || "",
         services: []
       };
       updated = [...categories, newCategory];
@@ -826,6 +832,12 @@ export default function ServicesListEditor() {
                   className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium resize-none placeholder:text-slate-500"
                 />
               </div>
+
+              <ImageUploadField
+                label="Service Card Icon (Shown on Homepage Grid)"
+                value={catIcon}
+                onChange={setCatIcon}
+              />
 
               <ImageUploadField
                 label="Featured Showcase Image"
