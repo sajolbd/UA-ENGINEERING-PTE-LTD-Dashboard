@@ -269,6 +269,12 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     aboutImage: "/images/home/about/about-main.jpg",
     aboutImageAlt: "UA Engineering Upgrading Worksite Inspections Team",
     aboutExperience: "15",
+    aboutCard1Title: "BCA Certified Company",
+    aboutCard1Desc: "Meeting standards with quality workmanship, compliance, and professional practices.",
+    aboutCard2Title: "Skilled & Certified Workforce",
+    aboutCard2Desc: "Experienced professionals delivering quality work with precision, reliability, and attention.",
+    aboutCard3Title: "Competitive & Transparent Pricing",
+    aboutCard3Desc: "Fair, upfront pricing with detailed quotations and no hidden costs or unexpected charges.",
     whyChooseBadge: "UA ADVANTAGE",
     whyChooseHeading: "Why Choose UA Engineering?",
     whyCard1Title: "Complete Building Solutions",
@@ -1242,6 +1248,78 @@ export default function CmsForms({
                           onChange={(e) => handleFieldChange("aboutExperience", e.target.value)}
                           className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
                         />
+                      </div>
+                    </div>
+
+                    {/* About Section Feature Cards (3 Cards) */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-slate-800">
+                      {/* Card 1 */}
+                      <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800 space-y-2">
+                        <span className="text-[10px] font-black uppercase text-primary tracking-wider">About Card 1</span>
+                        <div>
+                          <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-1">Title</label>
+                          <input
+                            type="text"
+                            value={localContent.aboutCard1Title || ""}
+                            onChange={(e) => handleFieldChange("aboutCard1Title", e.target.value)}
+                            className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-medium"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-1">Description</label>
+                          <textarea
+                            rows={2}
+                            value={localContent.aboutCard1Desc || ""}
+                            onChange={(e) => handleFieldChange("aboutCard1Desc", e.target.value)}
+                            className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-medium resize-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Card 2 */}
+                      <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800 space-y-2">
+                        <span className="text-[10px] font-black uppercase text-primary tracking-wider">About Card 2</span>
+                        <div>
+                          <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-1">Title</label>
+                          <input
+                            type="text"
+                            value={localContent.aboutCard2Title || ""}
+                            onChange={(e) => handleFieldChange("aboutCard2Title", e.target.value)}
+                            className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-medium"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-1">Description</label>
+                          <textarea
+                            rows={2}
+                            value={localContent.aboutCard2Desc || ""}
+                            onChange={(e) => handleFieldChange("aboutCard2Desc", e.target.value)}
+                            className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-medium resize-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Card 3 */}
+                      <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800 space-y-2">
+                        <span className="text-[10px] font-black uppercase text-primary tracking-wider">About Card 3</span>
+                        <div>
+                          <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-1">Title</label>
+                          <input
+                            type="text"
+                            value={localContent.aboutCard3Title || ""}
+                            onChange={(e) => handleFieldChange("aboutCard3Title", e.target.value)}
+                            className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-medium"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-1">Description</label>
+                          <textarea
+                            rows={2}
+                            value={localContent.aboutCard3Desc || ""}
+                            onChange={(e) => handleFieldChange("aboutCard3Desc", e.target.value)}
+                            className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-medium resize-none"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>

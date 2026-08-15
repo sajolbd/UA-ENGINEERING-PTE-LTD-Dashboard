@@ -48,6 +48,12 @@ export interface HomeContent {
   aboutImage: string;
   aboutImageAlt: string;
   aboutExperience: string;
+  aboutCard1Title?: string;
+  aboutCard1Desc?: string;
+  aboutCard2Title?: string;
+  aboutCard2Desc?: string;
+  aboutCard3Title?: string;
+  aboutCard3Desc?: string;
   whyChooseBadge: string;
   whyChooseHeading: string;
   relyBadge: string;
@@ -203,6 +209,12 @@ export const initialCmsData: CmsDatabase = {
       aboutImage: "/images/home/about/about-main.jpg",
       aboutImageAlt: "UA Engineering Upgrading Worksite Inspections Team",
       aboutExperience: "15",
+      aboutCard1Title: "BCA Certified Company",
+      aboutCard1Desc: "Meeting standards with quality workmanship, compliance, and professional practices.",
+      aboutCard2Title: "Skilled & Certified Workforce",
+      aboutCard2Desc: "Experienced professionals delivering quality work with precision, reliability, and attention.",
+      aboutCard3Title: "Competitive & Transparent Pricing",
+      aboutCard3Desc: "Fair, upfront pricing with detailed quotations and no hidden costs or unexpected charges.",
       whyChooseBadge: "UA ADVANTAGE",
       whyChooseHeading: "Why Choose UA Engineering?",
       whyCard1Title: "Complete Building Solutions",
