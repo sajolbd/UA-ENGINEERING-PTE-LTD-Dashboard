@@ -205,6 +205,9 @@ export default function DashboardHome() {
   // CMS State prefilled with actual website pages and SEO data
   const [cmsData, setCmsData] = useState<CmsDatabase>(initialCmsData);
 
+  // Database status state
+  const [dbStatus, setDbStatus] = useState<{ status: string; database: string }>({ status: "loading", database: "" });
+
   // Add Blog Modal States
   const [showAddBlogModal, setShowAddBlogModal] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -273,6 +276,20 @@ export default function DashboardHome() {
       const auth = localStorage.getItem("admin_auth");
       setIsAuthenticated(auth === "true");
     }
+
+    // Check backend health and database status
+    fetch(`${API_BASE}/api/health`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === "ok") {
+          setDbStatus({ status: "ok", database: data.database });
+        } else {
+          setDbStatus({ status: "error", database: "" });
+        }
+      })
+      .catch(() => {
+        setDbStatus({ status: "error", database: "" });
+      });
 
     fetch(`${API_BASE}/api/cms`)
       .then((res) => res.json())
@@ -708,6 +725,25 @@ export default function DashboardHome() {
 
         {/* PAGE CONTENT CONTAINER */}
         <main className="flex-1 p-3 sm:p-6 overflow-y-auto bg-slate-50/50 thin-scrollbar">
+          {/* Database connection warning banner */}
+          {dbStatus.status === "ok" && dbStatus.database !== "MongoDB" && (
+            <div className="mb-6 p-4 sm:p-5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 rounded-2xl flex items-start gap-4 text-amber-900 shadow-sm animate-fade-in">
+              <span className="text-2xl select-none leading-none">⚠️</span>
+              <div className="space-y-1">
+                <h4 className="text-xs font-black uppercase tracking-wider text-amber-800">
+                  Database Local Fallback Active
+                </h4>
+                <p className="text-[11px] font-semibold text-amber-700/90 leading-relaxed">
+                  The backend server is running in local fallback mode (using <strong>{dbStatus.database}</strong>) because it could not connect to your MongoDB database. Any updates you make here (including uploaded images) will be stored temporarily in memory or local files and will be <strong>REVERTED/LOST</strong> when the server restarts or redeploys (which happens frequently on Vercel or Render).
+                </p>
+                <div className="pt-2 text-[10px] font-bold text-amber-800 flex flex-wrap gap-x-4 gap-y-1 border-t border-amber-200/30">
+                  <span>🛠️ <strong>How to fix:</strong> Configure the <code>MONGODB_URI</code> environment variable on your hosting dashboard (Vercel/Render).</span>
+                  <span>🔒 Make sure your MongoDB Atlas IP Access List (whitelist) allows connections from all IPs (<code>0.0.0.0/0</code>).</span>
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeTab === "overview" ? (
             /* OVERVIEW TAB VIEW */
             <div className="space-y-6 animate-fade-in">
