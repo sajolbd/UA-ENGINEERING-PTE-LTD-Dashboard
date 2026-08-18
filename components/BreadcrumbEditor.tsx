@@ -369,6 +369,7 @@ export default function BreadcrumbEditor({ cmsData, onUpdateCmsData }: Breadcrum
           return {
             ...cat,
             breadcrumbTitle: heroHeading,
+            shortDescription: heroSubheading,
             bgImage: heroImage
           };
         }
@@ -403,6 +404,7 @@ export default function BreadcrumbEditor({ cmsData, onUpdateCmsData }: Breadcrum
                 return {
                   ...sub,
                   breadcrumbTitle: heroHeading,
+                  description: heroSubheading,
                   breadcrumbBg: heroImage
                 };
               }
