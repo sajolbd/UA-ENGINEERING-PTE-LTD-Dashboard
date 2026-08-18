@@ -11,8 +11,10 @@ import {
   CheckCircle,
   AlertCircle,
   X,
-  MapPin
+  MapPin,
+  Database
 } from "lucide-react";
+import { initialProjectsData } from "../data/projectsData";
 
 interface ProjectItem {
   id?: string;
@@ -261,17 +263,53 @@ export default function ProjectsListEditor() {
     fetchWithTimeout(`${API_BASE}/api/projects`, {}, 5000)
       .then((res) => res.json())
       .then((res) => {
-        if (res.success && Array.isArray(res.data)) {
+        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
           setProjects(res.data);
+        } else {
+          setProjects(initialProjectsData);
         }
       })
-      .catch((err) => console.warn("Failed to load projects list:", err))
+      .catch((err) => {
+        console.warn("Failed to load projects list, using fallback:", err);
+        setProjects(initialProjectsData);
+      })
       .finally(() => setLoading(false));
   };
 
   useEffect(() => {
     loadProjects();
   }, []);
+
+  const handleSeedProjects = async () => {
+    setLoading(true);
+    try {
+      let savedCount = 0;
+      for (const p of initialProjectsData) {
+        const payload = {
+          slug: p.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+          title: p.title,
+          category: p.category,
+          image: p.image,
+          description: p.description || "",
+          location: p.location || "Singapore",
+          gallery: p.gallery || []
+        };
+        const res = await fetch(`${API_BASE}/api/projects`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const resJson = await res.json();
+        if (resJson.success) savedCount++;
+      }
+      loadProjects();
+      showToast("success", "Portfolio Seeded", `Successfully seeded ${savedCount} projects into database!`);
+    } catch {
+      showToast("error", "Seeding Failed", "Could not seed default projects.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddGalleryItem = () => {
     setGallery([...gallery, ""]);
@@ -426,13 +464,24 @@ export default function ProjectsListEditor() {
           </div>
         </div>
 
-        <button
-          onClick={handleOpenAddModal}
-          className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-lg shadow-primary/20 transition-all active:scale-95 self-start sm:self-auto select-none"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add New Project</span>
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button
+            onClick={handleSeedProjects}
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold transition-all active:scale-95 select-none"
+            title="Save default 12 website projects into Database"
+          >
+            <Database className="w-3.5 h-3.5 text-primary" />
+            <span>Seed Default Projects</span>
+          </button>
+
+          <button
+            onClick={handleOpenAddModal}
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-lg shadow-primary/20 transition-all active:scale-95 select-none"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add New Project</span>
+          </button>
+        </div>
       </div>
 
       {/* SAVE SUCCESS NOTIFICATION */}
