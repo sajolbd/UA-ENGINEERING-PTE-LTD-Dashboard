@@ -41,6 +41,9 @@ interface ServiceCategory {
   bgImage: string;
   icon?: string;
   services: SubService[];
+  features?: string[];
+  benefits?: string[];
+  process?: string[];
 }
 
 interface ImageUploadFieldProps {
@@ -240,6 +243,37 @@ export default function ServicesListEditor() {
   const [catFeaturedImage, setCatFeaturedImage] = useState("");
   const [catBgImage, setCatBgImage] = useState("");
   const [catIcon, setCatIcon] = useState("");
+  const [catFeatures, setCatFeatures] = useState<string[]>([""]);
+  const [catBenefits, setCatBenefits] = useState<string[]>([""]);
+  const [catProcessList, setCatProcessList] = useState<string[]>([""]);
+
+  const handleCatListChange = (index: number, value: string, listType: "features" | "benefits" | "process") => {
+    if (listType === "features") {
+      const copy = [...catFeatures];
+      copy[index] = value;
+      setCatFeatures(copy);
+    } else if (listType === "benefits") {
+      const copy = [...catBenefits];
+      copy[index] = value;
+      setCatBenefits(copy);
+    } else {
+      const copy = [...catProcessList];
+      copy[index] = value;
+      setCatProcessList(copy);
+    }
+  };
+
+  const handleAddCatListItem = (listType: "features" | "benefits" | "process") => {
+    if (listType === "features") setCatFeatures([...catFeatures, ""]);
+    else if (listType === "benefits") setCatBenefits([...catBenefits, ""]);
+    else setCatProcessList([...catProcessList, ""]);
+  };
+
+  const handleRemoveCatListItem = (index: number, listType: "features" | "benefits" | "process") => {
+    if (listType === "features") setCatFeatures(catFeatures.filter((_, idx) => idx !== index));
+    else if (listType === "benefits") setCatBenefits(catBenefits.filter((_, idx) => idx !== index));
+    else setCatProcessList(catProcessList.filter((_, idx) => idx !== index));
+  };
 
   // Sub-Service Modal States (Add & Edit)
   const [showSubModal, setShowSubModal] = useState(false);
@@ -349,6 +383,9 @@ export default function ServicesListEditor() {
     setCatFeaturedImage("/images/services/sanitary-hero.png");
     setCatBgImage("/images/layout/breadcrumb-bg.png");
     setCatIcon("");
+    setCatFeatures([""]);
+    setCatBenefits([""]);
+    setCatProcessList([""]);
     setShowCategoryModal(true);
   };
 
@@ -362,6 +399,9 @@ export default function ServicesListEditor() {
     setCatFeaturedImage(cat.featuredImage);
     setCatBgImage(cat.bgImage);
     setCatIcon(cat.icon || "");
+    setCatFeatures(cat.features && cat.features.length > 0 ? cat.features : [""]);
+    setCatBenefits(cat.benefits && cat.benefits.length > 0 ? cat.benefits : [""]);
+    setCatProcessList(cat.process && cat.process.length > 0 ? cat.process : [""]);
     setShowCategoryModal(true);
   };
 
@@ -376,6 +416,10 @@ export default function ServicesListEditor() {
       ? editingCategorySlug
       : catTitle.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
+    const featuresClean = catFeatures.map((s) => s.trim()).filter(Boolean);
+    const benefitsClean = catBenefits.map((s) => s.trim()).filter(Boolean);
+    const processClean = catProcessList.map((s) => s.trim()).filter(Boolean);
+
     let updated: ServiceCategory[];
     if (editingCategorySlug) {
       // Editing existing category
@@ -389,7 +433,10 @@ export default function ServicesListEditor() {
             description: catDesc.trim(),
             featuredImage: catFeaturedImage || "/images/services/sanitary-hero.png",
             bgImage: catBgImage || "/images/layout/breadcrumb-bg.png",
-            icon: catIcon || ""
+            icon: catIcon || "",
+            features: featuresClean,
+            benefits: benefitsClean,
+            process: processClean
           };
         }
         return c;
@@ -405,7 +452,10 @@ export default function ServicesListEditor() {
         featuredImage: catFeaturedImage || "/images/services/sanitary-hero.png",
         bgImage: catBgImage || "/images/layout/breadcrumb-bg.png",
         icon: catIcon || "",
-        services: []
+        services: [],
+        features: featuresClean,
+        benefits: benefitsClean,
+        process: processClean
       };
       updated = [...categories, newCategory];
     }
@@ -867,6 +917,108 @@ export default function ServicesListEditor() {
                 value={catBgImage}
                 onChange={setCatBgImage}
               />
+
+              {/* Dynamic list: Category Key Specifications / Features */}
+              <div className="space-y-2 pt-2 border-t border-slate-800">
+                <div className="flex items-center justify-between">
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                    Category Key Specifications / Highlights
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => handleAddCatListItem("features")}
+                    className="text-[10px] font-extrabold text-primary hover:underline inline-flex items-center gap-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Bullet Row
+                  </button>
+                </div>
+                {catFeatures.map((item, idx) => (
+                  <div key={idx} className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      placeholder="e.g. BCA Certified Workmanship..."
+                      value={item}
+                      onChange={(e) => handleCatListChange(idx, e.target.value, "features")}
+                      className="flex-1 px-4 py-2 text-xs border border-slate-700 rounded-xl bg-slate-950 text-white placeholder:text-slate-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveCatListItem(idx, "features")}
+                      className="p-2 text-slate-400 hover:text-red-400"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Dynamic list: Category Benefits to Client */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                    Category Key Benefits / Why Choose Us
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => handleAddCatListItem("benefits")}
+                    className="text-[10px] font-extrabold text-primary hover:underline inline-flex items-center gap-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Bullet Row
+                  </button>
+                </div>
+                {catBenefits.map((item, idx) => (
+                  <div key={idx} className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      placeholder="Benefit point..."
+                      value={item}
+                      onChange={(e) => handleCatListChange(idx, e.target.value, "benefits")}
+                      className="flex-1 px-4 py-2 text-xs border border-slate-700 rounded-xl bg-slate-950 text-white placeholder:text-slate-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveCatListItem(idx, "benefits")}
+                      className="p-2 text-slate-400 hover:text-red-400"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Dynamic list: Category Work Process Steps */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                    Category Work Process Steps
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => handleAddCatListItem("process")}
+                    className="text-[10px] font-extrabold text-primary hover:underline inline-flex items-center gap-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Bullet Row
+                  </button>
+                </div>
+                {catProcessList.map((item, idx) => (
+                  <div key={idx} className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      placeholder="Step description..."
+                      value={item}
+                      onChange={(e) => handleCatListChange(idx, e.target.value, "process")}
+                      className="flex-1 px-4 py-2 text-xs border border-slate-700 rounded-xl bg-slate-950 text-white placeholder:text-slate-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveCatListItem(idx, "process")}
+                      className="p-2 text-slate-400 hover:text-red-400"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
 
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
                 <button

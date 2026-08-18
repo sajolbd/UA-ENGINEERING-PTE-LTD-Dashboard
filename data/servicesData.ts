@@ -21,6 +21,9 @@ export interface ServiceCategory {
   bgImage: string;
   icon?: string;
   services: SubService[];
+  features?: string[];
+  benefits?: string[];
+  process?: string[];
 }
 
 export const initialServicesData: ServiceCategory[] = [
