@@ -307,6 +307,9 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     callbackBgImage: "/images/home/call/callback-bg.png",
     callbackSupportImage: "/images/home/call/call-support.png",
     callbackButtonText: "Submit Now",
+    completedProjectsBadge: "LATEST PROJECTS",
+    completedProjectsHeading: "Our Completed Projects",
+    completedProjectsSubheading: "A showcase of our successfully delivered projects in Singapore, reflecting our commitment to structural precision, safety, and architectural elegance.",
     reviewsBadge: "CLIENT TESTIMONIALS",
     reviewsHeading: "What Our Clients Say About UA Engineering",
     processBadge: "HOW IT WORKS",
@@ -1606,6 +1609,51 @@ export default function CmsForms({
                         label="Call Support Mascot Graphic Image"
                         value={localContent.callbackSupportImage || ""}
                         onChange={(val) => handleFieldChange("callbackSupportImage", val)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* 6.1 OUR COMPLETED PROJECTS SECTION CONTROL */}
+                  <div className="space-y-4 border-b border-slate-100 pb-5">
+                    <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                      6.1 Our Completed Projects Section Control
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Section Tag / Badge (e.g. &quot;LATEST PROJECTS&quot;)
+                        </label>
+                        <input
+                          type="text"
+                          value={(localContent.completedProjectsBadge as string) || "LATEST PROJECTS"}
+                          onChange={(e) => handleFieldChange("completedProjectsBadge", e.target.value)}
+                          placeholder="LATEST PROJECTS"
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Section Main Title / Heading (e.g. &quot;Our Completed Projects&quot;)
+                        </label>
+                        <input
+                          type="text"
+                          value={(localContent.completedProjectsHeading as string) || "Our Completed Projects"}
+                          onChange={(e) => handleFieldChange("completedProjectsHeading", e.target.value)}
+                          placeholder="Our Completed Projects"
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                        Section Subtitle / Description Text
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={(localContent.completedProjectsSubheading as string) || "A showcase of our successfully delivered projects in Singapore, reflecting our commitment to structural precision, safety, and architectural elegance."}
+                        onChange={(e) => handleFieldChange("completedProjectsSubheading", e.target.value)}
+                        placeholder="Provide section subtitle text..."
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium resize-none placeholder:text-slate-500"
                       />
                     </div>
                   </div>
