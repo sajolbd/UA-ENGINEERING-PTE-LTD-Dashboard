@@ -9,9 +9,7 @@ import {
   CheckCircle,
   AlertCircle,
   Database,
-  Code,
-  Sliders,
-  Image as ImageIcon
+  Code
 } from "lucide-react";
 import {
   CmsDatabase,
@@ -129,6 +127,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
           {/* Background grid pattern for transparency */}
           <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:12px_12px]" />
           
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={fullImageUrl}
             alt="Uploaded Preview"
@@ -426,6 +425,7 @@ export default function CmsForms({
   const pageId = activeTab.split("_")[0] as keyof CmsDatabase;
   const [formType, setFormType] = useState<"content" | "seo">("content");
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [localContent, setLocalContent] = useState<Record<string, any>>({});
   const [localSeo, setLocalSeo] = useState<PageSeo>({
     metaTitle: "",
@@ -447,6 +447,7 @@ export default function CmsForms({
     if (!pageId || !cmsData[pageId]) return;
 
     const pageData = cmsData[pageId];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const contentMap = { ...(pageData.content as unknown as Record<string, any>) };
 
     // Fill defaults for 7 Hero Sliders on Home Page
@@ -601,6 +602,7 @@ export default function CmsForms({
     });
   }, [pageId, cmsData]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleFieldChange = (field: string, value: any) => {
     setLocalContent((prev) => ({ ...prev, [field]: value }));
   };
@@ -761,6 +763,7 @@ export default function CmsForms({
                 {/* Mock Navbar */}
                 <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={getImageUrl(localContent.siteLogo || "/images/logo.png")}
                       alt="Site Logo"
@@ -768,14 +771,14 @@ export default function CmsForms({
                       onError={(e) => { (e.target as HTMLImageElement).src = "/images/logo.png"; }}
                     />
                     <div>
-                      <h5 className="text-xs font-black text-white">{localContent.companyName || "UA ENGINEERING PTE. LTD."}</h5>
-                      <p className="text-[10px] text-slate-400 font-medium">{localContent.welcomeMessage || "Welcome to UA Engineering"}</p>
+                      <h5 className="text-xs font-black text-white">{(localContent.companyName as string) || "UA ENGINEERING PTE. LTD."}</h5>
+                      <p className="text-[10px] text-slate-400 font-medium">{(localContent.welcomeMessage as string) || "Welcome to UA Engineering"}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-xs text-slate-300 font-semibold">
-                    <span className="hidden sm:inline">📞 {localContent.phone || "+65 9841 1786"}</span>
+                    <span className="hidden sm:inline">📞 {(localContent.phone as string) || "+65 9841 1786"}</span>
                     <button type="button" className="px-3 py-1.5 bg-primary text-white font-bold rounded-xl text-xs shadow-sm">
-                      {localContent.appointmentButtonText || "Book An Appointment"}
+                      {(localContent.appointmentButtonText as string) || "Book An Appointment"}
                     </button>
                   </div>
                 </div>
@@ -783,6 +786,7 @@ export default function CmsForms({
                 {/* Mock Footer */}
                 <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
                   <div className="flex items-center gap-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={getImageUrl(localContent.footerLogo || "/images/footer-logo.png")}
                       alt="Footer Logo"
@@ -792,10 +796,10 @@ export default function CmsForms({
                     <span className="text-xs font-bold text-slate-300">Footer Branding</span>
                   </div>
                   <p className="text-[11px] text-slate-400 leading-relaxed font-medium">
-                    {localContent.footerAboutText || "Professional engineering, renovation, waterproofing, and steel fabrication solutions in Singapore."}
+                    {(localContent.footerAboutText as string) || "Professional engineering, renovation, waterproofing, and steel fabrication solutions in Singapore."}
                   </p>
                   <div className="text-[10px] text-slate-500 font-mono pt-1">
-                    📍 {localContent.address || "10 Anson Road, Singapore"} | ✉️ {localContent.email || "hello.uaengineering@gmail.com"}
+                    📍 {(localContent.address as string) || "10 Anson Road, Singapore"} | ✉️ {(localContent.email as string) || "hello.uaengineering@gmail.com"}
                   </div>
                 </div>
               </div>
@@ -806,6 +810,7 @@ export default function CmsForms({
               <div className="space-y-3">
                 {/* Hero Banner Mockup with 7 Sliders Selector */}
                 <div className="relative w-full h-[220px] sm:h-[250px] flex items-center justify-center overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-xl group">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={getImageUrl(localContent.heroImage || "/images/home/hero/hero-bg.png")}
                     alt="Hero Background"
@@ -820,10 +825,10 @@ export default function CmsForms({
                       Slide #{previewSlide}: {previewSlide === 1 ? "General & Renovation" : previewSlide === 2 ? "Engineering Team" : previewSlide === 3 ? "Painting" : previewSlide === 4 ? "Roof Repairs" : previewSlide === 5 ? "Electrical" : previewSlide === 6 ? "Plumbing" : "Steel Fabrication"}
                     </span>
                     <h3 className="text-base sm:text-lg font-black text-white tracking-tight leading-snug">
-                      {localContent[`heroSlide${previewSlide}Heading`] || (previewSlide === 1 ? localContent.heroHeading : `Hero Slide ${previewSlide} Title`) || "Hero Heading"}
+                      {(localContent[`heroSlide${previewSlide}Heading`] as string) || (previewSlide === 1 ? (localContent.heroHeading as string) : `Hero Slide ${previewSlide} Title`) || "Hero Heading"}
                     </h3>
                     <p className="text-[11px] text-slate-200 line-clamp-2 font-medium">
-                      {localContent[`heroSlide${previewSlide}Subheading`] || (previewSlide === 1 ? localContent.heroSubheading : `Hero Slide ${previewSlide} Description`) || "Hero Subheading"}
+                      {(localContent[`heroSlide${previewSlide}Subheading`] as string) || (previewSlide === 1 ? (localContent.heroSubheading as string) : `Hero Slide ${previewSlide} Description`) || "Hero Subheading"}
                     </p>
                   </div>
 
@@ -849,6 +854,7 @@ export default function CmsForms({
             {/* STATIC PAGE HERO & SECTIONS PREVIEW (about, services, projects, blog, contact) */}
             {pageId !== "site" && pageId !== "home" && (
               <div className="relative w-full h-[180px] sm:h-[220px] flex items-center justify-center overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-xl group">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={getImageUrl(localContent.heroImage || "/images/layout/breadcrumb-bg.png")}
                   alt="Page Hero Background"
@@ -860,11 +866,11 @@ export default function CmsForms({
 
                 <div className="relative z-10 border border-white/30 bg-black/50 backdrop-blur-md px-6 py-4 max-w-lg text-center rounded-xl shadow-2xl space-y-1">
                   <h3 className="text-base sm:text-lg font-black text-white tracking-tight uppercase leading-snug">
-                    {localContent.heroHeading || `${pageId.toUpperCase()} PAGE HERO`}
+                    {(localContent.heroHeading as string) || `${pageId.toUpperCase()} PAGE HERO`}
                   </h3>
-                  {localContent.heroSubheading && (
+                  {Boolean(localContent.heroSubheading) && (
                     <p className="text-[11px] text-slate-300 line-clamp-2 font-medium">
-                      {localContent.heroSubheading}
+                      {localContent.heroSubheading as string}
                     </p>
                   )}
                 </div>
@@ -1623,7 +1629,7 @@ export default function CmsForms({
                       </div>
                       <div>
                         <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                          Section Heading ("Hear out From our clients")
+                          Section Heading (&quot;Hear out From our clients&quot;)
                         </label>
                         <input
                           type="text"
@@ -1671,6 +1677,7 @@ export default function CmsForms({
                     </div>
 
                     <div className="space-y-4">
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                       {(Array.isArray(localContent.testimonials) ? localContent.testimonials : []).map((item: any, idx: number) => {
                         const updateTestimonialItem = (field: string, val: string) => {
                           const currentList = Array.isArray(localContent.testimonials) ? [...localContent.testimonials] : [];
@@ -1788,7 +1795,7 @@ export default function CmsForms({
                       </div>
                       <div>
                         <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                          Section Main Title ("5-Star Happy Customer Reviews")
+                          Section Main Title (&quot;5-Star Happy Customer Reviews&quot;)
                         </label>
                         <input
                           type="text"
@@ -1824,7 +1831,9 @@ export default function CmsForms({
                     </div>
 
                     <div className="space-y-4">
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                       {(Array.isArray(localContent.googleReviews) ? localContent.googleReviews : []).map((item: any, idx: number) => {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const updateReviewItem = (field: string, val: any) => {
                           const currentList = Array.isArray(localContent.googleReviews) ? [...localContent.googleReviews] : [];
                           const listCopy = [...currentList];
@@ -1925,7 +1934,7 @@ export default function CmsForms({
                       </div>
                       <div>
                         <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                          Section Main Heading ("Reliable Engineering & Renovation Solutions Near You!")
+                          Section Main Heading (&quot;Reliable Engineering &amp; Renovation Solutions Near You!&quot;)
                         </label>
                         <input
                           type="text"
@@ -1968,7 +1977,9 @@ export default function CmsForms({
                     </div>
 
                     <div className="space-y-4">
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                       {(Array.isArray(localContent.regions) ? localContent.regions : []).map((region: any, idx: number) => {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const updateRegion = (field: string, val: any) => {
                           const currentList = Array.isArray(localContent.regions) ? [...localContent.regions] : [];
                           const listCopy = [...currentList];
@@ -2160,14 +2171,14 @@ export default function CmsForms({
                           );
                         }
 
-                        return list.map((faq: any, idx: number) => (
+                        return list.map((faq: Record<string, string>, idx: number) => (
                           <div key={idx} className="p-3 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2 relative">
                             <div className="flex justify-between items-center">
                               <span className="text-[9px] font-extrabold text-slate-400 uppercase">FAQ Item #{idx + 1}</span>
                               <button
                                 type="button"
                                 onClick={() => {
-                                  const newList = list.filter((_: any, i: number) => i !== idx);
+                                  const newList = list.filter((_: Record<string, string>, i: number) => i !== idx);
                                   handleFieldChange("faqsJson", JSON.stringify(newList));
                                 }}
                                 className="text-[10px] font-bold text-red-400 hover:text-red-300"

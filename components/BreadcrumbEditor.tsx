@@ -1,13 +1,12 @@
 "use client";
-import { API_BASE, getImageUrl } from "../lib/api";
+import { API_BASE, fetchWithTimeout, getImageUrl } from "../lib/api";
+import { initialServicesData } from "../data/servicesData";
 
 import React, { useState, useEffect } from "react";
 import {
   Image as ImageIcon,
   Save,
   CheckCircle,
-  AlertCircle,
-  Globe,
   Info,
   Briefcase,
   FolderGit,
@@ -149,6 +148,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
         }`}>
           <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:12px_12px]" />
           
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={fullImageUrl}
             alt="Uploaded Preview"
@@ -259,10 +259,10 @@ export default function BreadcrumbEditor({ cmsData, onUpdateCmsData }: Breadcrum
 
   // Load Services directory
   useEffect(() => {
-    fetch(`${API_BASE}/api/services`)
+    fetchWithTimeout(`${API_BASE}/api/services`, {}, 5000)
       .then((res) => res.json())
       .then((res) => {
-        if (res.success && res.data) {
+        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
           setCategories(res.data);
           if (res.data.length > 0) {
             setSelectedCatSlug(res.data[0].slug);
@@ -270,9 +270,26 @@ export default function BreadcrumbEditor({ cmsData, onUpdateCmsData }: Breadcrum
               setSelectedSubSlug(res.data[0].services[0].slug);
             }
           }
+        } else {
+          setCategories(initialServicesData);
+          if (initialServicesData.length > 0) {
+            setSelectedCatSlug(initialServicesData[0].slug);
+            if (initialServicesData[0].services && initialServicesData[0].services.length > 0) {
+              setSelectedSubSlug(initialServicesData[0].services[0].slug);
+            }
+          }
         }
       })
-      .catch((err) => console.error("Failed to load services for breadcrumbs:", err));
+      .catch((err) => {
+        console.warn("Failed to load services for breadcrumbs, using fallback:", err);
+        setCategories(initialServicesData);
+        if (initialServicesData.length > 0) {
+          setSelectedCatSlug(initialServicesData[0].slug);
+          if (initialServicesData[0].services && initialServicesData[0].services.length > 0) {
+            setSelectedSubSlug(initialServicesData[0].services[0].slug);
+          }
+        }
+      });
   }, []);
 
   // Sync state when page changes in pages mode
@@ -587,6 +604,7 @@ export default function BreadcrumbEditor({ cmsData, onUpdateCmsData }: Breadcrum
         </div>
 
         <div className="relative w-full h-[220px] sm:h-[260px] flex items-center justify-center overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-xl group">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={fullImageUrl}
             alt="Breadcrumb Mockup Background"
@@ -627,7 +645,7 @@ export default function BreadcrumbEditor({ cmsData, onUpdateCmsData }: Breadcrum
         <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
           <Sparkles className="w-5 h-5 text-primary" />
           <h4 className="text-sm font-black uppercase tracking-wider text-white">
-            Edit Breadcrumb for "{heroHeading}"
+            Edit Breadcrumb for &quot;{heroHeading}&quot;
           </h4>
         </div>
 

@@ -127,6 +127,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
 
       {value && (
         <div className="relative group max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 aspect-video shadow-sm transition-all duration-300 hover:shadow-md">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={fullImageUrl}
             alt="Uploaded Preview"
@@ -631,6 +632,7 @@ export default function DashboardHome() {
         <div className="w-full max-w-md mx-4 p-8 bg-slate-900/50 backdrop-blur-xl border border-slate-800/80 rounded-3xl shadow-2xl space-y-6 text-center animate-scale-up z-10">
           {/* Logo Header */}
           <div className="space-y-2 flex flex-col items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img 
               src={getImageUrl("/images/footer-logo.png")} 
               alt="Logo" 

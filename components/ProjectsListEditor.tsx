@@ -1,5 +1,5 @@
 "use client";
-import { API_BASE, getImageUrl } from "../lib/api";
+import { API_BASE, fetchWithTimeout, getImageUrl } from "../lib/api";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -11,8 +11,7 @@ import {
   CheckCircle,
   AlertCircle,
   X,
-  MapPin,
-  Image as ImageIcon
+  MapPin
 } from "lucide-react";
 
 interface ProjectItem {
@@ -122,6 +121,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
         }`}>
           <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:12px_12px]" />
           
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={fullImageUrl}
             alt="Uploaded Preview"
@@ -258,14 +258,14 @@ export default function ProjectsListEditor() {
 
   const loadProjects = () => {
     setLoading(true);
-    fetch(`${API_BASE}/api/projects`)
+    fetchWithTimeout(`${API_BASE}/api/projects`, {}, 5000)
       .then((res) => res.json())
       .then((res) => {
-        if (res.success && res.data) {
+        if (res.success && Array.isArray(res.data)) {
           setProjects(res.data);
         }
       })
-      .catch((err) => console.error("Failed to load projects list:", err))
+      .catch((err) => console.warn("Failed to load projects list:", err))
       .finally(() => setLoading(false));
   };
 
@@ -476,6 +476,7 @@ export default function ProjectsListEditor() {
                 <div>
                   {/* Thumbnail Banner */}
                   <div className="relative aspect-video w-full bg-slate-950 border-b border-slate-800">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={getImageUrl(p.image)}
                       alt={p.title}
@@ -693,7 +694,7 @@ export default function ProjectsListEditor() {
                 Delete Project?
               </h4>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Are you sure you want to permanently delete <strong className="text-white">"{deleteConfirm.projectTitle}"</strong>?
+                Are you sure you want to permanently delete <strong className="text-white">&quot;{deleteConfirm.projectTitle}&quot;</strong>?
               </p>
             </div>
 

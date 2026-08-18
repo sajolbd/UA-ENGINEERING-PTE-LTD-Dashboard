@@ -134,6 +134,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
 
       {value && (
         <div className="relative group max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 aspect-video shadow-sm transition-all duration-300 hover:shadow-md">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={fullImageUrl}
             alt="Uploaded Preview"

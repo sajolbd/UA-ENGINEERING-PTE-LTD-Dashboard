@@ -1,5 +1,6 @@
 "use client";
-import { API_BASE, getImageUrl } from "../lib/api";
+import { API_BASE, fetchWithTimeout, getImageUrl } from "../lib/api";
+import { initialServicesData } from "../data/servicesData";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -138,6 +139,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
         }`}>
           <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:12px_12px]" />
           
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={fullImageUrl}
             alt="Uploaded Preview"
@@ -282,22 +284,35 @@ export default function ServicesListEditor() {
 
   const loadServices = () => {
     setLoading(true);
-    fetch(`${API_BASE}/api/services`)
+    fetchWithTimeout(`${API_BASE}/api/services`, {}, 5000)
       .then((res) => res.json())
       .then((res) => {
-        if (res.success && res.data) {
+        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
           setCategories(res.data);
-          if (res.data.length > 0 && !expandedCat) {
+          if (!expandedCat) {
             setExpandedCat(res.data[0].slug);
+          }
+        } else {
+          // Fallback if data is empty
+          setCategories(initialServicesData);
+          if (initialServicesData.length > 0 && !expandedCat) {
+            setExpandedCat(initialServicesData[0].slug);
           }
         }
       })
-      .catch((err) => console.error("Failed to load services directory:", err))
+      .catch((err) => {
+        console.warn("Using default fallback services directory:", err);
+        setCategories(initialServicesData);
+        if (initialServicesData.length > 0 && !expandedCat) {
+          setExpandedCat(initialServicesData[0].slug);
+        }
+      })
       .finally(() => setLoading(false));
   };
 
   useEffect(() => {
     loadServices();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const saveCategoriesToBackend = async (updated: ServiceCategory[], successMsg: string) => {
@@ -636,6 +651,7 @@ export default function ServicesListEditor() {
                 className="flex items-center justify-between p-5 cursor-pointer hover:bg-slate-800/60 select-none transition-colors"
               >
                 <div className="flex items-center gap-4">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={getImageUrl(cat.featuredImage)}
                     alt={cat.title}
@@ -688,7 +704,7 @@ export default function ServicesListEditor() {
                     <div className="flex items-center gap-2">
                       <Layers className="w-4 h-4 text-primary" />
                       <span className="text-xs font-extrabold uppercase tracking-wider text-slate-300">
-                        Sub-Services List inside "{cat.title}"
+                        Sub-Services List inside &quot;{cat.title}&quot;
                       </span>
                     </div>
                     
@@ -704,7 +720,7 @@ export default function ServicesListEditor() {
                   {cat.services.length === 0 ? (
                     <div className="text-center py-8 bg-slate-900/40 rounded-xl border border-dashed border-slate-800 p-4">
                       <p className="text-xs text-slate-400 font-bold">
-                        No services configured under "{cat.title}" yet. Click above to add your first service item!
+                        No services configured under &quot;{cat.title}&quot; yet. Click above to add your first service item!
                       </p>
                     </div>
                   ) : (
@@ -715,6 +731,7 @@ export default function ServicesListEditor() {
                           className="flex items-start justify-between p-4 bg-slate-900 border border-slate-800 rounded-2xl shadow-sm hover:border-slate-700 transition-all gap-3"
                         >
                           <div className="flex gap-3">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={getImageUrl(service.image)}
                               alt={service.title}
@@ -1093,7 +1110,7 @@ export default function ServicesListEditor() {
                 Delete {deleteConfirm.type === "category" ? "Category" : "Service"}?
               </h4>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Are you sure you want to permanently delete <strong className="text-white">"{deleteConfirm.title}"</strong>?
+                Are you sure you want to permanently delete <strong className="text-white">&quot;{deleteConfirm.title}&quot;</strong>?
               </p>
             </div>
 

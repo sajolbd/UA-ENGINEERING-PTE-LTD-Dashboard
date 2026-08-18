@@ -23,6 +23,7 @@ export default function Header({ totalViews, onMenuClick }: HeaderProps) {
 
         {/* Mobile Logo */}
         <div className="md:hidden p-2 bg-[#0a1526] rounded-xl flex items-center justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/logo.png" alt="Logo" className="h-7 w-auto max-w-[120px] object-contain animate-fade-in" />
         </div>
 

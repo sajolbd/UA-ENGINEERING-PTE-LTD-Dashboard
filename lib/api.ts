@@ -23,6 +23,28 @@ export const getApiBaseUrlClient = getApiBaseUrl;
 export const API_BASE = getApiBaseUrl();
 
 /**
+ * Fetch wrapper with timeout protection to prevent hanging UI
+ */
+export const fetchWithTimeout = async (
+  url: string,
+  options: RequestInit = {},
+  timeoutMs: number = 6000
+): Promise<Response> => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    return response;
+  } finally {
+    clearTimeout(id);
+  }
+};
+
+/**
  * Resolves image paths dynamically for the dashboard.
  */
 export const getImageUrl = (imagePath: string): string => {
@@ -38,3 +60,4 @@ export const getImageUrl = (imagePath: string): string => {
   // Local static asset paths are served directly from public/images
   return imagePath;
 };
+

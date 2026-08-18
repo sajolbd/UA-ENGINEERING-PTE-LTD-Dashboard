@@ -57,6 +57,7 @@ export default function Sidebar({
       <div className="relative flex items-center justify-between px-4 py-5 border-b border-[#15233c] h-20 bg-[#070f1c] shrink-0">
         {!isCollapsed ? (
           <div className="flex items-center justify-center w-full px-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/footer-logo.png"
               alt="UA Engineering Logo"
@@ -65,6 +66,7 @@ export default function Sidebar({
           </div>
         ) : (
           <div className="w-full flex justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/logo.png"
               alt="UA Engineering Logo Icon"
