@@ -9,12 +9,26 @@ export interface SubService {
   features: string[];
   benefits: string[];
   process: string[];
+  processSteps?: ProcessStep[];
+}
+
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export interface ProcessStep {
+  title: string;
+  description: string;
 }
 
 export interface ServiceCategory {
   slug: string;
   title: string;
   breadcrumbTitle?: string;
+  detailTitle?: string;
+  subServicesTitle?: string;
+  subServicesSubheading?: string;
   shortDescription: string;
   description: string;
   featuredImage: string;
@@ -24,12 +38,30 @@ export interface ServiceCategory {
   features?: string[];
   benefits?: string[];
   process?: string[];
+  processHeading?: string;
+  processText?: string;
+  processSteps?: ProcessStep[];
+  targetBadge?: string;
+  targetHeading?: string;
+  targetSubheading?: string;
+  targetSpaces?: string[];
+  whyChooseBadge?: string;
+  whyChooseHeading?: string;
+  whyChooseLeftTitle?: string;
+  whyChooseRightTitle?: string;
+  whyChooseAdvantages?: { title: string; description: string }[];
+  whyChooseChallenges?: { title: string; description: string }[];
+  serviceAreasBadge?: string;
+  serviceAreasHeading?: string;
+  serviceAreasSubheading?: string;
+  faqs?: FAQItem[];
 }
 
 export const initialServicesData: ServiceCategory[] = [
   {
     slug: "renovation-upgrading",
     title: "Renovation & Upgrading",
+    detailTitle: "Professional Renovation & Upgrading",
     shortDescription: "Transform your residential, commercial, or industrial spaces with our custom renovation and space-planning solutions.",
     description: "UA Engineering provides top-tier renovation, interior upgrading, and space optimization solutions in Singapore. From modernizing layout structures to premium custom finishes, we deliver turnkey excellence.",
     featuredImage: "/images/services/sanitary-hero.png",

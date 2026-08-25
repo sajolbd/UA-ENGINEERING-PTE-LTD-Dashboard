@@ -2090,6 +2090,117 @@ export default function CmsForms({
                       })}
                     </div>
                   </div>
+
+                  {/* 10. Frequently Asked Questions (FAQ) Section */}
+                  <div className="space-y-4 pt-5 border-t border-slate-800">
+                    <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                      10. Frequently Asked Questions (FAQ) Section
+                    </h4>
+                    <div>
+                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                        FAQ Section Title
+                      </label>
+                      <input
+                        type="text"
+                        value={localContent.faqHeading || ""}
+                        onChange={(e) => handleFieldChange("faqHeading", e.target.value)}
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                        FAQ Section Subheading
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={localContent.faqSubheading || ""}
+                        onChange={(e) => handleFieldChange("faqSubheading", e.target.value)}
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium resize-none placeholder:text-slate-500"
+                      />
+                    </div>
+
+                    {/* FAQ Items List Editor */}
+                    <div className="space-y-3 pt-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                          FAQ Q&A List
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            let list = [];
+                            try { list = JSON.parse(localContent.faqsJson || "[]"); } catch {}
+                            const newList = [...list, { question: "New Question?", answer: "New Answer text..." }];
+                            handleFieldChange("faqsJson", JSON.stringify(newList));
+                          }}
+                          className="text-[10px] font-extrabold text-primary hover:underline inline-flex items-center gap-1"
+                        >
+                          + Add FAQ Item
+                        </button>
+                      </div>
+
+                      {(() => {
+                        let list = [];
+                        try {
+                          list = JSON.parse(localContent.faqsJson || "[]");
+                        } catch {}
+                        
+                        if (list.length === 0) {
+                          return (
+                            <div className="text-center py-4 bg-slate-950/20 border border-dashed border-slate-800 rounded-xl p-3">
+                              <span className="text-xs text-slate-500">No FAQ items defined yet. Click above to add.</span>
+                            </div>
+                          );
+                        }
+
+                        return list.map((faq: Record<string, string>, idx: number) => (
+                          <div key={idx} className="p-3 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2 relative">
+                            <div className="flex justify-between items-center">
+                              <span className="text-[9px] font-extrabold text-slate-400 uppercase">FAQ Item #{idx + 1}</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newList = list.filter((_: Record<string, string>, i: number) => i !== idx);
+                                  handleFieldChange("faqsJson", JSON.stringify(newList));
+                                }}
+                                className="text-[10px] font-bold text-red-400 hover:text-red-300"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                            <div className="space-y-2">
+                              <div>
+                                <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-0.5">Question</label>
+                                <input
+                                  type="text"
+                                  value={faq.question || ""}
+                                  onChange={(e) => {
+                                    const newList = [...list];
+                                    newList[idx] = { ...newList[idx], question: e.target.value };
+                                    handleFieldChange("faqsJson", JSON.stringify(newList));
+                                  }}
+                                  className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-medium"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-0.5">Answer</label>
+                                <textarea
+                                  rows={2}
+                                  value={faq.answer || ""}
+                                  onChange={(e) => {
+                                    const newList = [...list];
+                                    newList[idx] = { ...newList[idx], answer: e.target.value };
+                                    handleFieldChange("faqsJson", JSON.stringify(newList));
+                                  }}
+                                  className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-medium resize-none"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
                 </div>
               )}
 

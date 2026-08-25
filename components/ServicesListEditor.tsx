@@ -29,12 +29,26 @@ interface SubService {
   features: string[];
   benefits: string[];
   process: string[];
+  processSteps?: ProcessStep[];
+}
+
+interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+interface ProcessStep {
+  title: string;
+  description: string;
 }
 
 interface ServiceCategory {
   slug: string;
   title: string;
   breadcrumbTitle?: string;
+  detailTitle?: string;
+  subServicesTitle?: string;
+  subServicesSubheading?: string;
   shortDescription: string;
   description: string;
   featuredImage: string;
@@ -44,6 +58,23 @@ interface ServiceCategory {
   features?: string[];
   benefits?: string[];
   process?: string[];
+  processHeading?: string;
+  processText?: string;
+  processSteps?: ProcessStep[];
+  targetBadge?: string;
+  targetHeading?: string;
+  targetSubheading?: string;
+  targetSpaces?: string[];
+  whyChooseBadge?: string;
+  whyChooseHeading?: string;
+  whyChooseLeftTitle?: string;
+  whyChooseRightTitle?: string;
+  whyChooseAdvantages?: { title: string; description: string }[];
+  whyChooseChallenges?: { title: string; description: string }[];
+  serviceAreasBadge?: string;
+  serviceAreasHeading?: string;
+  serviceAreasSubheading?: string;
+  faqs?: FAQItem[];
 }
 
 interface ImageUploadFieldProps {
@@ -238,6 +269,9 @@ export default function ServicesListEditor() {
   const [editingCategorySlug, setEditingCategorySlug] = useState<string | null>(null);
   const [catTitle, setCatTitle] = useState("");
   const [catBreadcrumbTitle, setCatBreadcrumbTitle] = useState("");
+  const [catDetailTitle, setCatDetailTitle] = useState("");
+  const [catSubServicesTitle, setCatSubServicesTitle] = useState("");
+  const [catSubServicesSubheading, setCatSubServicesSubheading] = useState("");
   const [catShortDesc, setCatShortDesc] = useState("");
   const [catDesc, setCatDesc] = useState("");
   const [catFeaturedImage, setCatFeaturedImage] = useState("");
@@ -246,6 +280,81 @@ export default function ServicesListEditor() {
   const [catFeatures, setCatFeatures] = useState<string[]>([""]);
   const [catBenefits, setCatBenefits] = useState<string[]>([""]);
   const [catProcessList, setCatProcessList] = useState<string[]>([""]);
+  const [catProcessHeading, setCatProcessHeading] = useState("");
+  const [catProcessText, setCatProcessText] = useState("");
+  const [catProcessSteps, setCatProcessSteps] = useState<{ title: string; description: string }[]>([
+    { title: "", description: "" }
+  ]);
+  const [catTargetBadge, setCatTargetBadge] = useState("");
+  const [catTargetHeading, setCatTargetHeading] = useState("");
+  const [catTargetSubheading, setCatTargetSubheading] = useState("");
+  const [catTargetSpaces, setCatTargetSpaces] = useState<string[]>([""]);
+  const [catWhyBadge, setCatWhyBadge] = useState("");
+  const [catWhyHeading, setCatWhyHeading] = useState("");
+  const [catWhyLeftTitle, setCatWhyLeftTitle] = useState("");
+  const [catWhyRightTitle, setCatWhyRightTitle] = useState("");
+  const [catWhyAdvantages, setCatWhyAdvantages] = useState<{ title: string; description: string }[]>([
+    { title: "", description: "" }
+  ]);
+  const [catWhyChallenges, setCatWhyChallenges] = useState<{ title: string; description: string }[]>([
+    { title: "", description: "" }
+  ]);
+  const [catAreasBadge, setCatAreasBadge] = useState("");
+  const [catAreasHeading, setCatAreasHeading] = useState("");
+  const [catAreasSubheading, setCatAreasSubheading] = useState("");
+  const [catFaqs, setCatFaqs] = useState<{ question: string; answer: string }[]>([{ question: "", answer: "" }]);
+
+  const handleWhyAdvantageChange = (index: number, field: "title" | "description", value: string) => {
+    const copy = [...catWhyAdvantages];
+    copy[index] = { ...copy[index], [field]: value };
+    setCatWhyAdvantages(copy);
+  };
+  const handleAddWhyAdvantage = () => {
+    setCatWhyAdvantages([...catWhyAdvantages, { title: "", description: "" }]);
+  };
+  const handleRemoveWhyAdvantage = (index: number) => {
+    setCatWhyAdvantages(catWhyAdvantages.filter((_, idx) => idx !== index));
+  };
+
+  const handleWhyChallengeChange = (index: number, field: "title" | "description", value: string) => {
+    const copy = [...catWhyChallenges];
+    copy[index] = { ...copy[index], [field]: value };
+    setCatWhyChallenges(copy);
+  };
+  const handleAddWhyChallenge = () => {
+    setCatWhyChallenges([...catWhyChallenges, { title: "", description: "" }]);
+  };
+  const handleRemoveWhyChallenge = (index: number) => {
+    setCatWhyChallenges(catWhyChallenges.filter((_, idx) => idx !== index));
+  };
+
+  const handleCatTargetSpaceChange = (index: number, value: string) => {
+    const copy = [...catTargetSpaces];
+    copy[index] = value;
+    setCatTargetSpaces(copy);
+  };
+
+  const handleAddCatTargetSpace = () => {
+    setCatTargetSpaces([...catTargetSpaces, ""]);
+  };
+
+  const handleRemoveCatTargetSpace = (index: number) => {
+    setCatTargetSpaces(catTargetSpaces.filter((_, idx) => idx !== index));
+  };
+
+  const handleCatProcessStepChange = (index: number, field: "title" | "description", value: string) => {
+    const copy = [...catProcessSteps];
+    copy[index] = { ...copy[index], [field]: value };
+    setCatProcessSteps(copy);
+  };
+
+  const handleAddCatProcessStep = () => {
+    setCatProcessSteps([...catProcessSteps, { title: "", description: "" }]);
+  };
+
+  const handleRemoveCatProcessStep = (index: number) => {
+    setCatProcessSteps(catProcessSteps.filter((_, idx) => idx !== index));
+  };
 
   const handleCatListChange = (index: number, value: string, listType: "features" | "benefits" | "process") => {
     if (listType === "features") {
@@ -275,6 +384,20 @@ export default function ServicesListEditor() {
     else setCatProcessList(catProcessList.filter((_, idx) => idx !== index));
   };
 
+  const handleCatFaqChange = (index: number, field: "question" | "answer", value: string) => {
+    const copy = [...catFaqs];
+    copy[index] = { ...copy[index], [field]: value };
+    setCatFaqs(copy);
+  };
+
+  const handleAddCatFaq = () => {
+    setCatFaqs([...catFaqs, { question: "", answer: "" }]);
+  };
+
+  const handleRemoveCatFaq = (index: number) => {
+    setCatFaqs(catFaqs.filter((_, idx) => idx !== index));
+  };
+
   // Sub-Service Modal States (Add & Edit)
   const [showSubModal, setShowSubModal] = useState(false);
   const [targetCategorySlug, setTargetCategorySlug] = useState<string>("");
@@ -289,6 +412,21 @@ export default function ServicesListEditor() {
   const [features, setFeatures] = useState<string[]>([""]);
   const [benefits, setBenefits] = useState<string[]>([""]);
   const [processList, setProcessList] = useState<string[]>([""]);
+  const [subProcessSteps, setSubProcessSteps] = useState<{ title: string; description: string }[]>([
+    { title: "", description: "" }
+  ]);
+
+  const handleSubProcessStepChange = (index: number, field: "title" | "description", value: string) => {
+    const copy = [...subProcessSteps];
+    copy[index] = { ...copy[index], [field]: value };
+    setSubProcessSteps(copy);
+  };
+  const handleAddSubProcessStep = () => {
+    setSubProcessSteps([...subProcessSteps, { title: "", description: "" }]);
+  };
+  const handleRemoveSubProcessStep = (index: number) => {
+    setSubProcessSteps(subProcessSteps.filter((_, idx) => idx !== index));
+  };
 
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -378,6 +516,9 @@ export default function ServicesListEditor() {
     setEditingCategorySlug(null);
     setCatTitle("");
     setCatBreadcrumbTitle("");
+    setCatDetailTitle("");
+    setCatSubServicesTitle("");
+    setCatSubServicesSubheading("");
     setCatShortDesc("");
     setCatDesc("");
     setCatFeaturedImage("/images/services/sanitary-hero.png");
@@ -386,6 +527,23 @@ export default function ServicesListEditor() {
     setCatFeatures([""]);
     setCatBenefits([""]);
     setCatProcessList([""]);
+    setCatProcessHeading("");
+    setCatProcessText("");
+    setCatProcessSteps([{ title: "", description: "" }]);
+    setCatTargetBadge("");
+    setCatTargetHeading("");
+    setCatTargetSubheading("");
+    setCatTargetSpaces([""]);
+    setCatWhyBadge("");
+    setCatWhyHeading("");
+    setCatWhyLeftTitle("");
+    setCatWhyRightTitle("");
+    setCatWhyAdvantages([{ title: "", description: "" }]);
+    setCatWhyChallenges([{ title: "", description: "" }]);
+    setCatAreasBadge("");
+    setCatAreasHeading("");
+    setCatAreasSubheading("");
+    setCatFaqs([{ question: "", answer: "" }]);
     setShowCategoryModal(true);
   };
 
@@ -394,6 +552,9 @@ export default function ServicesListEditor() {
     setEditingCategorySlug(cat.slug);
     setCatTitle(cat.title);
     setCatBreadcrumbTitle(cat.breadcrumbTitle || "");
+    setCatDetailTitle(cat.detailTitle || "");
+    setCatSubServicesTitle(cat.subServicesTitle || "");
+    setCatSubServicesSubheading(cat.subServicesSubheading || "");
     setCatShortDesc(cat.shortDescription);
     setCatDesc(cat.description);
     setCatFeaturedImage(cat.featuredImage);
@@ -402,6 +563,23 @@ export default function ServicesListEditor() {
     setCatFeatures(cat.features && cat.features.length > 0 ? cat.features : [""]);
     setCatBenefits(cat.benefits && cat.benefits.length > 0 ? cat.benefits : [""]);
     setCatProcessList(cat.process && cat.process.length > 0 ? cat.process : [""]);
+    setCatProcessHeading(cat.processHeading || "");
+    setCatProcessText(cat.processText || "");
+    setCatProcessSteps(cat.processSteps && cat.processSteps.length > 0 ? cat.processSteps : [{ title: "", description: "" }]);
+    setCatTargetBadge(cat.targetBadge || "");
+    setCatTargetHeading(cat.targetHeading || "");
+    setCatTargetSubheading(cat.targetSubheading || "");
+    setCatTargetSpaces(cat.targetSpaces && cat.targetSpaces.length > 0 ? cat.targetSpaces : [""]);
+    setCatWhyBadge(cat.whyChooseBadge || "");
+    setCatWhyHeading(cat.whyChooseHeading || "");
+    setCatWhyLeftTitle(cat.whyChooseLeftTitle || "");
+    setCatWhyRightTitle(cat.whyChooseRightTitle || "");
+    setCatWhyAdvantages(cat.whyChooseAdvantages && cat.whyChooseAdvantages.length > 0 ? cat.whyChooseAdvantages : [{ title: "", description: "" }]);
+    setCatWhyChallenges(cat.whyChooseChallenges && cat.whyChooseChallenges.length > 0 ? cat.whyChooseChallenges : [{ title: "", description: "" }]);
+    setCatAreasBadge(cat.serviceAreasBadge || "");
+    setCatAreasHeading(cat.serviceAreasHeading || "");
+    setCatAreasSubheading(cat.serviceAreasSubheading || "");
+    setCatFaqs(cat.faqs && cat.faqs.length > 0 ? cat.faqs : [{ question: "", answer: "" }]);
     setShowCategoryModal(true);
   };
 
@@ -419,6 +597,11 @@ export default function ServicesListEditor() {
     const featuresClean = catFeatures.map((s) => s.trim()).filter(Boolean);
     const benefitsClean = catBenefits.map((s) => s.trim()).filter(Boolean);
     const processClean = catProcessList.map((s) => s.trim()).filter(Boolean);
+    const processStepsClean = catProcessSteps.filter((s) => s.title.trim() !== "" || s.description.trim() !== "");
+    const targetSpacesClean = catTargetSpaces.map((s) => s.trim()).filter(Boolean);
+    const whyAdvantagesClean = catWhyAdvantages.filter((a) => a.title.trim() !== "" || a.description.trim() !== "");
+    const whyChallengesClean = catWhyChallenges.filter((c) => c.title.trim() !== "" || c.description.trim() !== "");
+    const faqsClean = catFaqs.filter((f) => f.question.trim() !== "" || f.answer.trim() !== "");
 
     let updated: ServiceCategory[];
     if (editingCategorySlug) {
@@ -429,6 +612,9 @@ export default function ServicesListEditor() {
             ...c,
             title: catTitle.trim(),
             breadcrumbTitle: catBreadcrumbTitle.trim() || undefined,
+            detailTitle: catDetailTitle.trim() || undefined,
+            subServicesTitle: catSubServicesTitle.trim() || undefined,
+            subServicesSubheading: catSubServicesSubheading.trim() || undefined,
             shortDescription: catShortDesc.trim(),
             description: catDesc.trim(),
             featuredImage: catFeaturedImage || "/images/services/sanitary-hero.png",
@@ -436,7 +622,24 @@ export default function ServicesListEditor() {
             icon: catIcon || "",
             features: featuresClean,
             benefits: benefitsClean,
-            process: processClean
+            process: processClean,
+            processHeading: catProcessHeading.trim(),
+            processText: catProcessText.trim(),
+            processSteps: processStepsClean,
+            targetBadge: catTargetBadge.trim() || undefined,
+            targetHeading: catTargetHeading.trim() || undefined,
+            targetSubheading: catTargetSubheading.trim() || undefined,
+            targetSpaces: targetSpacesClean,
+            whyChooseBadge: catWhyBadge.trim() || undefined,
+            whyChooseHeading: catWhyHeading.trim() || undefined,
+            whyChooseLeftTitle: catWhyLeftTitle.trim() || undefined,
+            whyChooseRightTitle: catWhyRightTitle.trim() || undefined,
+            whyChooseAdvantages: whyAdvantagesClean,
+            whyChooseChallenges: whyChallengesClean,
+            serviceAreasBadge: catAreasBadge.trim() || undefined,
+            serviceAreasHeading: catAreasHeading.trim() || undefined,
+            serviceAreasSubheading: catAreasSubheading.trim() || undefined,
+            faqs: faqsClean
           };
         }
         return c;
@@ -447,6 +650,9 @@ export default function ServicesListEditor() {
         slug,
         title: catTitle.trim(),
         breadcrumbTitle: catBreadcrumbTitle.trim() || undefined,
+        detailTitle: catDetailTitle.trim() || undefined,
+        subServicesTitle: catSubServicesTitle.trim() || undefined,
+        subServicesSubheading: catSubServicesSubheading.trim() || undefined,
         shortDescription: catShortDesc.trim(),
         description: catDesc.trim(),
         featuredImage: catFeaturedImage || "/images/services/sanitary-hero.png",
@@ -455,7 +661,24 @@ export default function ServicesListEditor() {
         services: [],
         features: featuresClean,
         benefits: benefitsClean,
-        process: processClean
+        process: processClean,
+        processHeading: catProcessHeading.trim(),
+        processText: catProcessText.trim(),
+        processSteps: processStepsClean,
+        targetBadge: catTargetBadge.trim() || undefined,
+        targetHeading: catTargetHeading.trim() || undefined,
+        targetSubheading: catTargetSubheading.trim() || undefined,
+        targetSpaces: targetSpacesClean,
+        whyChooseBadge: catWhyBadge.trim() || undefined,
+        whyChooseHeading: catWhyHeading.trim() || undefined,
+        whyChooseLeftTitle: catWhyLeftTitle.trim() || undefined,
+        whyChooseRightTitle: catWhyRightTitle.trim() || undefined,
+        whyChooseAdvantages: whyAdvantagesClean,
+        whyChooseChallenges: whyChallengesClean,
+        serviceAreasBadge: catAreasBadge.trim() || undefined,
+        serviceAreasHeading: catAreasHeading.trim() || undefined,
+        serviceAreasSubheading: catAreasSubheading.trim() || undefined,
+        faqs: faqsClean
       };
       updated = [...categories, newCategory];
     }
@@ -494,6 +717,14 @@ export default function ServicesListEditor() {
     setFeatures([""]);
     setBenefits([""]);
     setProcessList([""]);
+    setSubProcessSteps([
+      { title: "Assessment", description: "Initial consultation & site measurements" },
+      { title: "Design", description: "Layout presentation & design rendering" },
+      { title: "Approval", description: "Obtaining necessary HDB/BCA permits" },
+      { title: "Hacking", description: "Structural hacking & masonry flooring" },
+      { title: "Installation", description: "Electrical, plumbing & carpentry installation" },
+      { title: "Verification", description: "Final touch-ups, QA inspection & key handover" }
+    ]);
     setShowSubModal(true);
   };
 
@@ -507,9 +738,28 @@ export default function ServicesListEditor() {
     setSubBreadcrumbBg(service.breadcrumbBg || "");
     setSubDesc(service.description);
     setSubLongDesc(service.longDescription);
-    setFeatures(service.features.length > 0 ? service.features : [""]);
-    setBenefits(service.benefits.length > 0 ? service.benefits : [""]);
-    setProcessList(service.process.length > 0 ? service.process : [""]);
+    setFeatures(service.features && service.features.length > 0 ? service.features : [""]);
+    setBenefits(service.benefits && service.benefits.length > 0 ? service.benefits : [""]);
+    setProcessList(service.process && service.process.length > 0 ? service.process : [""]);
+
+    const stepsInitial = (service.processSteps && service.processSteps.length > 0)
+      ? service.processSteps
+      : (service.process && service.process.length > 0)
+        ? service.process.map((step, idx) => {
+            const defaultTitles = ["Assessment", "Design", "Approval", "Hacking", "Installation", "Verification"];
+            let title = defaultTitles[idx] || `Step 0${idx + 1}`;
+            let description = step;
+            if (typeof step === "string" && (step.includes(":") || step.includes("–") || step.includes(" - "))) {
+              const parts = step.split(/[:–]|\s-\s/);
+              if (parts.length > 1) {
+                title = parts[0].trim();
+                description = parts.slice(1).join(":").trim();
+              }
+            }
+            return { title, description };
+          })
+        : [{ title: "", description: "" }];
+    setSubProcessSteps(stepsInitial);
     setShowSubModal(true);
   };
 
@@ -552,6 +802,9 @@ export default function ServicesListEditor() {
       ? editingSubSlug
       : subTitle.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
+    const processStepsClean = subProcessSteps.filter((s) => s.title.trim() !== "" || s.description.trim() !== "");
+    const processListClean = processStepsClean.map((s) => `${s.title.trim()}: ${s.description.trim()}`);
+
     const updatedServiceItem: SubService = {
       slug,
       title: subTitle.trim(),
@@ -562,7 +815,8 @@ export default function ServicesListEditor() {
       longDescription: subLongDesc.trim(),
       features: features.filter((f) => f.trim() !== ""),
       benefits: benefits.filter((b) => b.trim() !== ""),
-      process: processList.filter((p) => p.trim() !== "")
+      process: processListClean,
+      processSteps: processStepsClean
     };
 
     const updatedCategories = categories.map((cat) => {
@@ -876,6 +1130,45 @@ export default function ServicesListEditor() {
 
               <div>
                 <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Detail Page Main Heading (Title on Category Page)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Professional Renovation & Upgrading"
+                  value={catDetailTitle}
+                  onChange={(e) => setCatDetailTitle(e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Sub-Services Section Heading
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. What We Offer Under Renovation & Upgrading"
+                  value={catSubServicesTitle}
+                  onChange={(e) => setCatSubServicesTitle(e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Sub-Services Section Subheading
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="e.g. Discover our specific range of professional contracting services designed to meet Singapore regulatory standards."
+                  value={catSubServicesSubheading}
+                  onChange={(e) => setCatSubServicesSubheading(e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium resize-none placeholder:text-slate-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
                   Short Description (Shown on cards)
                 </label>
                 <input
@@ -986,36 +1279,446 @@ export default function ServicesListEditor() {
                 ))}
               </div>
 
-              {/* Dynamic list: Category Work Process Steps */}
-              <div className="space-y-2">
+              {/* --- OUR WORKING PROCESS SECTION EDITOR --- */}
+              <div className="space-y-4 pt-4 border-t border-slate-800">
+                <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                  &quot;Our Working Process&quot; Section Settings
+                </h4>
+                
+                <div>
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                    Section Big Heading (Left Column)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Your Vision, Your Space, Our Renovation"
+                    value={catProcessHeading}
+                    onChange={(e) => setCatProcessHeading(e.target.value)}
+                    className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                    Section Narrative Description (Left Column)
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="e.g. Our structured renovation process transforms your Singapore property on time and budget..."
+                    value={catProcessText}
+                    onChange={(e) => setCatProcessText(e.target.value)}
+                    className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium resize-none placeholder:text-slate-500"
+                  />
+                </div>
+
+                {/* Detailed Process Steps List */}
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                      Process Steps List (Right Column Timeline)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleAddCatProcessStep}
+                      className="text-[10px] font-extrabold text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add Process Step
+                    </button>
+                  </div>
+
+                  {catProcessSteps.map((step, idx) => (
+                    <div key={idx} className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl space-y-2 relative">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[9px] font-extrabold text-slate-400 uppercase">Step 0{idx + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCatProcessStep(idx)}
+                          className="text-[10px] font-bold text-red-400 hover:text-red-300"
+                        >
+                          Remove Step
+                        </button>
+                      </div>
+                      <div className="space-y-2">
+                        <div>
+                          <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-0.5">Step Title</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. One-Site Meeting & Site Visit"
+                            value={step.title}
+                            onChange={(e) => handleCatProcessStepChange(idx, "title", e.target.value)}
+                            className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-medium"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-0.5">Step Description</label>
+                          <textarea
+                            rows={2}
+                            placeholder="e.g. We assess your space, understand your needs..."
+                            value={step.description}
+                            onChange={(e) => handleCatProcessStepChange(idx, "description", e.target.value)}
+                            className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-medium resize-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* --- TARGET PROPERTIES / SERVED SPACES SECTION EDITOR --- */}
+              <div className="space-y-4 pt-4 border-t border-slate-800">
+                <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                  &quot;Target Properties / Served Spaces&quot; Section Settings
+                </h4>
+                
+                <div>
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                    Section Badge Text (e.g. TARGET PROPERTIES)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. TARGET PROPERTIES or Served Properties"
+                    value={catTargetBadge}
+                    onChange={(e) => setCatTargetBadge(e.target.value)}
+                    className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                    Section Main Heading
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Professional Solutions for Every Space"
+                    value={catTargetHeading}
+                    onChange={(e) => setCatTargetHeading(e.target.value)}
+                    className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                    Section Narrative Subheading
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="e.g. Enhancing and protecting homes, offices, retail spaces, and industrial facilities with expert workmanship."
+                    value={catTargetSubheading}
+                    onChange={(e) => setCatTargetSubheading(e.target.value)}
+                    className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium resize-none placeholder:text-slate-500"
+                  />
+                </div>
+
+                {/* Target Property Cards List */}
+                <div className="space-y-2 pt-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                      Property / Space Cards List
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleAddCatTargetSpace}
+                      className="text-[10px] font-extrabold text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add Property Card
+                    </button>
+                  </div>
+                  {catTargetSpaces.map((space, idx) => (
+                    <div key={idx} className="flex gap-2 items-center">
+                      <input
+                        type="text"
+                        placeholder="e.g. HDB Flats, Condominiums, Landed Houses..."
+                        value={space}
+                        onChange={(e) => handleCatTargetSpaceChange(idx, e.target.value)}
+                        className="flex-1 px-4 py-2 text-xs border border-slate-700 rounded-xl bg-slate-950 text-white placeholder:text-slate-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveCatTargetSpace(idx)}
+                        className="p-2 text-slate-400 hover:text-red-400"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* --- WHY CHOOSE US / COMPARISON SECTION EDITOR --- */}
+              <div className="space-y-4 pt-4 border-t border-slate-800">
+                <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                  &quot;Why Choose Us / Comparison&quot; Section Settings
+                </h4>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                      Top Badge Text (e.g. UA ADVANTAGE)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. UA ADVANTAGE"
+                      value={catWhyBadge}
+                      onChange={(e) => setCatWhyBadge(e.target.value)}
+                      className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                      Main Section Heading
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Why Choose UA Engineering?"
+                      value={catWhyHeading}
+                      onChange={(e) => setCatWhyHeading(e.target.value)}
+                      className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                      Left Card Title (Company Name)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. UA ENGINEERING PTE. LTD."
+                      value={catWhyLeftTitle}
+                      onChange={(e) => setCatWhyLeftTitle(e.target.value)}
+                      className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                      Right Card Title (Common Challenges)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Common Contractor Challenges"
+                      value={catWhyRightTitle}
+                      onChange={(e) => setCatWhyRightTitle(e.target.value)}
+                      className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Left Card Advantages List */}
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider text-emerald-400">
+                      Left Card Advantages List (Thumbs Up Points)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleAddWhyAdvantage}
+                      className="text-[10px] font-extrabold text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add Advantage Point
+                    </button>
+                  </div>
+                  {catWhyAdvantages.map((item, idx) => (
+                    <div key={idx} className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl space-y-2 relative">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[9px] font-extrabold text-emerald-400 uppercase">Advantage #{idx + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveWhyAdvantage(idx)}
+                          className="text-[10px] font-bold text-red-400 hover:text-red-300"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <div className="space-y-2">
+                        <input
+                          type="text"
+                          placeholder="Advantage Title (e.g. Complete Building Solutions)..."
+                          value={item.title}
+                          onChange={(e) => handleWhyAdvantageChange(idx, "title", e.target.value)}
+                          className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-medium"
+                        />
+                        <textarea
+                          rows={2}
+                          placeholder="Advantage Description..."
+                          value={item.description}
+                          onChange={(e) => handleWhyAdvantageChange(idx, "description", e.target.value)}
+                          className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-medium resize-none"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Right Card Challenges List */}
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider text-rose-400">
+                      Right Card Challenges List (Thumbs Down Points)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleAddWhyChallenge}
+                      className="text-[10px] font-extrabold text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add Challenge Point
+                    </button>
+                  </div>
+                  {catWhyChallenges.map((item, idx) => (
+                    <div key={idx} className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl space-y-2 relative">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[9px] font-extrabold text-rose-400 uppercase">Challenge #{idx + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveWhyChallenge(idx)}
+                          className="text-[10px] font-bold text-red-400 hover:text-red-300"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <div className="space-y-2">
+                        <input
+                          type="text"
+                          placeholder="Challenge Title (e.g. Multiple Contractors to Manage)..."
+                          value={item.title}
+                          onChange={(e) => handleWhyChallengeChange(idx, "title", e.target.value)}
+                          className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-medium"
+                        />
+                        <textarea
+                          rows={2}
+                          placeholder="Challenge Description..."
+                          value={item.description}
+                          onChange={(e) => handleWhyChallengeChange(idx, "description", e.target.value)}
+                          className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-medium resize-none"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* --- SERVICE AREAS HEADER SECTION EDITOR WITH INPUT PREVIEW --- */}
+              <div className="space-y-4 pt-4 border-t border-slate-800">
+                <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                  &quot;Service Areas Header&quot; Section Settings
+                </h4>
+                
+                <div>
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                    Section Badge Text (e.g. SERVICE AREAS)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. SERVICE AREAS"
+                    value={catAreasBadge}
+                    onChange={(e) => setCatAreasBadge(e.target.value)}
+                    className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                    Section Main Heading
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Reliable House Renovation Solutions Near You!"
+                    value={catAreasHeading}
+                    onChange={(e) => setCatAreasHeading(e.target.value)}
+                    className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                    Section Narrative Subheading / Description
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="e.g. UA ENGINEERING proudly provides home renovation services across Singapore, covering all major residential and commercial areas."
+                    value={catAreasSubheading}
+                    onChange={(e) => setCatAreasSubheading(e.target.value)}
+                    className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium resize-none placeholder:text-slate-500"
+                  />
+                </div>
+
+                {/* --- LIVE INPUT PREVIEW BOX --- */}
+                <div className="mt-4 p-5 bg-slate-950 border border-red-900/50 rounded-2xl relative shadow-lg">
+                  <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-red-400 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-red-500 animate-ping inline-block" />
+                      Live Header Preview
+                    </span>
+                    <span className="text-[9px] text-slate-500 font-semibold">Real-Time Output</span>
+                  </div>
+
+                  <div className="text-center py-4 px-2 bg-slate-900/80 rounded-xl border border-slate-800">
+                    <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-red-400">
+                      {catAreasBadge || "SERVICE AREAS"}
+                    </p>
+                    <h3 className="mt-2 text-xl font-extrabold tracking-tight text-white sm:text-2xl leading-tight">
+                      {catAreasHeading || `Reliable ${catTitle || "Service"} Solutions Near You!`}
+                    </h3>
+                    <div className="mx-auto mt-3 flex h-1 w-16 overflow-hidden rounded-full">
+                      <div className="w-1/2 bg-red-500" />
+                      <div className="w-1/2 bg-slate-400" />
+                    </div>
+                    <p className="mt-4 text-xs leading-relaxed text-slate-300 max-w-lg mx-auto">
+                      {catAreasSubheading || "UA ENGINEERING proudly provides professional contracting services across Singapore, covering all major residential and commercial areas."}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dynamic list: Category FAQs */}
+              <div className="space-y-3 pt-2 border-t border-slate-800">
                 <div className="flex items-center justify-between">
                   <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-                    Category Work Process Steps
+                    Category FAQs (Frequently Asked Questions)
                   </label>
                   <button
                     type="button"
-                    onClick={() => handleAddCatListItem("process")}
+                    onClick={handleAddCatFaq}
                     className="text-[10px] font-extrabold text-primary hover:underline inline-flex items-center gap-1"
                   >
-                    <Plus className="w-3.5 h-3.5" /> Add Bullet Row
+                    <Plus className="w-3.5 h-3.5" /> Add FAQ Pair
                   </button>
                 </div>
-                {catProcessList.map((item, idx) => (
-                  <div key={idx} className="flex gap-2 items-center">
-                    <input
-                      type="text"
-                      placeholder="Step description..."
-                      value={item}
-                      onChange={(e) => handleCatListChange(idx, e.target.value, "process")}
-                      className="flex-1 px-4 py-2 text-xs border border-slate-700 rounded-xl bg-slate-950 text-white placeholder:text-slate-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveCatListItem(idx, "process")}
-                      className="p-2 text-slate-400 hover:text-red-400"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                {catFaqs.map((faq, idx) => (
+                  <div key={idx} className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl space-y-2 relative">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[9px] font-extrabold text-slate-400 uppercase">FAQ #{idx + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveCatFaq(idx)}
+                        className="text-[10px] font-bold text-red-400 hover:text-red-300"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <div className="space-y-2">
+                      <div>
+                        <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-0.5">Question</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Do you assist with BCA permits?"
+                          value={faq.question}
+                          onChange={(e) => handleCatFaqChange(idx, "question", e.target.value)}
+                          className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-950 text-white font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-0.5">Answer</label>
+                        <textarea
+                          rows={2}
+                          placeholder="e.g. Yes, we handle all statutory applications..."
+                          value={faq.answer}
+                          onChange={(e) => handleCatFaqChange(idx, "answer", e.target.value)}
+                          className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-950 text-white font-medium resize-none"
+                        />
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1194,38 +1897,91 @@ export default function ServicesListEditor() {
                 ))}
               </div>
 
-              {/* Dynamic list: process */}
-              <div className="space-y-2">
+              {/* Dynamic list: Structured Process Flow with Live Preview */}
+              <div className="space-y-3 pt-3 border-t border-slate-800">
                 <div className="flex items-center justify-between">
-                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-                    Work Process Steps
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-amber-400">
+                    &quot;Our Work Process Flow&quot; Steps (Title &amp; Description)
                   </label>
                   <button
                     type="button"
-                    onClick={() => handleAddListItem("process")}
+                    onClick={handleAddSubProcessStep}
                     className="text-[10px] font-extrabold text-primary hover:underline inline-flex items-center gap-1"
                   >
-                    <Plus className="w-3.5 h-3.5" /> Add Bullet Row
+                    <Plus className="w-3.5 h-3.5" /> Add Process Step
                   </button>
                 </div>
-                {processList.map((item, idx) => (
-                  <div key={idx} className="flex gap-2 items-center">
-                    <input
-                      type="text"
-                      placeholder="Step description..."
-                      value={item}
-                      onChange={(e) => handleListChange(idx, e.target.value, "process")}
-                      className="flex-1 px-4 py-2 text-xs border border-slate-700 rounded-xl bg-slate-950 text-white placeholder:text-slate-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveListItem(idx, "process")}
-                      className="p-2 text-slate-400 hover:text-red-400"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+
+                {subProcessSteps.map((step, idx) => (
+                  <div key={idx} className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl space-y-2 relative">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[9px] font-extrabold text-amber-400 uppercase">Step 0{idx + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSubProcessStep(idx)}
+                        className="text-[10px] font-bold text-red-400 hover:text-red-300"
+                      >
+                        Remove Step
+                      </button>
+                    </div>
+                    <div className="space-y-2">
+                      <div>
+                        <label className="block text-[9px] font-bold text-slate-400 mb-1">
+                          Step Title (Red Marked Part, e.g. Assessment, Design, Approval, Hacking, Installation, Verification)
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Assessment / Design / Approval..."
+                          value={step.title}
+                          onChange={(e) => handleSubProcessStepChange(idx, "title", e.target.value)}
+                          className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-extrabold focus:border-amber-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-bold text-slate-400 mb-1">
+                          Step Description (Work details)
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Initial consultation & site measurements..."
+                          value={step.description}
+                          onChange={(e) => handleSubProcessStepChange(idx, "description", e.target.value)}
+                          className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-medium"
+                        />
+                      </div>
+                    </div>
                   </div>
                 ))}
+
+                {/* --- LIVE WORK PROCESS FLOW PREVIEW BOX --- */}
+                <div className="mt-4 p-4 bg-slate-950 border border-amber-900/50 rounded-2xl relative shadow-lg">
+                  <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-amber-400 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping inline-block" />
+                      Live Work Process Flow Preview
+                    </span>
+                    <span className="text-[9px] text-slate-500 font-semibold">Real-Time Grid Output</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {subProcessSteps.map((step, i) => (
+                      <div key={i} className="p-3 bg-slate-900/90 border border-slate-800 rounded-xl relative flex flex-col justify-between">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[9px] font-extrabold text-amber-400 uppercase">Step 0{i + 1}</span>
+                          <span className="text-[10px] text-slate-500">▶</span>
+                        </div>
+                        <div>
+                          <h5 className="text-xs font-black text-white underline decoration-amber-500 decoration-2 underline-offset-4 mb-1">
+                            {step.title || `Phase ${i + 1}`}
+                          </h5>
+                          <p className="text-[11px] text-slate-300 font-medium leading-tight">
+                            {step.description || "Step description details..."}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
