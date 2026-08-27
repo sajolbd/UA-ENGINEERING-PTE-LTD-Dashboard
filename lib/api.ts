@@ -9,14 +9,12 @@ export const getApiBaseUrl = (): string => {
   }
   if (typeof window !== "undefined") {
     const hostname = window.location.hostname;
-    if (hostname.endsWith(".vercel.app") || hostname.includes("ua-engineering") || hostname.includes("vercel")) {
-      return "https://ua-engineering-pte-ltd-backend.vercel.app";
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      return "http://localhost:5000";
     }
-    if (hostname && hostname !== "localhost" && hostname !== "127.0.0.1") {
-      return `${window.location.protocol}//${hostname}:5000`;
-    }
+    return "https://ua-engineering-pte-ltd-backend.vercel.app";
   }
-  return "http://localhost:5000";
+  return "https://ua-engineering-pte-ltd-backend.vercel.app";
 };
 
 export const getApiBaseUrlClient = getApiBaseUrl;
