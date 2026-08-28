@@ -78,18 +78,28 @@ export interface AboutContent {
   heroImage: string;
   aboutImage?: string;
   heroImageAlt: string;
+  sectionTag?: string;
   overviewHeading: string;
   overviewText: string;
+  experienceYears?: string;
+  experienceTitle?: string;
+  experienceSubtitle?: string;
+  trustHeading?: string;
+  highlightsJson?: string;
   ehsHeading: string;
   ehsText: string;
   ehsImage: string;
+  processBadge?: string;
   processHeading: string;
   processSubheading: string;
+  processStepsJson?: string;
+  residentialBadge?: string;
+  residentialHeading: string;
+  residentialSubheading: string;
+  faqBadge?: string;
   faqHeading: string;
   faqSubheading: string;
   faqsJson?: string;
-  residentialHeading: string;
-  residentialSubheading: string;
 }
 
 export interface ServicesContent {
@@ -293,15 +303,85 @@ export const initialCmsData: CmsDatabase = {
       heroImage: "/images/layout/about-bg.png",
       aboutImage: "/images/home/about/about-main.jpg",
       heroImageAlt: "UA Engineering Commercial Facility Builders",
-      overviewHeading: "Company History & Core Values",
-      overviewText: "Founded in Singapore, UA Engineering has grown into a leading contractor offering mechanical, electrical, plumbing, waterproofing, and steel fabrication works. Integrity, safety, and client satisfaction drive our operations.",
+      sectionTag: "About Our Company",
+      overviewHeading: "Why Choose UA Engineering For Renovation & Upgrading Services in Singapore",
+      overviewText: "Looking for a dependable renovation and upgrading contractor in Singapore? UA ENGINEERING PTE. LTD. provides renovation, construction, and engineering services for HDB, BTO, condos, landed homes, commercial, and industrial properties.",
+      experienceYears: "15",
+      experienceTitle: "Years of Excellence",
+      experienceSubtitle: "Renovation & Upgrading Services",
+      trustHeading: "Why Property Owners Trust UA Engineering",
+      highlightsJson: JSON.stringify([
+        { text: "15+ Years of Industry Experience", icon: "Clock" },
+        { text: "Highly Skilled & Certified Workers", icon: "Wrench" },
+        { text: "BCA & HDB Compliant Workmanship", icon: "Award" },
+        { text: "Transparent & Competitive Pricing", icon: "DollarSign" },
+        { text: "Premium Quality Materials", icon: "ShieldCheck" },
+        { text: "Safety-First Construction Practices", icon: "ShieldCheck" },
+        { text: "On-Time Project Completion", icon: "Clock" },
+        { text: "100% Commitment to Client Satisfaction", icon: "ThumbsUp" }
+      ]),
       ehsHeading: "EHS Safety Policy & Environmental Compliance",
       ehsText: "We maintain a Zero-Accident policy across all site operations. Our EHS compliance officers inspect structural rigs, high-voltage lines, and confined space setups daily to protect our workers and clients.",
       ehsImage: "/images/home/about/about-main.jpg",
-      processHeading: "Our Engineering Process",
-      processSubheading: "From initial consultation to project completion, we follow standard safety guidelines.",
+      processBadge: "HOW WE WORK",
+      processHeading: "Our Process",
+      processSubheading: "Every successful renovation begins with proper planning and professional execution. At UA Engineering, we follow a proven project management process that ensures efficiency, quality, and complete customer confidence from the initial consultation through project completion.",
+      processStepsJson: JSON.stringify([
+        {
+          id: 1,
+          tag: "STEP 01",
+          title: "Consultation & Site Assessment",
+          description: "We discuss your renovation goals, inspect the property, take accurate measurements, assess technical requirements, and recommend practical solutions to develop a clear and efficient project plan.",
+          milestones: [
+            "Free consultation and site inspection",
+            "Detailed technical assessment",
+            "Structural and feasibility evaluation",
+            "Accurate measurements"
+          ]
+        },
+        {
+          id: 2,
+          tag: "STEP 02",
+          title: "Proposal & Project Planning",
+          description: "We prepare a transparent quotation covering scope, materials, pricing, and timeline. After approval, we organise resources, scheduling, and project planning for smooth execution.",
+          milestones: [
+            "Detailed itemised quotation",
+            "Transparent pricing",
+            "Material recommendations",
+            "Project scheduling"
+          ]
+        },
+        {
+          id: 3,
+          tag: "STEP 03",
+          title: "Professional Execution & Quality Control",
+          description: "Our skilled team completes every project safely under experienced supervision, following BCA and HDB standards while maintaining strict quality control throughout every stage.",
+          milestones: [
+            "Experienced project supervisors",
+            "Certified skilled workers",
+            "Premium construction materials",
+            "Continuous quality inspections"
+          ]
+        },
+        {
+          id: 4,
+          tag: "STEP 04",
+          title: "Completion, Handover & After-Sales Support",
+          description: "After final inspections and site cleaning, we hand over the completed project with warranty information, maintenance guidance, and responsive after-sales support for your peace of mind.",
+          milestones: [
+            "Final quality inspection",
+            "Complete project walkthrough",
+            "Site cleaning and finishing",
+            "Warranty documentation"
+          ]
+        }
+      ]),
+      residentialBadge: "WHAT WE DO",
+      residentialHeading: "Complete Renovation, Engineering & Property Improvement Services",
+      residentialSubheading: "UA Engineering provides complete renovation, structural, waterproofing, electrical, plumbing, aluminium, and solar panel solutions for residential, commercial, and industrial properties across Singapore.",
+      faqBadge: "FAQ'S",
       faqHeading: "FAQ's: Looking for Answers?",
-      faqSubheading: "Got questions about our engineering & renovation services in Singapore?",
+      faqSubheading: "Find expert answers to common questions about our renovation, construction, and handyman services in Singapore.",
       faqsJson: JSON.stringify([
         {
           question: "How long has UA Engineering PTE. LTD. been serving Singapore?",
@@ -319,9 +399,7 @@ export const initialCmsData: CmsDatabase = {
           question: "How do you ensure safety and quality control on site?",
           answer: "Safety is our absolute priority and is non-negotiable. We strictly follow Workplace Safety and Health (WSH) guidelines on all project sites. Our teams are equipped with certified personal protective equipment (PPE) and undergo regular risk assessments. For quality control, we utilize premium, Singapore-certified materials and conduct strict supervision at every project phase."
         }
-      ]),
-      residentialHeading: "Residential Renovation & Upgrading Capability",
-      residentialSubheading: "Providing HDB, Condominium, and Landed Home owners with certified renovation solutions."
+      ])
     },
     seo: {
       metaTitle: "About Us | UA Engineering PTE. LTD.",

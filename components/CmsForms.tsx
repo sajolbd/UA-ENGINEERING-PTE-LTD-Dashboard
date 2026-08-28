@@ -353,18 +353,105 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     heroHeading: "About UA Engineering",
     heroSubheading: "A dedicated team of licensed professional engineers and certified EHS compliance officers delivering high-quality construction works.",
     heroImage: "/images/layout/about-bg.png",
+    aboutImage: "/images/home/about/about-main.jpg",
     heroImageAlt: "UA Engineering Commercial Facility Builders",
-    overviewHeading: "Company History & Core Values",
-    overviewText: "Founded in Singapore, UA Engineering has grown into a leading contractor offering mechanical, electrical, plumbing, waterproofing, and steel fabrication works. Integrity, safety, and client satisfaction drive our operations.",
+    sectionTag: "About Our Company",
+    overviewHeading: "Why Choose UA Engineering For Renovation & Upgrading Services in Singapore",
+    overviewText: "Looking for a dependable renovation and upgrading contractor in Singapore? UA ENGINEERING PTE. LTD. provides renovation, construction, and engineering services for HDB, BTO, condos, landed homes, commercial, and industrial properties.",
+    experienceYears: "15",
+    experienceTitle: "Years of Excellence",
+    experienceSubtitle: "Renovation & Upgrading Services",
+    trustHeading: "Why Property Owners Trust UA Engineering",
+    highlightsJson: JSON.stringify([
+      { text: "15+ Years of Industry Experience", icon: "Clock" },
+      { text: "Highly Skilled & Certified Workers", icon: "Wrench" },
+      { text: "BCA & HDB Compliant Workmanship", icon: "Award" },
+      { text: "Transparent & Competitive Pricing", icon: "DollarSign" },
+      { text: "Premium Quality Materials", icon: "ShieldCheck" },
+      { text: "Safety-First Construction Practices", icon: "ShieldCheck" },
+      { text: "On-Time Project Completion", icon: "Clock" },
+      { text: "100% Commitment to Client Satisfaction", icon: "ThumbsUp" }
+    ]),
     ehsHeading: "EHS Safety Policy & Environmental Compliance",
     ehsText: "We maintain a Zero-Accident policy across all site operations. Our EHS compliance officers inspect structural rigs, high-voltage lines, and confined space setups daily to protect our workers and clients.",
     ehsImage: "/images/home/about/about-main.jpg",
-    processHeading: "Our Engineering Process",
-    processSubheading: "From initial consultation to project completion, we follow standard safety guidelines.",
-    faqHeading: "Frequently Asked Questions",
-    faqSubheading: "Got questions about our engineering & renovation services in Singapore?",
-    residentialHeading: "Residential Renovation & Upgrading Capability",
-    residentialSubheading: "Providing HDB, Condominium, and Landed Home owners with certified renovation solutions.",
+    processBadge: "HOW WE WORK",
+    processHeading: "Our Process",
+    processSubheading: "Every successful renovation begins with proper planning and professional execution. At UA Engineering, we follow a proven project management process that ensures efficiency, quality, and complete customer confidence from the initial consultation through project completion.",
+    processStepsJson: JSON.stringify([
+      {
+        id: 1,
+        tag: "STEP 01",
+        title: "Consultation & Site Assessment",
+        description: "We discuss your renovation goals, inspect the property, take accurate measurements, assess technical requirements, and recommend practical solutions to develop a clear and efficient project plan.",
+        milestones: [
+          "Free consultation and site inspection",
+          "Detailed technical assessment",
+          "Structural and feasibility evaluation",
+          "Accurate measurements"
+        ]
+      },
+      {
+        id: 2,
+        tag: "STEP 02",
+        title: "Proposal & Project Planning",
+        description: "We prepare a transparent quotation covering scope, materials, pricing, and timeline. After approval, we organise resources, scheduling, and project planning for smooth execution.",
+        milestones: [
+          "Detailed itemised quotation",
+          "Transparent pricing",
+          "Material recommendations",
+          "Project scheduling"
+        ]
+      },
+      {
+        id: 3,
+        tag: "STEP 03",
+        title: "Professional Execution & Quality Control",
+        description: "Our skilled team completes every project safely under experienced supervision, following BCA and HDB standards while maintaining strict quality control throughout every stage.",
+        milestones: [
+          "Experienced project supervisors",
+          "Certified skilled workers",
+          "Premium construction materials",
+          "Continuous quality inspections"
+        ]
+      },
+      {
+        id: 4,
+        tag: "STEP 04",
+        title: "Completion, Handover & After-Sales Support",
+        description: "After final inspections and site cleaning, we hand over the completed project with warranty information, maintenance guidance, and responsive after-sales support for your peace of mind.",
+        milestones: [
+          "Final quality inspection",
+          "Complete project walkthrough",
+          "Site cleaning and finishing",
+          "Warranty documentation"
+        ]
+      }
+    ]),
+    residentialBadge: "WHAT WE DO",
+    residentialHeading: "Complete Renovation, Engineering & Property Improvement Services",
+    residentialSubheading: "UA Engineering provides complete renovation, structural, waterproofing, electrical, plumbing, aluminium, and solar panel solutions for residential, commercial, and industrial properties across Singapore.",
+    faqBadge: "FAQ'S",
+    faqHeading: "FAQ's: Looking for Answers?",
+    faqSubheading: "Find expert answers to common questions about our renovation, construction, and handyman services in Singapore.",
+    faqsJson: JSON.stringify([
+      {
+        question: "How long has UA Engineering PTE. LTD. been serving Singapore?",
+        answer: "UA Engineering PTE. LTD. has been a trusted contractor in Singapore's renovation and engineering industry for over 15 years. Over the years, we've built a strong reputation for delivering high-quality renovation, partition, waterproofing, and structural upgrades for residential, commercial, and industrial properties."
+      },
+      {
+        question: "What sets UA Engineering apart from other contractors in Singapore?",
+        answer: "What sets us apart is our professional specialization, certified engineering teams (such as EMA-certified electricians), transparency in quoting, and adherence to Singapore building safety guidelines (HDB/BCA). We provide turnkey project execution from minor handyman repairs to full landed house addition & alteration (A&A)."
+      },
+      {
+        question: "Do you offer free site inspections and consultations?",
+        answer: "Yes, we believe in empowering our clients with the information they need to make informed decisions. We offer free, no-obligation site assessments and detailed consultations. This allows us to inspect your property (e.g., for roof leakages or renovation layout plans) and provide a transparent, upfront quotation."
+      },
+      {
+        question: "How do you ensure safety and quality control on site?",
+        answer: "Safety is our absolute priority and is non-negotiable. We strictly follow Workplace Safety and Health (WSH) guidelines on all project sites. Our teams are equipped with certified personal protective equipment (PPE) and undergo regular risk assessments. For quality control, we utilize premium, Singapore-certified materials and conduct strict supervision at every project phase."
+      }
+    ]),
   },
   services: {
     heroHeading: "Our Engineering Services",
@@ -2207,13 +2294,26 @@ export default function CmsForms({
               {/* --- ABOUT PAGE SECTIONS --- */}
               {pageId === "about" && (
                 <div className="space-y-6">
+                  {/* 2. Company Overview & Experience Badge */}
                   <div className="space-y-4 border-b border-slate-100 pb-5">
                     <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
-                      2. Company History & Overview Section
+                      2. Company Overview & Experience Badge Section
                     </h4>
                     <div>
                       <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                        Overview Heading
+                        Section Tag Line (e.g. &quot;About Our Company&quot;)
+                      </label>
+                      <input
+                        type="text"
+                        value={localContent.sectionTag || ""}
+                        onChange={(e) => handleFieldChange("sectionTag", e.target.value)}
+                        placeholder="About Our Company"
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                        Overview Heading / Main Title
                       </label>
                       <input
                         type="text"
@@ -2233,11 +2333,162 @@ export default function CmsForms({
                         className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium resize-none placeholder:text-slate-500"
                       />
                     </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <ImageUploadField
+                        label="About Section Showcase Image"
+                        value={localContent.aboutImage || localContent.heroImage || ""}
+                        onChange={(val) => handleFieldChange("aboutImage", val)}
+                      />
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Experience Counter Years (e.g. &quot;15&quot;)
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.experienceYears || ""}
+                          onChange={(e) => handleFieldChange("experienceYears", e.target.value)}
+                          placeholder="15"
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary outline-none bg-slate-900 text-white font-medium"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Experience Badge Title
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.experienceTitle || ""}
+                          onChange={(e) => handleFieldChange("experienceTitle", e.target.value)}
+                          placeholder="Years of Excellence"
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary outline-none bg-slate-900 text-white font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Experience Badge Subtitle
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.experienceSubtitle || ""}
+                          onChange={(e) => handleFieldChange("experienceSubtitle", e.target.value)}
+                          placeholder="Renovation & Upgrading Services"
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary outline-none bg-slate-900 text-white font-medium"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                        Trust Sub-Heading (e.g. &quot;Why Property Owners Trust UA Engineering&quot;)
+                      </label>
+                      <input
+                        type="text"
+                        value={localContent.trustHeading || ""}
+                        onChange={(e) => handleFieldChange("trustHeading", e.target.value)}
+                        placeholder="Why Property Owners Trust UA Engineering"
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary outline-none bg-slate-900 text-white font-medium"
+                      />
+                    </div>
                   </div>
 
-                  <div className="space-y-4">
+                  {/* 3. Trust Highlights Manager */}
+                  <div className="space-y-4 border-b border-slate-100 pb-5">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2">
+                        3. Trust Highlights Manager (Interactive Strengths Grid)
+                      </h4>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          let list = [];
+                          try { list = JSON.parse(localContent.highlightsJson || "[]"); } catch {}
+                          const newList = [...list, { text: "New Trust Highlight", icon: "ShieldCheck" }];
+                          handleFieldChange("highlightsJson", JSON.stringify(newList));
+                        }}
+                        className="text-[10px] font-extrabold bg-primary text-white px-3 py-1.5 rounded-xl hover:bg-primary/90 transition-all cursor-pointer"
+                      >
+                        + Add Highlight
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                      {(() => {
+                        let list = [];
+                        try {
+                          list = JSON.parse(localContent.highlightsJson || "[]");
+                        } catch {}
+
+                        if (list.length === 0) {
+                          return (
+                            <div className="col-span-2 text-center py-4 bg-slate-950/20 border border-dashed border-slate-800 rounded-xl p-3">
+                              <span className="text-xs text-slate-500">No highlights defined. Click above to add.</span>
+                            </div>
+                          );
+                        }
+
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        return list.map((item: any, idx: number) => (
+                          <div key={idx} className="p-3 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2 relative">
+                            <div className="flex justify-between items-center">
+                              <span className="text-[9px] font-extrabold text-slate-400 uppercase">Highlight #{idx + 1}</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                  const newList = list.filter((_: any, i: number) => i !== idx);
+                                  handleFieldChange("highlightsJson", JSON.stringify(newList));
+                                }}
+                                className="text-[10px] font-bold text-red-400 hover:text-red-300 cursor-pointer"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                            <div className="grid grid-cols-1 gap-2">
+                              <div>
+                                <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-0.5">Highlight Text</label>
+                                <input
+                                  type="text"
+                                  value={item.text || ""}
+                                  onChange={(e) => {
+                                    const newList = [...list];
+                                    newList[idx] = { ...newList[idx], text: e.target.value };
+                                    handleFieldChange("highlightsJson", JSON.stringify(newList));
+                                  }}
+                                  className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg outline-none bg-slate-900 text-white font-medium"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-0.5">Icon Style</label>
+                                <select
+                                  value={item.icon || "ShieldCheck"}
+                                  onChange={(e) => {
+                                    const newList = [...list];
+                                    newList[idx] = { ...newList[idx], icon: e.target.value };
+                                    handleFieldChange("highlightsJson", JSON.stringify(newList));
+                                  }}
+                                  className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium outline-none"
+                                >
+                                  <option value="Clock">Clock (Experience / Speed)</option>
+                                  <option value="Wrench">Wrench (Workforce / Skilled)</option>
+                                  <option value="Award">Award (BCA / Certification)</option>
+                                  <option value="DollarSign">DollarSign (Pricing / Value)</option>
+                                  <option value="ShieldCheck">ShieldCheck (Quality / Safety)</option>
+                                  <option value="ThumbsUp">ThumbsUp (Satisfaction / Trust)</option>
+                                  <option value="CheckCircle2">CheckCircle2 (Compliance / Approved)</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* 4. EHS Workplace Safety Policy Section */}
+                  <div className="space-y-4 border-b border-slate-100 pb-5">
                     <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
-                      3. EHS Workplace Safety Policy Section
+                      4. EHS Workplace Safety Policy Section
                     </h4>
                     <div>
                       <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
@@ -2268,21 +2519,271 @@ export default function CmsForms({
                     />
                   </div>
 
-                  {/* --- FAQ SECTION --- */}
-                  <div className="space-y-4 pt-5 border-t border-slate-800">
+                  {/* 5. Our Engineering Work Process Section */}
+                  <div className="space-y-4 border-b border-slate-100 pb-5">
                     <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
-                      4. Frequently Asked Questions (FAQ) Section
+                      5. Engineering Work Process Section & Step Manager
                     </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Process Badge Tag (e.g. &quot;HOW WE WORK&quot;)
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.processBadge || ""}
+                          onChange={(e) => handleFieldChange("processBadge", e.target.value)}
+                          placeholder="HOW WE WORK"
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary outline-none bg-slate-900 text-white font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Process Main Title
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.processHeading || ""}
+                          onChange={(e) => handleFieldChange("processHeading", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary outline-none bg-slate-900 text-white font-medium"
+                        />
+                      </div>
+                    </div>
                     <div>
                       <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                        FAQ Section Title
+                        Process Section Intro Description
                       </label>
-                      <input
-                        type="text"
-                        value={localContent.faqHeading || ""}
-                        onChange={(e) => handleFieldChange("faqHeading", e.target.value)}
-                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                      <textarea
+                        rows={2}
+                        value={localContent.processSubheading || ""}
+                        onChange={(e) => handleFieldChange("processSubheading", e.target.value)}
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary outline-none bg-slate-900 text-white font-medium resize-none"
                       />
+                    </div>
+
+                    {/* Interactive Process Steps List Editor */}
+                    <div className="space-y-4 pt-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                          Process Steps & Milestone Cards Manager
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            let list = [];
+                            try { list = JSON.parse(localContent.processStepsJson || "[]"); } catch {}
+                            const newStep = {
+                              id: Date.now(),
+                              tag: `STEP 0${list.length + 1}`,
+                              title: "New Process Step",
+                              description: "Describe step process details...",
+                              milestones: ["Milestone feature 1", "Milestone feature 2"]
+                            };
+                            handleFieldChange("processStepsJson", JSON.stringify([...list, newStep]));
+                          }}
+                          className="text-[10px] font-extrabold bg-primary text-white px-3 py-1.5 rounded-xl hover:bg-primary/90 transition-all cursor-pointer"
+                        >
+                          + Add Step
+                        </button>
+                      </div>
+
+                      {(() => {
+                        let list = [];
+                        try {
+                          list = JSON.parse(localContent.processStepsJson || "[]");
+                        } catch {}
+
+                        if (list.length === 0) {
+                          return (
+                            <div className="text-center py-4 bg-slate-950/20 border border-dashed border-slate-800 rounded-xl p-3">
+                              <span className="text-xs text-slate-500">No process steps defined. Click above to add.</span>
+                            </div>
+                          );
+                        }
+
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        return list.map((step: any, idx: number) => {
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          const updateStep = (field: string, val: any) => {
+                            const listCopy = [...list];
+                            listCopy[idx] = { ...listCopy[idx], [field]: val };
+                            handleFieldChange("processStepsJson", JSON.stringify(listCopy));
+                          };
+
+                          const milestonesList = Array.isArray(step.milestones) ? step.milestones : [];
+
+                          return (
+                            <div key={idx} className="p-4 bg-slate-950/70 rounded-2xl border border-slate-800 space-y-3 relative">
+                              <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                                <span className="text-xs font-black text-primary uppercase">
+                                  {step.tag || `STEP 0${idx + 1}`} - {step.title}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    const updatedList = list.filter((_: any, i: number) => i !== idx);
+                                    handleFieldChange("processStepsJson", JSON.stringify(updatedList));
+                                  }}
+                                  className="text-[10px] font-bold text-red-400 hover:text-red-300 cursor-pointer"
+                                >
+                                  Delete Step
+                                </button>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div>
+                                  <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-0.5">Step Badge Tag (e.g. STEP 01)</label>
+                                  <input
+                                    type="text"
+                                    value={step.tag || ""}
+                                    onChange={(e) => updateStep("tag", e.target.value)}
+                                    className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
+                                  />
+                                </div>
+                                <div className="md:col-span-2">
+                                  <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-0.5">Step Title</label>
+                                  <input
+                                    type="text"
+                                    value={step.title || ""}
+                                    onChange={(e) => updateStep("title", e.target.value)}
+                                    className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium"
+                                  />
+                                </div>
+                              </div>
+
+                              <div>
+                                <label className="block text-[9px] font-extrabold uppercase text-slate-400 mb-0.5">Step Description</label>
+                                <textarea
+                                  rows={2}
+                                  value={step.description || ""}
+                                  onChange={(e) => updateStep("description", e.target.value)}
+                                  className="w-full px-3 py-1.5 text-xs border border-slate-700 rounded-lg bg-slate-900 text-white font-medium resize-none"
+                                />
+                              </div>
+
+                              {/* Milestones sub-list editor */}
+                              <div className="pt-2 border-t border-slate-900 space-y-2">
+                                <div className="flex justify-between items-center">
+                                  <label className="block text-[9px] font-extrabold uppercase text-slate-400">Milestone Check Points</label>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const updatedMilestones = [...milestonesList, "New Milestone Point"];
+                                      updateStep("milestones", updatedMilestones);
+                                    }}
+                                    className="text-[9px] font-bold text-primary hover:underline cursor-pointer"
+                                  >
+                                    + Add Milestone
+                                  </button>
+                                </div>
+                                <div className="space-y-1.5">
+                                  {milestonesList.map((mItem: string, mIdx: number) => (
+                                    <div key={mIdx} className="flex items-center gap-2">
+                                      <span className="text-[10px] text-primary font-bold">✓</span>
+                                      <input
+                                        type="text"
+                                        value={mItem}
+                                        onChange={(e) => {
+                                          const copyM = [...milestonesList];
+                                          copyM[mIdx] = e.target.value;
+                                          updateStep("milestones", copyM);
+                                        }}
+                                        className="flex-1 px-3 py-1 text-xs border border-slate-800 rounded-md bg-slate-900 text-slate-200 font-medium"
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const copyM = milestonesList.filter((_: string, i: number) => i !== mIdx);
+                                          updateStep("milestones", copyM);
+                                        }}
+                                        className="text-[10px] text-slate-500 hover:text-red-400 px-1 cursor-pointer"
+                                      >
+                                        ✕
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* 6. Residential & Commercial Capability Section */}
+                  <div className="space-y-4 border-b border-slate-100 pb-5">
+                    <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                      6. Residential & Commercial Capability Section
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Section Tag Badge (e.g. &quot;WHAT WE DO&quot;)
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.residentialBadge || ""}
+                          onChange={(e) => handleFieldChange("residentialBadge", e.target.value)}
+                          placeholder="WHAT WE DO"
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary outline-none bg-slate-900 text-white font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          Capability Heading
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.residentialHeading || ""}
+                          onChange={(e) => handleFieldChange("residentialHeading", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary outline-none bg-slate-900 text-white font-medium"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                        Capability Subheading / Overview
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={localContent.residentialSubheading || ""}
+                        onChange={(e) => handleFieldChange("residentialSubheading", e.target.value)}
+                        className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary outline-none bg-slate-900 text-white font-medium resize-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* 7. Frequently Asked Questions (FAQ) Section */}
+                  <div className="space-y-4 pt-2">
+                    <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-l-2 border-primary pl-2 mb-2">
+                      7. Frequently Asked Questions (FAQ) Section
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          FAQ Badge Tag (e.g. &quot;FAQ&apos;S&quot;)
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.faqBadge || ""}
+                          onChange={(e) => handleFieldChange("faqBadge", e.target.value)}
+                          placeholder="FAQ'S"
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary outline-none bg-slate-900 text-white font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          FAQ Section Title
+                        </label>
+                        <input
+                          type="text"
+                          value={localContent.faqHeading || ""}
+                          onChange={(e) => handleFieldChange("faqHeading", e.target.value)}
+                          className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium placeholder:text-slate-500"
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
@@ -2310,7 +2811,7 @@ export default function CmsForms({
                             const newList = [...list, { question: "New Question?", answer: "New Answer text..." }];
                             handleFieldChange("faqsJson", JSON.stringify(newList));
                           }}
-                          className="text-[10px] font-extrabold text-primary hover:underline inline-flex items-center gap-1"
+                          className="text-[10px] font-extrabold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
                         >
                           + Add FAQ Item
                         </button>
@@ -2340,7 +2841,7 @@ export default function CmsForms({
                                   const newList = list.filter((_: Record<string, string>, i: number) => i !== idx);
                                   handleFieldChange("faqsJson", JSON.stringify(newList));
                                 }}
-                                className="text-[10px] font-bold text-red-400 hover:text-red-300"
+                                className="text-[10px] font-bold text-red-400 hover:text-red-300 cursor-pointer"
                               >
                                 Remove
                               </button>
