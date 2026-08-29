@@ -339,7 +339,7 @@ export default function ProjectsListEditor() {
 
   const handleOpenEditModal = (p: ProjectItem, e: React.MouseEvent) => {
     e.stopPropagation();
-    const id = p.id || p._id || "";
+    const id = p._id || p.id || "";
     setEditingProjectId(id);
     setTitle(p.title);
     setCategory(p.category || "Painting & Waterproofing");
@@ -377,44 +377,45 @@ export default function ProjectsListEditor() {
         body: JSON.stringify(payload)
       });
       const result = await res.json();
-      if (result.success) {
+      if (res.ok && result.success) {
         setSaveSuccess(true);
         setShowModal(false);
         loadProjects();
         showToast("success", isEdit ? "Project Updated" : "Project Published", `"${title.trim()}" has been saved successfully.`);
         setTimeout(() => setSaveSuccess(false), 4000);
       } else {
-        showToast("error", "Save Failed", result.error || "Failed to save project");
+        showToast("error", "Save Failed", result.error || result.message || "Failed to save project");
       }
-    } catch {
-      showToast("error", "Connection Error", "Failed to connect to backend server.");
+    } catch (err: any) {
+      showToast("error", "Connection Error", err?.message || "Failed to connect to backend server.");
     }
   };
 
-  const handleDeleteProjectPrompt = (projectId: string, projectTitle: string, e: React.MouseEvent) => {
+  const handleDeleteProjectPrompt = (p: ProjectItem, e: React.MouseEvent) => {
     e.stopPropagation();
-    setDeleteConfirm({ show: true, projectId, projectTitle });
+    const id = p._id || p.id || "";
+    setDeleteConfirm({ show: true, projectId: id, projectTitle: p.title });
   };
 
   const confirmDeleteProject = async () => {
     const { projectId, projectTitle } = deleteConfirm;
     setDeleteConfirm({ show: false, projectId: "", projectTitle: "" });
 
-    const updatedProjects = projects.filter((p) => (p.id || p._id) !== projectId);
+    const updatedProjects = projects.filter((p) => (p._id || p.id) !== projectId);
 
     try {
       const response = await fetch(`${API_BASE}/api/projects/${projectId}`, {
         method: "DELETE"
       });
       const result = await response.json();
-      if (result.success) {
+      if (response.ok && result.success) {
         setProjects(updatedProjects);
         showToast("success", "Project Deleted", `"${projectTitle}" has been removed successfully.`);
       } else {
-        showToast("error", "Delete Failed", result.error || "Failed to delete project");
+        showToast("error", "Delete Failed", result.error || result.message || "Failed to delete project");
       }
-    } catch {
-      showToast("error", "Connection Error", "Failed to connect to backend server.");
+    } catch (err: any) {
+      showToast("error", "Connection Error", err?.message || "Failed to connect to backend server.");
     }
   };
 
@@ -517,7 +518,7 @@ export default function ProjectsListEditor() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProjects.map((p) => {
-            const id = p.id || p._id || "";
+            const id = p._id || p.id || "";
             return (
               <div
                 key={id}
@@ -572,7 +573,7 @@ export default function ProjectsListEditor() {
                     </button>
 
                     <button
-                      onClick={(e) => handleDeleteProjectPrompt(id, p.title, e)}
+                      onClick={(e) => handleDeleteProjectPrompt(p, e)}
                       className="p-1.5 bg-slate-800 hover:bg-red-950/80 text-slate-400 hover:text-red-400 rounded-xl border border-slate-700 transition"
                       title="Delete Project"
                     >

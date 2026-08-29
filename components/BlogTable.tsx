@@ -327,17 +327,17 @@ export default function BlogTable({
         body: JSON.stringify(newBlog)
       });
       const result = await res.json();
-      if (result.success) {
+      if (res.ok && result.success) {
         setSaveSuccess(true);
         setShowModal(false);
         onRefresh();
         showToast("success", "Article Published", `"${title.trim()}" has been published successfully.`);
         setTimeout(() => setSaveSuccess(false), 4000);
       } else {
-        showToast("error", "Publish Failed", result.error || "Failed to publish article");
+        showToast("error", "Publish Failed", result.error || result.message || "Failed to publish article");
       }
-    } catch {
-      showToast("error", "Connection Error", "Failed to connect to Express REST server.");
+    } catch (err: any) {
+      showToast("error", "Publish Error", err?.message || "Failed to connect to backend API server.");
     }
   };
 
@@ -354,14 +354,14 @@ export default function BlogTable({
         method: "DELETE"
       });
       const result = await res.json();
-      if (result.success) {
+      if (res.ok && result.success) {
         onRefresh();
         showToast("success", "Article Deleted", `"${blogTitle}" has been removed successfully.`);
       } else {
-        showToast("error", "Delete Failed", result.error || "Failed to delete article");
+        showToast("error", "Delete Failed", result.error || result.message || "Failed to delete article");
       }
-    } catch {
-      showToast("error", "Connection Error", "Failed to connect to Express REST server.");
+    } catch (err: any) {
+      showToast("error", "Delete Error", err?.message || "Failed to connect to backend API server.");
     }
   };
 
@@ -565,7 +565,7 @@ export default function BlogTable({
               </tr>
             ) : (
               posts.map((post, idx) => {
-                const id = post.id || post._id || idx.toString();
+                const id = post._id || post.id || post.slug || idx.toString();
                 return (
                   <tr key={id} className="hover:bg-slate-50/50 transition-colors group">
                     <td className="py-3.5 px-5 font-bold text-secondary group-hover:text-primary transition-colors max-w-xs truncate">
