@@ -26,7 +26,7 @@ export const API_BASE = getApiBaseUrl();
 export const fetchWithTimeout = async (
   url: string,
   options: RequestInit = {},
-  timeoutMs: number = 6000
+  timeoutMs: number = 15000
 ): Promise<Response> => {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeoutMs);
