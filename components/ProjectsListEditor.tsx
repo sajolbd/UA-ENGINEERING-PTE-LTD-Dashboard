@@ -47,57 +47,22 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 15 * 1024 * 1024) {
-      setError("File is too large. Max limit is 15MB.");
-      return;
-    }
-
     setUploading(true);
     setError(null);
 
     try {
-      const compressedDataUrl = await compressImageFile(file, 1200, 1200, 0.75);
-
-      const formData = new FormData();
-      formData.append("image", file);
-
-      const res = await fetch(`${API_BASE}/api/upload`, {
-        method: "POST",
-        body: formData,
-      });
-
-      const result = await res.json();
-      if (result.success && result.imagePath) {
-        onChange(result.imagePath);
-      } else {
-        onChange(compressedDataUrl);
-      }
-    } catch {
-      try {
-        const compressedDataUrl = await compressImageFile(file, 1200, 1200, 0.75);
-        onChange(compressedDataUrl);
-      } catch {
-        setError("Failed to process image.");
-      }
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleBase64Convert = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    try {
-      setUploading(true);
-      const compressedDataUrl = await compressImageFile(file, 1200, 1200, 0.75);
+      const compressedDataUrl = await compressImageFile(file, 1000, 1000, 0.75);
       onChange(compressedDataUrl);
-    } catch {
-      setError("Failed to convert image.");
+    } catch (err: any) {
+      console.error("Image processing error:", err);
+      setError("Failed to process image file.");
     } finally {
       setUploading(false);
+      if (e.target) e.target.value = "";
     }
   };
+
+  const handleBase64Convert = handleFileChange;
 
   const fullImageUrl = getImageUrl(value);
   const isBase64 = value.startsWith("data:");
