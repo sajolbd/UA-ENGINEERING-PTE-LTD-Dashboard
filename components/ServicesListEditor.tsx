@@ -487,21 +487,21 @@ export default function ServicesListEditor() {
 
   const saveCategoriesToBackend = async (updated: ServiceCategory[], successMsg: string) => {
     try {
-      const res = await fetch(`${API_BASE}/api/services`, {
+      const res = await fetchWithTimeout(`${API_BASE}/api/services`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ categories: updated })
-      });
+      }, 15000);
 
-      let result;
+      let result: any = {};
       try {
         result = await res.json();
       } catch {
         if (res.status === 413) {
-          showToast("error", "Payload Too Large", "Image files are too large. Please use smaller/compressed images.");
+          showToast("error", "Payload Too Large", "Image files are too large. Please use smaller image files.");
           return false;
         }
-        showToast("error", "Server Error", `Backend returned status ${res.status}`);
+        showToast("error", "Server Error", `Backend returned HTTP status ${res.status}`);
         return false;
       }
 
