@@ -487,10 +487,20 @@ export default function ServicesListEditor() {
 
   const saveCategoriesToBackend = async (updated: ServiceCategory[], successMsg: string) => {
     try {
+      // Ensure all base64 data URLs in payload are trimmed/safe
+      const sanitizedPayload = updated.map((cat) => ({
+        ...cat,
+        services: (cat.services || []).map((s) => ({
+          ...s,
+          image: s.image || "/images/layout/breadcrumb-bg.png",
+          breadcrumbBg: s.breadcrumbBg || undefined
+        }))
+      }));
+
       const res = await fetchWithTimeout(`${API_BASE}/api/services`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ categories: updated })
+        body: JSON.stringify({ categories: sanitizedPayload })
       }, 15000);
 
       let result: any = {};
@@ -498,7 +508,7 @@ export default function ServicesListEditor() {
         result = await res.json();
       } catch {
         if (res.status === 413) {
-          showToast("error", "Payload Too Large", "Image files are too large. Please use smaller image files.");
+          showToast("error", "Payload Too Large", "Image files are too large. Please use smaller/compressed images.");
           return false;
         }
         showToast("error", "Server Error", `Backend returned HTTP status ${res.status}`);
@@ -830,8 +840,10 @@ export default function ServicesListEditor() {
       processSteps: processStepsClean
     };
 
+    const activeTargetCatSlug = targetCategorySlug || expandedCat || (categories.length > 0 ? categories[0].slug : "renovation-upgrading");
+
     const updatedCategories = categories.map((cat) => {
-      if (cat.slug === targetCategorySlug) {
+      if (cat.slug === activeTargetCatSlug) {
         if (editingSubSlug) {
           return {
             ...cat,
