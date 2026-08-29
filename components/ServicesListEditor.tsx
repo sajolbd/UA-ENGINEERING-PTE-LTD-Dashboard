@@ -1,6 +1,7 @@
 "use client";
 import { API_BASE, fetchWithTimeout, getImageUrl } from "../lib/api";
 import { initialServicesData } from "../data/servicesData";
+import { compressImageFile } from "../lib/imageUtils";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -93,18 +94,20 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) {
-      setError("File is too large. Max limit is 10MB.");
+    if (file.size > 15 * 1024 * 1024) {
+      setError("File is too large. Max limit is 15MB.");
       return;
     }
 
     setUploading(true);
     setError(null);
 
-    const formData = new FormData();
-    formData.append("image", file);
-
     try {
+      const compressedDataUrl = await compressImageFile(file, 1200, 1200, 0.75);
+
+      const formData = new FormData();
+      formData.append("image", file);
+
       const res = await fetch(`${API_BASE}/api/upload`, {
         method: "POST",
         body: formData,
@@ -114,38 +117,33 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
       if (result.success && result.imagePath) {
         onChange(result.imagePath);
       } else {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          if (typeof reader.result === "string") {
-            onChange(reader.result);
-          }
-        };
-        reader.readAsDataURL(file);
+        onChange(compressedDataUrl);
       }
     } catch {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === "string") {
-          onChange(reader.result);
-        }
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressedDataUrl = await compressImageFile(file, 1200, 1200, 0.75);
+        onChange(compressedDataUrl);
+      } catch {
+        setError("Failed to process image.");
+      }
     } finally {
       setUploading(false);
     }
   };
 
-  const handleBase64Convert = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBase64Convert = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (typeof reader.result === "string") {
-        onChange(reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      setUploading(true);
+      const compressedDataUrl = await compressImageFile(file, 1200, 1200, 0.75);
+      onChange(compressedDataUrl);
+    } catch {
+      setError("Failed to convert image.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const fullImageUrl = getImageUrl(value);
@@ -494,19 +492,32 @@ export default function ServicesListEditor() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ categories: updated })
       });
-      const result = await res.json();
-      if (result.success) {
+
+      let result;
+      try {
+        result = await res.json();
+      } catch {
+        if (res.status === 413) {
+          showToast("error", "Payload Too Large", "Image files are too large. Please use smaller/compressed images.");
+          return false;
+        }
+        showToast("error", "Server Error", `Backend returned status ${res.status}`);
+        return false;
+      }
+
+      if (res.ok && result.success) {
         setCategories(updated);
         setSaveSuccess(true);
         showToast("success", "Database Saved", successMsg);
         setTimeout(() => setSaveSuccess(false), 4000);
         return true;
       } else {
-        showToast("error", "Save Failed", result.error || "Failed to save services database");
+        showToast("error", "Save Failed", result.error || result.message || "Failed to save services database");
         return false;
       }
-    } catch {
-      showToast("error", "Connection Error", "Failed to connect to backend server.");
+    } catch (err: any) {
+      console.error("saveCategoriesToBackend error:", err);
+      showToast("error", "Connection Error", err?.message || "Failed to connect to backend server.");
       return false;
     }
   };

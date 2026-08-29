@@ -1,5 +1,6 @@
 "use client";
 import { API_BASE, getImageUrl } from "../lib/api";
+import { compressImageFile } from "../lib/imageUtils";
 
 import React, { useState, useRef } from "react";
 import {
@@ -27,7 +28,16 @@ import {
   Eraser,
   Image as ImageIcon,
   Video as VideoIcon,
-  Table as TableIcon
+  Table as TableIcon,
+  Quote,
+  Link,
+  Code,
+  Undo,
+  Redo,
+  Sparkles,
+  HelpCircle,
+  Eye,
+  FileText
 } from "lucide-react";
 import { BlogPost } from "../data/blogData";
 
@@ -58,18 +68,20 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) {
-      setError("File is too large. Max limit is 10MB.");
+    if (file.size > 15 * 1024 * 1024) {
+      setError("File is too large. Max limit is 15MB.");
       return;
     }
 
     setUploading(true);
     setError(null);
 
-    const formData = new FormData();
-    formData.append("image", file);
-
     try {
+      const compressedDataUrl = await compressImageFile(file, 1200, 1200, 0.75);
+
+      const formData = new FormData();
+      formData.append("image", file);
+
       const res = await fetch(`${API_BASE}/api/upload`, {
         method: "POST",
         body: formData,
@@ -79,38 +91,33 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
       if (result.success && result.imagePath) {
         onChange(result.imagePath);
       } else {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          if (typeof reader.result === "string") {
-            onChange(reader.result);
-          }
-        };
-        reader.readAsDataURL(file);
+        onChange(compressedDataUrl);
       }
     } catch {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === "string") {
-          onChange(reader.result);
-        }
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressedDataUrl = await compressImageFile(file, 1200, 1200, 0.75);
+        onChange(compressedDataUrl);
+      } catch {
+        setError("Failed to process image.");
+      }
     } finally {
       setUploading(false);
     }
   };
 
-  const handleBase64Convert = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBase64Convert = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (typeof reader.result === "string") {
-        onChange(reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      setUploading(true);
+      const compressedDataUrl = await compressImageFile(file, 1200, 1200, 0.75);
+      onChange(compressedDataUrl);
+    } catch {
+      setError("Failed to convert image.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const fullImageUrl = getImageUrl(value);
