@@ -692,7 +692,16 @@ export default function CmsForms({
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleFieldChange = (field: string, value: any) => {
-    setLocalContent((prev) => ({ ...prev, [field]: value }));
+    setLocalContent((prev) => {
+      const updated = { ...prev, [field]: value };
+      if (pageId === "home" && field === "heroHeading") {
+        updated.heroSlide1Heading = value;
+      }
+      if (pageId === "home" && field === "heroSubheading") {
+        updated.heroSlide1Subheading = value;
+      }
+      return updated;
+    });
   };
 
   const handleSeoChange = (field: keyof PageSeo, value: string) => {
