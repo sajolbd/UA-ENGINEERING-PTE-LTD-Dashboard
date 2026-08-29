@@ -376,7 +376,15 @@ export default function ProjectsListEditor() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      const result = await res.json();
+
+      let result: any = {};
+      try {
+        result = await res.json();
+      } catch {
+        showToast("error", "Server Error", `Backend returned HTTP status ${res.status}`);
+        return;
+      }
+
       if (res.ok && result.success) {
         setSaveSuccess(true);
         setShowModal(false);
@@ -407,7 +415,15 @@ export default function ProjectsListEditor() {
       const response = await fetch(`${API_BASE}/api/projects/${projectId}`, {
         method: "DELETE"
       });
-      const result = await response.json();
+
+      let result: any = {};
+      try {
+        result = await response.json();
+      } catch {
+        showToast("error", "Server Error", `Backend returned HTTP status ${response.status}`);
+        return;
+      }
+
       if (response.ok && result.success) {
         setProjects(updatedProjects);
         showToast("success", "Project Deleted", `"${projectTitle}" has been removed successfully.`);
