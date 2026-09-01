@@ -167,13 +167,13 @@ export interface CmsDatabase {
 export const initialCmsData: CmsDatabase = {
   site: {
     content: {
-      siteLogo: "/images/logo.png",
-      footerLogo: "/images/footer-logo.png",
+      siteLogo: "/images/logo.webp",
+      footerLogo: "/images/logo.webp",
       companyName: "UA ENGINEERING PTE. LTD.",
       welcomeMessage: "Welcome to",
-      phone: "+65 9841 1786",
-      email: "hello.uaengineering@gmail.com",
-      address: "10 Anson Road, Singapore 079903",
+      phone: "+65 8459 3003",
+      email: "Info@uaengineering.com.sg",
+      address: "38C Sea Avenue Marine Mansion Singapore 424256",
       workingHours: "Mon - Sat: 9:00 AM - 6:00 PM (Emergency 24/7 Support)",
       appointmentButtonText: "Book An Appointment",
       footerAboutText: "Professional engineering, renovation, waterproofing, and steel fabrication solutions in Singapore. Licensed, certified, and compliant with BCA standards.",
@@ -181,7 +181,7 @@ export const initialCmsData: CmsDatabase = {
       instagram: "https://instagram.com",
       linkedin: "https://linkedin.com",
       youtube: "https://youtube.com",
-      whatsapp: "https://wa.me/6598411786",
+      whatsapp: "https://wa.me/6584593003",
     },
     seo: {
       metaTitle: "UA Engineering PTE. LTD. | Singapore Engineering & Renovation",
@@ -286,13 +286,13 @@ export const initialCmsData: CmsDatabase = {
         "@type": "LocalBusiness",
         "name": "UA Engineering Pte Ltd",
         "image": "https://ua-engineering.com/images/logo.png",
-        "address": {
+        address: {
           "@type": "PostalAddress",
-          "streetAddress": "10 Anson Road",
+          "streetAddress": "38C Sea Avenue Marine Mansion",
           "addressLocality": "Singapore",
-          "postalCode": "079903"
+          "postalCode": "424256"
         },
-        "telephone": "+65 9841 1786"
+        "telephone": "+65 8459 3003"
       }, null, 2),
     },
   },
@@ -475,9 +475,9 @@ export const initialCmsData: CmsDatabase = {
       heroSubheading: "Get in touch for commercial quotations, structural surveys, emergency substation audits, or custom plumbing design layout consultations.",
       heroImage: "/images/contact/contact-bg.jpg",
       heroImageAlt: "UA Engineering Singapore Customer Support Center",
-      contactAddress: "10 Anson Road, Singapore 079903",
-      contactPhone: "+65 9841 1786",
-      contactEmail: "info@ua-engineering.com",
+      contactAddress: "38C Sea Avenue Marine Mansion Singapore 424256",
+      contactPhone: "+65 8459 3003",
+      contactEmail: "Info@uaengineering.com.sg",
       contactHours: "Mon - Sat: 9:00 AM - 6:00 PM (Emergency 24/7 Support)",
     },
     seo: {

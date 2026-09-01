@@ -10,7 +10,7 @@
       "metaTitle": "UA Engineering PTE. LTD.",
       "metaDescription": "UA Engineering PTE. LTD. provides renovation, waterproofing, steel works, roofing, electrical, plumbing, aircon, aluminium glazing and maintenance services across Singapore.",
       "metaKeywords": "UA Engineering, Singapore Renovation, Waterproofing Singapore, Roof Extension, Steel Works, Electrical Services, Plumbing Services, Aircon Repair, Aluminium Works, Engineering Company Singapore",
-      "schemaJson": "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"LocalBusiness\",\n  \"name\": \"UA Engineering Pte Ltd\",\n  \"image\": \"https://ua-engineering.com/images/logo.png\",\n  \"address\": {\n    \"@type\": \"PostalAddress\",\n    \"streetAddress\": \"10 Anson Road\",\n    \"addressLocality\": \"Singapore\",\n    \"postalCode\": \"079903\"\n  },\n  \"telephone\": \"+65 9841 1786\"\n}"
+      "schemaJson": "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"LocalBusiness\",\n  \"name\": \"UA Engineering Pte Ltd\",\n  \"image\": \"https://ua-engineering.com/images/logo.png\",\n  \"address\": {\n    \"@type\": \"PostalAddress\",\n    \"streetAddress\": \"38C Sea Avenue Marine Mansion\",\n    \"addressLocality\": \"Singapore\",\n    \"postalCode\": \"424256\"\n  },\n  \"telephone\": \"+65 8459 3003\"\n}"
     }
   },
   "about": {

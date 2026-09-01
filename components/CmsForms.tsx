@@ -445,19 +445,19 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     heroSubheading: "Get in touch for commercial quotations, structural surveys, emergency substation audits, or custom plumbing design layout consultations.",
     heroImage: "/images/contact/contact-bg.jpg",
     heroImageAlt: "UA Engineering Singapore Customer Support Center",
-    contactAddress: "10 Anson Road, Singapore 079903",
-    contactPhone: "+65 9841 1786",
-    contactEmail: "info@ua-engineering.com",
+    contactAddress: "38C Sea Avenue Marine Mansion Singapore 424256",
+    contactPhone: "+65 8459 3003",
+    contactEmail: "Info@uaengineering.com.sg",
     contactHours: "Mon - Sat: 9:00 AM - 6:00 PM (Emergency 24/7 Support)",
   },
   site: {
-    siteLogo: "/images/logo.png",
-    footerLogo: "/images/footer-logo.png",
+    siteLogo: "/images/logo.webp",
+    footerLogo: "/images/logo.webp",
     companyName: "UA ENGINEERING PTE. LTD.",
     welcomeMessage: "Welcome to UA Engineering",
-    phone: "+65 9841 1786",
-    email: "hello.uaengineering@gmail.com",
-    address: "10 Anson Road, Singapore 079903",
+    phone: "+65 8459 3003",
+    email: "Info@uaengineering.com.sg",
+    address: "38C Sea Avenue Marine Mansion Singapore 424256",
     workingHours: "Mon - Sat: 9:00 AM - 6:00 PM (Emergency 24/7 Support)",
     appointmentButtonText: "Book An Appointment",
     footerAboutText: "Professional engineering, renovation, waterproofing, and steel fabrication solutions in Singapore. Licensed, certified, and compliant with BCA standards.",
@@ -465,7 +465,7 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     instagram: "https://instagram.com",
     linkedin: "https://linkedin.com",
     youtube: "https://youtube.com",
-    whatsapp: "https://wa.me/6598411786",
+    whatsapp: "https://wa.me/6584593003",
   },
 };
 
@@ -838,7 +838,7 @@ export default function CmsForms({
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-xs text-slate-300 font-semibold">
-                    <span className="hidden sm:inline">📞 {(localContent.phone as string) || "+65 9841 1786"}</span>
+                    <span className="hidden sm:inline">📞 {(localContent.phone as string) || "+65 8459 3003"}</span>
                     <button type="button" className="px-3 py-1.5 bg-primary text-white font-bold rounded-xl text-xs shadow-sm">
                       {(localContent.appointmentButtonText as string) || "Book An Appointment"}
                     </button>
@@ -861,7 +861,7 @@ export default function CmsForms({
                     {(localContent.footerAboutText as string) || "Professional engineering, renovation, waterproofing, and steel fabrication solutions in Singapore."}
                   </p>
                   <div className="text-[10px] text-slate-500 font-mono pt-1">
-                    📍 {(localContent.address as string) || "10 Anson Road, Singapore"} | ✉️ {(localContent.email as string) || "hello.uaengineering@gmail.com"}
+                    📍 {(localContent.address as string) || "38C Sea Avenue Marine Mansion Singapore 424256"} | ✉️ {(localContent.email as string) || "Info@uaengineering.com.sg"}
                   </div>
                 </div>
               </div>
