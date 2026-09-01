@@ -59,7 +59,7 @@ export default function Sidebar({
           <div className="flex items-center justify-center w-full px-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/footer-logo.png"
+              src="/images/logo.webp"
               alt="UA Engineering Logo"
               className="max-h-14 w-auto object-contain brightness-100"
             />
@@ -68,7 +68,7 @@ export default function Sidebar({
           <div className="w-full flex justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/logo.png"
+              src="/images/logo.webp"
               alt="UA Engineering Logo Icon"
               className="h-10 w-10 object-contain brightness-100"
             />

@@ -827,10 +827,10 @@ export default function CmsForms({
                   <div className="flex items-center gap-3">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={getImageUrl(localContent.siteLogo || "/images/logo.png")}
+                      src={getImageUrl(localContent.siteLogo || "/images/logo.webp")}
                       alt="Site Logo"
                       className="h-9 w-auto object-contain"
-                      onError={(e) => { (e.target as HTMLImageElement).src = "/images/logo.png"; }}
+                      onError={(e) => { (e.target as HTMLImageElement).src = "/images/logo.webp"; }}
                     />
                     <div>
                       <h5 className="text-xs font-black text-white">{(localContent.companyName as string) || "UA ENGINEERING PTE. LTD."}</h5>
@@ -850,10 +850,10 @@ export default function CmsForms({
                   <div className="flex items-center gap-3">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={getImageUrl(localContent.footerLogo || "/images/footer-logo.png")}
+                      src={getImageUrl(localContent.footerLogo || "/images/logo.webp")}
                       alt="Footer Logo"
                       className="h-8 w-auto object-contain"
-                      onError={(e) => { (e.target as HTMLImageElement).src = "/images/footer-logo.png"; }}
+                      onError={(e) => { (e.target as HTMLImageElement).src = "/images/logo.webp"; }}
                     />
                     <span className="text-xs font-bold text-slate-300">Footer Branding</span>
                   </div>

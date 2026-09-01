@@ -46,7 +46,7 @@ export const fetchWithTimeout = async (
  * Resolves image paths dynamically for the dashboard.
  */
 export const getImageUrl = (imagePath: string): string => {
-  if (!imagePath) return "/images/logo.png";
+  if (!imagePath) return "/images/logo.webp";
   if (imagePath.startsWith("http") || imagePath.startsWith("data:")) {
     return imagePath;
   }
