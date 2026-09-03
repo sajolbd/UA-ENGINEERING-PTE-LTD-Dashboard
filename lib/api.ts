@@ -12,9 +12,9 @@ export const getApiBaseUrl = (): string => {
     if (hostname === "localhost" || hostname === "127.0.0.1") {
       return "http://localhost:5000";
     }
-    return "https://ua-engineering-pte-ltd-backend-production.up.railway.app";
+    return "https://ua-engineering-pte-ltd-backend.vercel.app";
   }
-  return "https://ua-engineering-pte-ltd-backend-production.up.railway.app";
+  return "https://ua-engineering-pte-ltd-backend.vercel.app";
 };
 
 export const getApiBaseUrlClient = getApiBaseUrl;
