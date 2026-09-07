@@ -1225,7 +1225,16 @@ export default function CmsForms({
                       const slideDefault = DEFAULT_HERO_SLIDES[slide.id] || { heading: "", subheading: "" };
                       const headingVal = localContent[headingKey] !== undefined ? localContent[headingKey] : slideDefault.heading;
                       const subheadingVal = localContent[subheadingKey] !== undefined ? localContent[subheadingKey] : slideDefault.subheading;
-                      const bgVal = localContent[bgKey] || localContent.heroImage || "/images/home/hero/hero-bg.png";
+                      const DEFAULT_HERO_SLIDE_BGS: Record<number, string> = {
+                        1: "/images/home/hero/hero-bg.png",
+                        2: "/images/services/renovation.png",
+                        3: "/images/services/painting.png",
+                        4: "/images/services/sub_roof_extension.png",
+                        5: "/images/services/sub_electrical.png",
+                        6: "/images/services/sub_plumbing.png",
+                        7: "/images/services/sub_steel_work.png",
+                      };
+                      const bgVal = localContent[bgKey] || DEFAULT_HERO_SLIDE_BGS[slide.id] || localContent.heroImage || "/images/home/hero/hero-bg.png";
 
                       return (
                         <div key={slide.id} className="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl space-y-3">
