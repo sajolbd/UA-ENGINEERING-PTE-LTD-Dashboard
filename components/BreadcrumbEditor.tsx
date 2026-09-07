@@ -1,6 +1,6 @@
 "use client";
 import { API_BASE, fetchWithTimeout, getImageUrl } from "../lib/api";
-import { initialServicesData, ServiceCategory, SubService } from "../data/servicesData";
+import { initialServicesData, ServiceCategory } from "../data/servicesData";
 
 import React, { useState, useEffect } from "react";
 import {
