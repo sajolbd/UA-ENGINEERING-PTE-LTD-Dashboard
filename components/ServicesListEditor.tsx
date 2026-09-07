@@ -100,7 +100,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     try {
       const compressedDataUrl = await compressImageFile(file, 1000, 1000, 0.75);
       onChange(compressedDataUrl);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Image processing error:", err);
       setError("Failed to process image file.");
     } finally {
@@ -419,7 +419,7 @@ export default function ServicesListEditor() {
 
   const loadServices = () => {
     setLoading(true);
-    fetchWithTimeout(`${API_BASE}/api/services`, {}, 5000)
+    fetchWithTimeout(`${API_BASE}/api/services`, {}, 20000)
       .then((res) => res.json())
       .then((res) => {
         if (res.success && Array.isArray(res.data) && res.data.length > 0) {
@@ -428,16 +428,15 @@ export default function ServicesListEditor() {
             setExpandedCat(res.data[0].slug);
           }
         } else {
-          // Fallback if data is empty
-          setCategories(initialServicesData);
+          setCategories((prev) => (prev.length > 0 ? prev : initialServicesData));
           if (initialServicesData.length > 0 && !expandedCat) {
             setExpandedCat(initialServicesData[0].slug);
           }
         }
       })
       .catch((err) => {
-        console.warn("Using default fallback services directory:", err);
-        setCategories(initialServicesData);
+        console.warn("Backend services fetch timeout or error, using existing/initial state:", err);
+        setCategories((prev) => (prev.length > 0 ? prev : initialServicesData));
         if (initialServicesData.length > 0 && !expandedCat) {
           setExpandedCat(initialServicesData[0].slug);
         }
@@ -468,7 +467,7 @@ export default function ServicesListEditor() {
         body: JSON.stringify({ categories: sanitizedPayload })
       }, 15000);
 
-      let result: any = {};
+      let result: Record<string, unknown> = {};
       try {
         result = await res.json();
       } catch {
@@ -487,12 +486,12 @@ export default function ServicesListEditor() {
         setTimeout(() => setSaveSuccess(false), 4000);
         return true;
       } else {
-        showToast("error", "Save Failed", result.error || result.message || "Failed to save services database");
+        showToast("error", "Save Failed", (result.error as string) || (result.message as string) || "Failed to save services database");
         return false;
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("saveCategoriesToBackend error:", err);
-      showToast("error", "Connection Error", err?.message || "Failed to connect to backend server.");
+      showToast("error", "Connection Error", (err as Error)?.message || "Failed to connect to backend server.");
       return false;
     }
   };

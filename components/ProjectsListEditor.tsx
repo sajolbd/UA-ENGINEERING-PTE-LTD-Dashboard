@@ -53,7 +53,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     try {
       const compressedDataUrl = await compressImageFile(file, 1000, 1000, 0.75);
       onChange(compressedDataUrl);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Image processing error:", err);
       setError("Failed to process image file.");
     } finally {
@@ -226,18 +226,18 @@ export default function ProjectsListEditor() {
 
   const loadProjects = () => {
     setLoading(true);
-    fetchWithTimeout(`${API_BASE}/api/projects`, {}, 5000)
+    fetchWithTimeout(`${API_BASE}/api/projects`, {}, 20000)
       .then((res) => res.json())
       .then((res) => {
         if (res.success && Array.isArray(res.data) && res.data.length > 0) {
           setProjects(res.data);
         } else {
-          setProjects(initialProjectsData);
+          setProjects((prev) => (prev.length > 0 ? prev : initialProjectsData));
         }
       })
       .catch((err) => {
-        console.warn("Failed to load projects list, using fallback:", err);
-        setProjects(initialProjectsData);
+        console.warn("Failed to load projects list, keeping current/initial state:", err);
+        setProjects((prev) => (prev.length > 0 ? prev : initialProjectsData));
       })
       .finally(() => setLoading(false));
   };
@@ -342,7 +342,7 @@ export default function ProjectsListEditor() {
         body: JSON.stringify(payload)
       });
 
-      let result: any = {};
+      let result: Record<string, unknown> = {};
       try {
         result = await res.json();
       } catch {
@@ -357,10 +357,10 @@ export default function ProjectsListEditor() {
         showToast("success", isEdit ? "Project Updated" : "Project Published", `"${title.trim()}" has been saved successfully.`);
         setTimeout(() => setSaveSuccess(false), 4000);
       } else {
-        showToast("error", "Save Failed", result.error || result.message || "Failed to save project");
+        showToast("error", "Save Failed", (result.error as string) || (result.message as string) || "Failed to save project");
       }
-    } catch (err: any) {
-      showToast("error", "Connection Error", err?.message || "Failed to connect to backend server.");
+    } catch (err) {
+      showToast("error", "Connection Error", (err as Error)?.message || "Failed to connect to backend server.");
     }
   };
 
@@ -381,7 +381,7 @@ export default function ProjectsListEditor() {
         method: "DELETE"
       });
 
-      let result: any = {};
+      let result: Record<string, unknown> = {};
       try {
         result = await response.json();
       } catch {
@@ -393,10 +393,10 @@ export default function ProjectsListEditor() {
         setProjects(updatedProjects);
         showToast("success", "Project Deleted", `"${projectTitle}" has been removed successfully.`);
       } else {
-        showToast("error", "Delete Failed", result.error || result.message || "Failed to delete project");
+        showToast("error", "Delete Failed", (result.error as string) || (result.message as string) || "Failed to delete project");
       }
-    } catch (err: any) {
-      showToast("error", "Connection Error", err?.message || "Failed to connect to backend server.");
+    } catch (err) {
+      showToast("error", "Connection Error", (err as Error)?.message || "Failed to connect to backend server.");
     }
   };
 
