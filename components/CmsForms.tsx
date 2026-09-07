@@ -1,5 +1,5 @@
 "use client";
-import { API_BASE, getImageUrl } from "../lib/api";
+import { getImageUrl } from "../lib/api";
 import { compressImageFile } from "../lib/imageUtils";
 
 import React, { useState, useEffect } from "react";
