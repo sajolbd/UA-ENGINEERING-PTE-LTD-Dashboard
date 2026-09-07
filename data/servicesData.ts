@@ -404,20 +404,91 @@ export const initialServicesData: ServiceCategory[] = [
     "process": [],
     "faqs": [
       {
-        "question": "test question",
-        "answer": "test answer"
-      }
-    ],
-    "processHeading": "",
-    "processText": "",
-    "processSteps": [
-      {
-        "title": "test",
-        "description": "test description"
+        "question": "What renovation services does UA Engineering provide?",
+        "answer": "We provide home, kitchen, room, flooring, decking, and open-plan renovation services, including C&R works."
       },
       {
-        "title": "step 1",
-        "description": "step 1 description"
+        "question": "Do you handle HDB, condo, and landed property renovations?",
+        "answer": "Yes. We provide customised renovation solutions for HDB flats, condominiums, and landed homes across Singapore."
+      },
+      {
+        "question": "Can UA Engineering help with creating open-plan spaces?",
+        "answer": "Yes. We handle C&R works, including site assessment, non-load-bearing wall removal, masonry, and reconstruction, while following Singapore regulations."
+      },
+      {
+        "question": "Do you provide customised renovation solutions?",
+        "answer": "Yes. Our team tailors renovation plans, layouts, materials, finishes, and built-in solutions to suit your space and requirements."
+      },
+      {
+        "question": "How do you ensure renovation projects stay on schedule and budget?",
+        "answer": "We use structured project management, transparent quotations, quality materials, and coordinated workmanship to keep projects organised and on track."
+      },
+      {
+        "question": "Does UA Engineering provide renovation services across Singapore?",
+        "answer": "Yes. We serve major areas across Singapore, including the Central, East, North, North-East, and West regions."
+      },
+      {
+        "question": "How can I get a quotation for my renovation project?",
+        "answer": "Contact UA Engineering through the Get Free Quote, WhatsApp, or Let Us Call You options and share your project requirements."
+      }
+    ],
+    "processHeading": "Our Working Process",
+    "processText": "Our structured renovation process transforms your Singapore property on time and budget. We manage design, structural permits, and premium built-in cabinetry.",
+    "processSteps": [
+      {
+        "title": "One-Site Meeting & Site Visit",
+        "description": "We assess your space, understand your needs, and identify the best renovation approach."
+      },
+      {
+        "title": "Planning & Proposal Making",
+        "description": "We create a clear renovation plan with scope, timeline, materials, and pricing."
+      },
+      {
+        "title": "Start Working & Quality Control",
+        "description": "Our team executes the project with strict supervision and consistent quality checks."
+      },
+      {
+        "title": "Functional Audit & Handover",
+        "description": "We inspect every detail, complete final checks, and hand over a ready-to-use space."
+      }
+    ],
+    "targetSpaces": [],
+    "whyChooseLeftTitle": "Our Renovation & Upgrading",
+    "whyChooseRightTitle": "Traditional Renovation Companies",
+    "whyChooseAdvantages": [
+      {
+        "title": "Smart Space Planning",
+        "description": "We use digital layout planning and modern design tools to optimize every square foot of your home, creating functional, stylish, and efficient living spaces."
+      },
+      {
+        "title": "Minimal Disruption Process",
+        "description": "Our organised workflow, dust-control measures, and efficient project coordination reduce noise, mess, and inconvenience during renovation works."
+      },
+      {
+        "title": "Premium Materials & Finishes",
+        "description": "We source durable, high-quality materials and apply advanced installation techniques to ensure long-lasting performance and a refined finish."
+      },
+      {
+        "title": "Skilled & Certified Team",
+        "description": "Our BCA-compliant workmanship and experienced project specialists deliver reliable results with strict attention to safety and quality standards."
+      }
+    ],
+    "whyChooseChallenges": [
+      {
+        "title": "Outdated Planning Methods",
+        "description": "Traditional contractors may rely on basic planning, resulting in inefficient layouts, wasted space, and design changes during the project."
+      },
+      {
+        "title": "Delays & Poor Coordination",
+        "description": "Without a structured workflow, projects can face delays, miscommunication, and extended renovation timelines that disrupt daily life."
+      },
+      {
+        "title": "Inconsistent Workmanship",
+        "description": "Some contractors use lower-grade materials or outdated techniques, leading to uneven finishes and frequent repair needs"
+      },
+      {
+        "title": "Limited Quality Assurance",
+        "description": "Traditional processes may lack proper inspections, documentation, and systematic quality control, reducing confidence in the final result."
       }
     ]
   },
