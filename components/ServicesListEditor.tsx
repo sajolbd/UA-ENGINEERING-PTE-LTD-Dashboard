@@ -19,11 +19,6 @@ import {
   Sparkles
 } from "lucide-react";
 
-interface FAQItem {
-  question: string;
-  answer: string;
-}
-
 interface ImageUploadFieldProps {
   label: string;
   value: string;
