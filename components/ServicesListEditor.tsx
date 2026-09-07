@@ -465,7 +465,7 @@ export default function ServicesListEditor() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ categories: sanitizedPayload })
-      }, 15000);
+      }, 60000);
 
       let result: Record<string, unknown> = {};
       try {
