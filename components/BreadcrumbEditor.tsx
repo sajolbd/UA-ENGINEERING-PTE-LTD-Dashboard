@@ -1,6 +1,6 @@
 "use client";
 import { API_BASE, fetchWithTimeout, getImageUrl } from "../lib/api";
-import { initialServicesData } from "../data/servicesData";
+import { initialServicesData, ServiceCategory, SubService } from "../data/servicesData";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -26,30 +26,6 @@ interface BreadcrumbEditorProps {
     formType: "content" | "seo",
     data: CmsContentUnion | PageSeo
   ) => Promise<boolean>;
-}
-
-interface SubService {
-  slug: string;
-  title: string;
-  image: string;
-  breadcrumbTitle?: string;
-  breadcrumbBg?: string;
-  description: string;
-  longDescription: string;
-  features: string[];
-  benefits: string[];
-  process: string[];
-}
-
-interface ServiceCategory {
-  slug: string;
-  title: string;
-  breadcrumbTitle?: string;
-  shortDescription: string;
-  description: string;
-  featuredImage: string;
-  bgImage: string;
-  services: SubService[];
 }
 
 interface ImageUploadFieldProps {

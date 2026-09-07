@@ -1,21 +1,65 @@
-export interface SubService {
-  id: string;
+export interface ProcessStep {
   title: string;
   description: string;
+}
+
+export interface SubService {
+  id?: string;
+  slug: string;
+  title: string;
+  description: string;
+  longDescription?: string;
   image: string;
   features?: string[];
+  benefits?: string[];
+  process?: string[];
+  processSteps?: ProcessStep[];
+  breadcrumbTitle?: string;
+  breadcrumbBg?: string;
 }
 
 export interface ServiceCategory {
-  id: string;
+  id?: string;
+  slug: string;
   title: string;
-  tagline: string;
+  tagline?: string;
+  breadcrumbTitle?: string;
+  detailTitle?: string;
+  subServicesTitle?: string;
+  subServicesSubheading?: string;
+  shortDescription?: string;
   description: string;
-  heroImage: string;
-  cardImage: string;
-  subServices: SubService[];
+  heroImage?: string;
+  cardImage?: string;
+  featuredImage?: string;
+  bgImage?: string;
+  icon?: string;
+  services: SubService[];
+  subServices?: SubService[];
+  features?: string[];
+  benefits?: string[];
+  process?: string[];
+  processHeading?: string;
+  processText?: string;
+  processSteps?: ProcessStep[];
+  targetBadge?: string;
+  targetHeading?: string;
+  targetSubheading?: string;
+  targetSpaces?: string[];
+  whyChooseBadge?: string;
+  whyChooseHeading?: string;
+  whyChooseLeftTitle?: string;
+  whyChooseRightTitle?: string;
+  whyChooseAdvantages?: { title: string; description: string }[];
+  whyChooseChallenges?: { title: string; description: string }[];
+  serviceAreasBadge?: string;
+  serviceAreasHeading?: string;
+  serviceAreasSubheading?: string;
+  serviceAreasCount?: string;
+  serviceAreasMapImage?: string;
   faqs?: Array<{ question: string; answer: string }>;
 }
+
 
 export const servicesData: ServiceCategory[] = [
   {
@@ -1149,3 +1193,5 @@ export const servicesData: ServiceCategory[] = [
     "process": []
   }
 ];
+
+export const initialServicesData = servicesData;

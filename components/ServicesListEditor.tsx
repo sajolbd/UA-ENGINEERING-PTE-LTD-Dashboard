@@ -1,6 +1,6 @@
 "use client";
 import { API_BASE, fetchWithTimeout, getImageUrl } from "../lib/api";
-import { initialServicesData } from "../data/servicesData";
+import { initialServicesData, ServiceCategory, SubService, ProcessStep } from "../data/servicesData";
 import { compressImageFile } from "../lib/imageUtils";
 
 import React, { useState, useEffect } from "react";
@@ -19,63 +19,9 @@ import {
   Sparkles
 } from "lucide-react";
 
-interface SubService {
-  slug: string;
-  title: string;
-  image: string;
-  breadcrumbTitle?: string;
-  breadcrumbBg?: string;
-  description: string;
-  longDescription: string;
-  features: string[];
-  benefits: string[];
-  process: string[];
-  processSteps?: ProcessStep[];
-}
-
 interface FAQItem {
   question: string;
   answer: string;
-}
-
-interface ProcessStep {
-  title: string;
-  description: string;
-}
-
-interface ServiceCategory {
-  slug: string;
-  title: string;
-  breadcrumbTitle?: string;
-  detailTitle?: string;
-  subServicesTitle?: string;
-  subServicesSubheading?: string;
-  shortDescription: string;
-  description: string;
-  featuredImage: string;
-  bgImage: string;
-  icon?: string;
-  services: SubService[];
-  features?: string[];
-  benefits?: string[];
-  process?: string[];
-  processHeading?: string;
-  processText?: string;
-  processSteps?: ProcessStep[];
-  targetBadge?: string;
-  targetHeading?: string;
-  targetSubheading?: string;
-  targetSpaces?: string[];
-  whyChooseBadge?: string;
-  whyChooseHeading?: string;
-  whyChooseLeftTitle?: string;
-  whyChooseRightTitle?: string;
-  whyChooseAdvantages?: { title: string; description: string }[];
-  whyChooseChallenges?: { title: string; description: string }[];
-  serviceAreasBadge?: string;
-  serviceAreasHeading?: string;
-  serviceAreasSubheading?: string;
-  faqs?: FAQItem[];
 }
 
 interface ImageUploadFieldProps {
@@ -540,10 +486,10 @@ export default function ServicesListEditor() {
     setCatDetailTitle(cat.detailTitle || "");
     setCatSubServicesTitle(cat.subServicesTitle || "");
     setCatSubServicesSubheading(cat.subServicesSubheading || "");
-    setCatShortDesc(cat.shortDescription);
-    setCatDesc(cat.description);
-    setCatFeaturedImage(cat.featuredImage);
-    setCatBgImage(cat.bgImage);
+    setCatShortDesc(cat.shortDescription || "");
+    setCatDesc(cat.description || "");
+    setCatFeaturedImage(cat.featuredImage || "");
+    setCatBgImage(cat.bgImage || "");
     setCatIcon(cat.icon || "");
     setCatFeatures(cat.features && cat.features.length > 0 ? cat.features : [""]);
     setCatBenefits(cat.benefits && cat.benefits.length > 0 ? cat.benefits : [""]);
@@ -722,7 +668,7 @@ export default function ServicesListEditor() {
     setSubImage(service.image);
     setSubBreadcrumbBg(service.breadcrumbBg || "");
     setSubDesc(service.description);
-    setSubLongDesc(service.longDescription);
+    setSubLongDesc(service.longDescription || "");
     setFeatures(service.features && service.features.length > 0 ? service.features : [""]);
     setBenefits(service.benefits && service.benefits.length > 0 ? service.benefits : [""]);
     setProcessList(service.process && service.process.length > 0 ? service.process : [""]);
@@ -944,7 +890,7 @@ export default function ServicesListEditor() {
                 <div className="flex items-center gap-4">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={getImageUrl(cat.featuredImage)}
+                    src={getImageUrl(cat.featuredImage || "")}
                     alt={cat.title}
                     className="w-14 h-14 object-cover rounded-xl border border-slate-700 shrink-0"
                     onError={(e) => {
