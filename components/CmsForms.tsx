@@ -508,19 +508,19 @@ export default function CmsForms({
       [1, 2, 3, 4, 5, 6, 7].forEach((num) => {
         const hKey = `heroSlide${num}Heading`;
         const sKey = `heroSlide${num}Subheading`;
-        if (!contentMap[hKey]) {
+        if (contentMap[hKey] === undefined) {
           contentMap[hKey] = DEFAULT_HERO_SLIDES[num].heading;
         }
-        if (!contentMap[sKey]) {
+        if (contentMap[sKey] === undefined) {
           contentMap[sKey] = DEFAULT_HERO_SLIDES[num].subheading;
         }
       });
     }
 
-    // Fill page section defaults if missing
+    // Fill page section defaults ONLY if property is undefined in DB
     const pageDefaults = DEFAULT_PAGE_CONTENT[pageId] || {};
     Object.keys(pageDefaults).forEach((key) => {
-      if (contentMap[key] === undefined || contentMap[key] === "") {
+      if (contentMap[key] === undefined) {
         contentMap[key] = pageDefaults[key];
       }
     });

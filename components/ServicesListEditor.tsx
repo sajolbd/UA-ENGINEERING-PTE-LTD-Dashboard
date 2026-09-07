@@ -419,7 +419,7 @@ export default function ServicesListEditor() {
 
   const loadServices = () => {
     setLoading(true);
-    fetchWithTimeout(`${API_BASE}/api/services`, {}, 20000)
+    fetchWithTimeout(`${API_BASE}/api/services`, { cache: "no-store" }, 20000)
       .then((res) => res.json())
       .then((res) => {
         if (res.success && Array.isArray(res.data) && res.data.length > 0) {

@@ -261,7 +261,7 @@ export default function DashboardHome() {
   ];
 
   const fetchBlogs = () => {
-    fetch(`${API_BASE}/api/blogs`)
+    fetch(`${API_BASE}/api/blogs`, { cache: "no-store" })
       .then((res) => res.json())
       .then((res) => {
         if (res.success && res.data) {
@@ -279,7 +279,7 @@ export default function DashboardHome() {
     }
 
     // Check backend health and database status
-    fetch(`${API_BASE}/api/health`)
+    fetch(`${API_BASE}/api/health`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         if (data.status === "ok") {
@@ -292,7 +292,7 @@ export default function DashboardHome() {
         setDbStatus({ status: "error", database: "" });
       });
 
-    fetch(`${API_BASE}/api/cms`)
+    fetch(`${API_BASE}/api/cms`, { cache: "no-store" })
       .then((res) => res.json())
       .then((res) => {
         if (res.success && res.data) {
