@@ -51,7 +51,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     try {
       const compressedDataUrl = await compressImageFile(file, 1000, 1000, 0.75);
       onChange(compressedDataUrl);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Image processing error:", err);
       setError("Failed to process image file.");
     } finally {
