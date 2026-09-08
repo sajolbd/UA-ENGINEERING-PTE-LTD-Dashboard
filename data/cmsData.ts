@@ -172,7 +172,7 @@ export const initialCmsData: CmsDatabase = {
       "companyName": "UA ENGINEERING PTE. LTD.",
       "welcomeMessage": "Welcome to",
       "phone": "+65 8459 3003",
-      "email": "hello.uaengineering@gmail.com",
+      "email": "info@uaengineering.com.sg",
       "address": "38C SEA AVENUE MARINE MANSION SINGAPORE 424256",
       "workingHours": "Mon - Sat: 9:00 AM - 6:00 PM (Emergency 24/7 Support)",
       "appointmentButtonText": "Book An Appointment",
@@ -378,7 +378,7 @@ export const initialCmsData: CmsDatabase = {
       "heroImageAlt": "UA Engineering Singapore Customer Support Center",
       "contactAddress": "38C SEA AVENUE MARINE MANSION SINGAPORE 424256",
       "contactPhone": "+65 8459 3003",
-      "contactEmail": "hello.uaengineering@gmail.com",
+      "contactEmail": "info@uaengineering.com.sg",
       "contactHours": "Mon - Sat: 9:00 AM - 6:00 PM (Emergency 24/7 Support)"
     },
     "seo": {
