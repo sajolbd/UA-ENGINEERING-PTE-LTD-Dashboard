@@ -55,6 +55,12 @@ export interface ServiceCategory {
   processHeading?: string;
   processSubheading?: string;
   processSteps?: { step: string; title: string; description: string }[];
+  whyChooseBadge?: string;
+  whyChooseHeading?: string;
+  whyChooseLeftTitle?: string;
+  whyChooseRightTitle?: string;
+  whyChooseAdvantages?: { title: string; description: string }[];
+  whyChooseChallenges?: { title: string; description: string }[];
   faqs?: FAQItem[];
   __v?: number;
 }
@@ -84,8 +90,8 @@ export const servicesData: ServiceCategory[] = [
     ],
     "whyChooseBadge": "UA ADVANTAGE",
     "whyChooseHeading": "Why Choose UA Engineering For Renovation?",
-    "whyChooseLeftTitle": "Traditional Renovation Companies",
-    "whyChooseRightTitle": "Our Renovation & Upgrading",
+    "whyChooseLeftTitle": "Our Renovation & Upgrading",
+    "whyChooseRightTitle": "Traditional Renovation Companies",
     "whyChooseAdvantages": [
       {
         "title": "Smart Space Planning",
@@ -606,8 +612,8 @@ export const servicesData: ServiceCategory[] = [
     ],
     "whyChooseBadge": "UA ADVANTAGE",
     "whyChooseHeading": "Our Structural & Exterior Works",
-    "whyChooseLeftTitle": "Other Traditional Contractors",
-    "whyChooseRightTitle": "Our Structural & Exterior Works",
+    "whyChooseLeftTitle": "Our Structural & Exterior Works",
+    "whyChooseRightTitle": "Other Traditional Contractors",
     "whyChooseAdvantages": [
       {
         "title": "Accurate Site Measurements",
@@ -1017,8 +1023,8 @@ export const servicesData: ServiceCategory[] = [
     ],
     "whyChooseBadge": "UA ADVANTAGE",
     "whyChooseHeading": "Why Choose UA Engineering For Painting & Waterproofing?",
-    "whyChooseLeftTitle": "Typical Painting & Waterproofing Services",
-    "whyChooseRightTitle": "Our Painting & Waterproofing Services",
+    "whyChooseLeftTitle": "Our Painting & Waterproofing Services",
+    "whyChooseRightTitle": "Typical Painting & Waterproofing Services",
     "whyChooseAdvantages": [
       {
         "title": "Thorough Site Assessment",
@@ -1259,8 +1265,8 @@ export const servicesData: ServiceCategory[] = [
     ],
     "whyChooseBadge": "UA ADVANTAGE",
     "whyChooseHeading": "Why Choose UA Engineering For Aluminium & Glazing?",
-    "whyChooseLeftTitle": "Common Contractor Challenges",
-    "whyChooseRightTitle": "Our Aluminium & Glazing Works",
+    "whyChooseLeftTitle": "Our Aluminium & Glazing Works",
+    "whyChooseRightTitle": "Common Contractor Challenges",
     "whyChooseAdvantages": [
       {
         "title": "Customised Solutions",
@@ -1671,8 +1677,8 @@ export const servicesData: ServiceCategory[] = [
     ],
     "whyChooseBadge": "UA ADVANTAGE",
     "whyChooseHeading": "Why Choose UA Engineering For Electrical, Plumbing & Aircon?",
-    "whyChooseLeftTitle": "Common Service Challenges",
-    "whyChooseRightTitle": "Our Commitment to Quality Services",
+    "whyChooseLeftTitle": "Our Commitment to Quality Services",
+    "whyChooseRightTitle": "Common Service Challenges",
     "whyChooseAdvantages": [
       {
         "title": "Integrated Building Solutions",
@@ -1969,8 +1975,8 @@ export const servicesData: ServiceCategory[] = [
     ],
     "whyChooseBadge": "UA ADVANTAGE",
     "whyChooseHeading": "Why Choose UA Engineering For Solar Panel Installation?",
-    "whyChooseLeftTitle": "Common Installation Challenges",
-    "whyChooseRightTitle": "UA Engineering's Solar Installation Expertise",
+    "whyChooseLeftTitle": "UA Engineering's Solar Installation Expertise",
+    "whyChooseRightTitle": "Common Installation Challenges",
     "whyChooseAdvantages": [
       {
         "title": "Assess the site, roof condition, space, and sunlight to determine the best panel placement.",
