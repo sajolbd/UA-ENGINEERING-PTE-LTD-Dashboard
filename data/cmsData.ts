@@ -1,171 +1,17 @@
-export interface PageSeo {
-  metaTitle: string;
-  metaDescription: string;
-  metaKeywords: string;
-  schemaJson: string;
+export interface CmsPage {
+  pageId: string;
+  content: Record<string, any>;
+  seo: {
+    metaTitle: string;
+    metaDescription: string;
+    metaKeywords: string;
+    schemaJson: string;
+  };
 }
 
-export interface SiteContent {
-  siteLogo: string;
-  footerLogo: string;
-  companyName: string;
-  welcomeMessage: string;
-  phone: string;
-  email: string;
-  address: string;
-  workingHours: string;
-  appointmentButtonText: string;
-  footerAboutText: string;
-  facebook: string;
-  instagram: string;
-  linkedin: string;
-  youtube: string;
-  whatsapp: string;
-}
-
-export interface HomeContent {
-  heroHeading: string;
-  heroSubheading: string;
-  heroSlide1Heading?: string;
-  heroSlide1Subheading?: string;
-  heroSlide2Heading?: string;
-  heroSlide2Subheading?: string;
-  heroSlide3Heading?: string;
-  heroSlide3Subheading?: string;
-  heroSlide4Heading?: string;
-  heroSlide4Subheading?: string;
-  heroSlide5Heading?: string;
-  heroSlide5Subheading?: string;
-  heroSlide6Heading?: string;
-  heroSlide6Subheading?: string;
-  heroSlide7Heading?: string;
-  heroSlide7Subheading?: string;
-  heroImage: string;
-  heroImageAlt: string;
-  heroCtaText: string;
-  aboutHeading: string;
-  aboutSubheading: string;
-  aboutImage: string;
-  aboutImageAlt: string;
-  aboutExperience: string;
-  aboutCard1Title?: string;
-  aboutCard1Desc?: string;
-  aboutCard2Title?: string;
-  aboutCard2Desc?: string;
-  aboutCard3Title?: string;
-  aboutCard3Desc?: string;
-  whyChooseBadge: string;
-  whyChooseHeading: string;
-  relyBadge: string;
-  relyHeading: string;
-  relyImage: string;
-  relyButtonText: string;
-  callbackHeading: string;
-  callbackSubheading: string;
-  callbackBgImage: string;
-  callbackSupportImage: string;
-  callbackButtonText: string;
-  reviewsBadge: string;
-  reviewsHeading: string;
-  processBadge: string;
-  processHeading: string;
-  [key: string]: any;
-}
-
-export interface AboutContent {
-  heroHeading: string;
-  heroSubheading: string;
-  heroImage: string;
-  aboutImage?: string;
-  heroImageAlt: string;
-  sectionTag?: string;
-  overviewHeading: string;
-  overviewText: string;
-  experienceYears?: string;
-  experienceTitle?: string;
-  experienceSubtitle?: string;
-  trustHeading?: string;
-  highlightsJson?: string;
-  ehsHeading: string;
-  ehsText: string;
-  ehsImage: string;
-  processBadge?: string;
-  processHeading: string;
-  processSubheading: string;
-  processStepsJson?: string;
-  residentialBadge?: string;
-  residentialHeading: string;
-  residentialSubheading: string;
-  faqBadge?: string;
-  faqHeading: string;
-  faqSubheading: string;
-  faqsJson?: string;
-}
-
-export interface ServicesContent {
-  heroHeading: string;
-  heroSubheading: string;
-  heroImage: string;
-  heroImageAlt: string;
-  servicesHeading: string;
-  servicesSubheading: string;
-}
-
-export interface ProjectsContent {
-  heroHeading: string;
-  heroSubheading: string;
-  heroImage: string;
-  heroImageAlt: string;
-  portfolioHeading: string;
-  portfolioSubheading: string;
-}
-
-export interface BlogContent {
-  heroHeading: string;
-  heroSubheading: string;
-  heroImage: string;
-  heroImageAlt: string;
-  blogHeading: string;
-  blogSubheading: string;
-}
-
-export interface ContactContent {
-  heroHeading: string;
-  heroSubheading: string;
-  heroImage: string;
-  heroImageAlt: string;
-  contactAddress: string;
-  contactPhone: string;
-  contactEmail: string;
-  contactHours: string;
-}
-
-export type CmsContentUnion =
-  | SiteContent
-  | HomeContent
-  | AboutContent
-  | ServicesContent
-  | ProjectsContent
-  | BlogContent
-  | ContactContent;
-
-export interface PageCmsData {
-  content: CmsContentUnion;
-  seo: PageSeo;
-}
-
-export interface CmsDatabase {
-  site: { content: SiteContent; seo: PageSeo };
-  home: { content: HomeContent; seo: PageSeo };
-  about: { content: AboutContent; seo: PageSeo };
-  services: { content: ServicesContent; seo: PageSeo };
-  projects: { content: ProjectsContent; seo: PageSeo };
-  blog: { content: BlogContent; seo: PageSeo };
-  contact: { content: ContactContent; seo: PageSeo };
-}
-
-export const initialCmsData: CmsDatabase = {
+export const initialCmsData: Record<string, CmsPage> = {
   "site": {
+    "pageId": "site",
     "content": {
       "siteLogo": "/images/logo.webp",
       "footerLogo": "/images/logo.webp",
@@ -191,6 +37,7 @@ export const initialCmsData: CmsDatabase = {
     }
   },
   "home": {
+    "pageId": "home",
     "content": {
       "heroHeading": "From Renovation to Painting, Roofing, Electrical, Plumbing and Steel Works.",
       "heroSubheading": "We handle it all with expertise, reliability, and guaranteed quality.",
@@ -286,6 +133,7 @@ export const initialCmsData: CmsDatabase = {
     }
   },
   "about": {
+    "pageId": "about",
     "content": {
       "heroHeading": "About UA Engineering",
       "heroSubheading": "UA Engineering is a Singapore-based company providing renovation, structural, glazing, electrical, plumbing, aircon, waterproofing, and solar solutions.",
@@ -323,6 +171,7 @@ export const initialCmsData: CmsDatabase = {
     }
   },
   "services": {
+    "pageId": "services",
     "content": {
       "heroHeading": "Our Engineering Services",
       "heroSubheading": "Professional solutions covering plumbing, substation electrical networks, waterproofing membranes, drywall, tiling, hacking, and solar panels.",
@@ -339,6 +188,7 @@ export const initialCmsData: CmsDatabase = {
     }
   },
   "projects": {
+    "pageId": "projects",
     "content": {
       "heroHeading": "Our Completed Projects",
       "heroSubheading": "A catalog of successfully delivered commercial, retail, and residential projects reflecting structural engineering precision and quality.",
@@ -355,6 +205,7 @@ export const initialCmsData: CmsDatabase = {
     }
   },
   "blog": {
+    "pageId": "blog",
     "content": {
       "heroHeading": "Engineering & Safety Resources",
       "heroSubheading": "Professional insights, building codes, EHS checklists, and tips on flat roof waterproofing and electrical safety upgrades in HDBs.",
@@ -371,6 +222,7 @@ export const initialCmsData: CmsDatabase = {
     }
   },
   "contact": {
+    "pageId": "contact",
     "content": {
       "heroHeading": "Contact UA Engineering",
       "heroSubheading": "Get in touch for commercial quotations, structural surveys, emergency substation audits, or custom plumbing design layout consultations.",
