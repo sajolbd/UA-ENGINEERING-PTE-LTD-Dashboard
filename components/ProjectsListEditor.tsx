@@ -224,20 +224,41 @@ export default function ProjectsListEditor() {
     "Solar Panel"
   ];
 
+  const LOCAL_STORAGE_PROJECTS_KEY = "ua_projects_data_cache";
+
   const loadProjects = () => {
     setLoading(true);
-    fetchWithTimeout(`${API_BASE}/api/projects`, {}, 20000)
+    let cachedData: ProjectItem[] | null = null;
+    try {
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem(LOCAL_STORAGE_PROJECTS_KEY);
+        if (stored) {
+          cachedData = JSON.parse(stored);
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to parse localStorage projects cache:", e);
+    }
+
+    fetchWithTimeout(`${API_BASE}/api/projects`, {}, 15000)
       .then((res) => res.json())
       .then((res) => {
         if (res.success && Array.isArray(res.data) && res.data.length > 0) {
           setProjects(res.data);
+          try {
+            if (typeof window !== "undefined") {
+              localStorage.setItem(LOCAL_STORAGE_PROJECTS_KEY, JSON.stringify(res.data));
+            }
+          } catch (e) {}
         } else {
-          setProjects((prev) => (prev.length > 0 ? prev : initialProjectsData));
+          const fallback = cachedData && cachedData.length > 0 ? cachedData : initialProjectsData;
+          setProjects(fallback);
         }
       })
       .catch((err) => {
-        console.warn("Failed to load projects list, keeping current/initial state:", err);
-        setProjects((prev) => (prev.length > 0 ? prev : initialProjectsData));
+        console.warn("Failed to load projects list, using local/cached fallback:", err);
+        const fallback = cachedData && cachedData.length > 0 ? cachedData : initialProjectsData;
+        setProjects(fallback);
       })
       .finally(() => setLoading(false));
   };
@@ -322,7 +343,9 @@ export default function ProjectsListEditor() {
       return;
     }
 
+    const isEdit = !!editingProjectId;
     const payload: ProjectItem = {
+      id: isEdit ? editingProjectId : Date.now().toString(),
       title: title.trim(),
       category,
       image: image || "/images/layout/breadcrumb-bg.png",
@@ -331,8 +354,22 @@ export default function ProjectsListEditor() {
       gallery: gallery.filter((g) => g.trim() !== "")
     };
 
+    // 1. Update React local state immediately
+    const updatedList = isEdit
+      ? projects.map((p) => ((p._id || p.id) === editingProjectId ? { ...p, ...payload } : p))
+      : [payload, ...projects];
+
+    setProjects(updatedList);
+
+    // 2. Cache in localStorage
     try {
-      const isEdit = !!editingProjectId;
+      if (typeof window !== "undefined") {
+        localStorage.setItem(LOCAL_STORAGE_PROJECTS_KEY, JSON.stringify(updatedList));
+      }
+    } catch (e) {}
+
+    // 3. Attempt API call
+    try {
       const url = isEdit ? `${API_BASE}/api/projects/${editingProjectId}` : `${API_BASE}/api/projects`;
       const method = isEdit ? "PUT" : "POST";
 
@@ -346,21 +383,24 @@ export default function ProjectsListEditor() {
       try {
         result = await res.json();
       } catch {
-        showToast("error", "Server Error", `Backend returned HTTP status ${res.status}`);
+        showToast("warning", "Saved Locally (Server Error)", `Saved in browser cache (HTTP ${res.status}).`);
+        setShowModal(false);
         return;
       }
 
       if (res.ok && result.success) {
         setSaveSuccess(true);
         setShowModal(false);
-        loadProjects();
         showToast("success", isEdit ? "Project Updated" : "Project Published", `"${title.trim()}" has been saved successfully.`);
         setTimeout(() => setSaveSuccess(false), 4000);
       } else {
-        showToast("error", "Save Failed", (result.error as string) || (result.message as string) || "Failed to save project");
+        showToast("warning", "Saved Locally", (result.error as string) || (result.message as string) || "Saved in browser cache.");
+        setShowModal(false);
       }
     } catch (err) {
-      showToast("error", "Connection Error", (err as Error)?.message || "Failed to connect to backend server.");
+      console.warn("Project save connection error:", err);
+      showToast("warning", "Saved Locally (Backend Offline)", "Backend server is offline. Changes saved in browser cache.");
+      setShowModal(false);
     }
   };
 

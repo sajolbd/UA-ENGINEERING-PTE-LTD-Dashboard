@@ -358,28 +358,51 @@ export default function ServicesListEditor() {
     }, 4000);
   };
 
+  const LOCAL_STORAGE_SERVICES_KEY = "ua_services_categories_cache";
+
   const loadServices = () => {
     setLoading(true);
-    fetchWithTimeout(`${API_BASE}/api/services`, { cache: "no-store" }, 20000)
+    let cachedData: ServiceCategory[] | null = null;
+    try {
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem(LOCAL_STORAGE_SERVICES_KEY);
+        if (stored) {
+          cachedData = JSON.parse(stored);
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to parse localStorage services cache:", e);
+    }
+
+    fetchWithTimeout(`${API_BASE}/api/services`, { cache: "no-store" }, 15000)
       .then((res) => res.json())
       .then((res) => {
         if (res.success && Array.isArray(res.data) && res.data.length > 0) {
           setCategories(res.data);
+          try {
+            if (typeof window !== "undefined") {
+              localStorage.setItem(LOCAL_STORAGE_SERVICES_KEY, JSON.stringify(res.data));
+            }
+          } catch (e) {
+            console.warn("Failed to set localStorage services cache:", e);
+          }
           if (!expandedCat) {
             setExpandedCat(res.data[0].slug);
           }
         } else {
-          setCategories((prev) => (prev.length > 0 ? prev : initialServicesData));
-          if (initialServicesData.length > 0 && !expandedCat) {
-            setExpandedCat(initialServicesData[0].slug);
+          const fallback = cachedData && cachedData.length > 0 ? cachedData : initialServicesData;
+          setCategories(fallback);
+          if (fallback.length > 0 && !expandedCat) {
+            setExpandedCat(fallback[0].slug);
           }
         }
       })
       .catch((err) => {
-        console.warn("Backend services fetch timeout or error, using existing/initial state:", err);
-        setCategories((prev) => (prev.length > 0 ? prev : initialServicesData));
-        if (initialServicesData.length > 0 && !expandedCat) {
-          setExpandedCat(initialServicesData[0].slug);
+        console.warn("Backend services fetch timeout or error, using local/cached fallback:", err);
+        const fallback = cachedData && cachedData.length > 0 ? cachedData : initialServicesData;
+        setCategories(fallback);
+        if (fallback.length > 0 && !expandedCat) {
+          setExpandedCat(fallback[0].slug);
         }
       })
       .finally(() => setLoading(false));
@@ -390,50 +413,107 @@ export default function ServicesListEditor() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const compressPayloadImages = async (cats: ServiceCategory[]): Promise<ServiceCategory[]> => {
+    const processImg = async (imgStr?: string): Promise<string> => {
+      if (!imgStr || !imgStr.startsWith("data:image/") || imgStr.length < 200000) {
+        return imgStr || "";
+      }
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          const maxDim = 800;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return resolve(imgStr);
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/webp", 0.65));
+        };
+        img.onerror = () => resolve(imgStr);
+        img.src = imgStr;
+      });
+    };
+
+    return Promise.all(
+      cats.map(async (cat) => {
+        const featuredImage = await processImg(cat.featuredImage);
+        const bgImage = await processImg(cat.bgImage);
+        const services = await Promise.all(
+          (cat.services || []).map(async (s) => ({
+            ...s,
+            image: (await processImg(s.image)) || "/images/layout/breadcrumb-bg.png",
+            breadcrumbBg: s.breadcrumbBg ? await processImg(s.breadcrumbBg) : undefined,
+          }))
+        );
+        return {
+          ...cat,
+          featuredImage: featuredImage || "/images/services/sanitary-hero.png",
+          bgImage: bgImage || "/images/layout/breadcrumb-bg.png",
+          services,
+        };
+      })
+    );
+  };
+
   const saveCategoriesToBackend = async (updated: ServiceCategory[], successMsg: string) => {
+    // 1. Update React state immediately so UI updates instantly
+    setCategories(updated);
+
+    // 2. Persist to localStorage cache
     try {
-      // Ensure all base64 data URLs in payload are trimmed/safe
-      const sanitizedPayload = updated.map((cat) => ({
-        ...cat,
-        services: (cat.services || []).map((s) => ({
-          ...s,
-          image: s.image || "/images/layout/breadcrumb-bg.png",
-          breadcrumbBg: s.breadcrumbBg || undefined
-        }))
-      }));
+      if (typeof window !== "undefined") {
+        localStorage.setItem(LOCAL_STORAGE_SERVICES_KEY, JSON.stringify(updated));
+      }
+    } catch (e) {
+      console.warn("Failed to save services to localStorage:", e);
+    }
+
+    // 3. Attempt to save to backend REST API with payload size optimization
+    try {
+      const sanitizedPayload = await compressPayloadImages(updated);
 
       const res = await fetchWithTimeout(`${API_BASE}/api/services`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ categories: sanitizedPayload })
-      }, 60000);
+      }, 25000);
 
       let result: Record<string, unknown> = {};
       try {
         result = await res.json();
       } catch {
         if (res.status === 413) {
-          showToast("error", "Payload Too Large", "Image files are too large. Please use smaller/compressed images.");
-          return false;
+          showToast("warning", "Saved Locally (Payload Too Large)", "Images are large. Category saved in browser cache.");
+          return true;
         }
-        showToast("error", "Server Error", `Backend returned HTTP status ${res.status}`);
-        return false;
+        showToast("warning", "Saved Locally (Server Error)", `Saved in browser cache (HTTP ${res.status}).`);
+        return true;
       }
 
       if (res.ok && result.success) {
-        setCategories(updated);
         setSaveSuccess(true);
         showToast("success", "Database Saved", successMsg);
         setTimeout(() => setSaveSuccess(false), 4000);
         return true;
       } else {
-        showToast("error", "Save Failed", (result.error as string) || (result.message as string) || "Failed to save services database");
-        return false;
+        showToast("warning", "Saved Locally", (result.error as string) || (result.message as string) || "Category saved in browser cache.");
+        return true;
       }
     } catch (err) {
-      console.error("saveCategoriesToBackend error:", err);
-      showToast("error", "Connection Error", (err as Error)?.message || "Failed to connect to backend server.");
-      return false;
+      console.warn("saveCategoriesToBackend connection error:", err);
+      showToast("warning", "Saved Locally (Backend Offline)", "Backend server is offline. Changes saved in browser cache.");
+      return true;
     }
   };
 
