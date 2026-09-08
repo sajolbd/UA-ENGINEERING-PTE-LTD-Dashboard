@@ -660,7 +660,7 @@ export default function ServicesListEditor() {
     setEditingSubSlug(service.slug);
     setSubTitle(service.title);
     setSubBreadcrumbTitle(service.breadcrumbTitle || "");
-    setSubImage(service.image);
+    setSubImage(service.image || "");
     setSubBreadcrumbBg(service.breadcrumbBg || "");
     setSubDesc(service.description);
     setSubLongDesc(service.longDescription || "");
@@ -965,7 +965,7 @@ export default function ServicesListEditor() {
                           <div className="flex gap-3">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                              src={getImageUrl(service.image)}
+                              src={getImageUrl(service.image || "")}
                               alt={service.title}
                               className="w-14 h-14 object-cover rounded-xl border border-slate-700 shrink-0"
                               onError={(e) => {

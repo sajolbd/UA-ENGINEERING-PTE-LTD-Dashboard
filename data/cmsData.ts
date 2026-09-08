@@ -1,17 +1,121 @@
-export interface CmsPage {
-  pageId: string;
-  content: Record<string, any>;
-  seo: {
-    metaTitle: string;
-    metaDescription: string;
-    metaKeywords: string;
-    schemaJson: string;
-  };
+export interface PageSeo {
+  metaTitle: string;
+  metaDescription: string;
+  metaKeywords: string;
+  schemaJson: string;
 }
 
-export const initialCmsData: Record<string, CmsPage> = {
+export interface SiteContent {
+  siteLogo: string;
+  footerLogo: string;
+  companyName: string;
+  welcomeMessage: string;
+  phone: string;
+  email: string;
+  address: string;
+  workingHours: string;
+  appointmentButtonText: string;
+  footerAboutText: string;
+  facebook: string;
+  instagram: string;
+  linkedin: string;
+  youtube: string;
+  whatsapp: string;
+  [key: string]: any;
+}
+
+export interface HomeContent {
+  heroHeading: string;
+  heroSubheading: string;
+  heroImage: string;
+  heroImageAlt?: string;
+  heroCtaText?: string;
+  aboutHeading?: string;
+  aboutSubheading?: string;
+  whyChooseBadge?: string;
+  whyChooseHeading?: string;
+  [key: string]: any;
+}
+
+export interface AboutContent {
+  heroHeading: string;
+  heroSubheading: string;
+  heroImage: string;
+  overviewHeading?: string;
+  overviewText?: string;
+  ehsHeading?: string;
+  ehsText?: string;
+  processHeading?: string;
+  processSubheading?: string;
+  residentialHeading?: string;
+  faqHeading?: string;
+  [key: string]: any;
+}
+
+export interface ServicesContent {
+  heroHeading: string;
+  heroSubheading: string;
+  heroImage: string;
+  servicesHeading?: string;
+  servicesSubheading?: string;
+  [key: string]: any;
+}
+
+export interface ProjectsContent {
+  heroHeading: string;
+  heroSubheading: string;
+  heroImage: string;
+  portfolioHeading?: string;
+  portfolioSubheading?: string;
+  [key: string]: any;
+}
+
+export interface BlogContent {
+  heroHeading: string;
+  heroSubheading: string;
+  heroImage: string;
+  blogHeading?: string;
+  blogSubheading?: string;
+  [key: string]: any;
+}
+
+export interface ContactContent {
+  heroHeading: string;
+  heroSubheading: string;
+  heroImage: string;
+  contactAddress?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  contactHours?: string;
+  [key: string]: any;
+}
+
+export type CmsContentUnion =
+  | SiteContent
+  | HomeContent
+  | AboutContent
+  | ServicesContent
+  | ProjectsContent
+  | BlogContent
+  | ContactContent;
+
+export interface PageCmsData {
+  content: CmsContentUnion;
+  seo: PageSeo;
+}
+
+export interface CmsDatabase {
+  site: { content: SiteContent; seo: PageSeo };
+  home: { content: HomeContent; seo: PageSeo };
+  about: { content: AboutContent; seo: PageSeo };
+  services: { content: ServicesContent; seo: PageSeo };
+  projects: { content: ProjectsContent; seo: PageSeo };
+  blog: { content: BlogContent; seo: PageSeo };
+  contact: { content: ContactContent; seo: PageSeo };
+}
+
+export const initialCmsData: CmsDatabase = {
   "site": {
-    "pageId": "site",
     "content": {
       "siteLogo": "/images/logo.webp",
       "footerLogo": "/images/logo.webp",
@@ -37,7 +141,6 @@ export const initialCmsData: Record<string, CmsPage> = {
     }
   },
   "home": {
-    "pageId": "home",
     "content": {
       "heroHeading": "From Renovation to Painting, Roofing, Electrical, Plumbing and Steel Works.",
       "heroSubheading": "We handle it all with expertise, reliability, and guaranteed quality.",
@@ -199,7 +302,6 @@ export const initialCmsData: Record<string, CmsPage> = {
     }
   },
   "about": {
-    "pageId": "about",
     "content": {
       "heroHeading": "About UA Engineering",
       "heroSubheading": "UA Engineering is a Singapore-based company providing renovation, structural, glazing, electrical, plumbing, aircon, waterproofing, and solar solutions.",
@@ -237,7 +339,6 @@ export const initialCmsData: Record<string, CmsPage> = {
     }
   },
   "services": {
-    "pageId": "services",
     "content": {
       "heroHeading": "Our Engineering Services",
       "heroSubheading": "Professional solutions covering plumbing, substation electrical networks, waterproofing membranes, drywall, tiling, hacking, and solar panels.",
@@ -320,7 +421,6 @@ export const initialCmsData: Record<string, CmsPage> = {
     }
   },
   "projects": {
-    "pageId": "projects",
     "content": {
       "heroHeading": "Our Completed Projects",
       "heroSubheading": "A catalog of successfully delivered commercial, retail, and residential projects reflecting structural engineering precision and quality.",
@@ -337,7 +437,6 @@ export const initialCmsData: Record<string, CmsPage> = {
     }
   },
   "blog": {
-    "pageId": "blog",
     "content": {
       "heroHeading": "Engineering & Safety Resources",
       "heroSubheading": "Professional insights, building codes, EHS checklists, and tips on flat roof waterproofing and electrical safety upgrades in HDBs.",
@@ -354,7 +453,6 @@ export const initialCmsData: Record<string, CmsPage> = {
     }
   },
   "contact": {
-    "pageId": "contact",
     "content": {
       "heroHeading": "Contact UA Engineering",
       "heroSubheading": "Get in touch for commercial quotations, structural surveys, emergency substation audits, or custom plumbing design layout consultations.",

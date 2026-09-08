@@ -6,12 +6,14 @@ export interface SubService {
   image?: string;
   description: string;
   longDescription?: string;
+  breadcrumbTitle?: string;
+  breadcrumbBg?: string;
   features?: string[];
   benefits?: string[];
   process?: string[];
   processHeading?: string;
   processSubheading?: string;
-  processSteps?: { step: string; title: string; description: string }[];
+  processSteps?: { step?: string; title: string; description: string }[];
   targetSpacesHeading?: string;
   targetSpacesSubheading?: string;
   targetSpaces?: { title: string; subtitle: string; description: string; points: string[]; image?: string }[];
@@ -32,6 +34,7 @@ export interface FAQItem {
 }
 
 export interface ProcessStep {
+  step?: string;
   title: string;
   description: string;
 }
@@ -43,18 +46,28 @@ export interface ServiceCategory {
   title: string;
   shortDescription: string;
   description: string;
-  longDescription: string;
-  image: string;
-  featuredImage: string;
-  bgImage: string;
-  icon: string;
+  longDescription?: string;
+  image?: string;
+  featuredImage?: string;
+  bgImage?: string;
+  icon?: string;
+  breadcrumbTitle?: string;
+  breadcrumbBg?: string;
+  detailTitle?: string;
+  subServicesTitle?: string;
+  subServicesSubheading?: string;
+  processText?: string;
+  targetBadge?: string;
+  targetHeading?: string;
+  targetSubheading?: string;
+  targetSpaces?: any;
   services: SubService[];
   features?: string[];
   benefits?: string[];
   process?: string[];
   processHeading?: string;
   processSubheading?: string;
-  processSteps?: { step: string; title: string; description: string }[];
+  processSteps?: { step?: string; title: string; description: string }[];
   whyChooseBadge?: string;
   whyChooseHeading?: string;
   whyChooseLeftTitle?: string;
@@ -2475,3 +2488,5 @@ export const servicesData: ServiceCategory[] = [
     ]
   }
 ];
+
+export const initialServicesData = servicesData;
