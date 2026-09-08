@@ -61,6 +61,10 @@ export interface ServiceCategory {
   whyChooseRightTitle?: string;
   whyChooseAdvantages?: { title: string; description: string }[];
   whyChooseChallenges?: { title: string; description: string }[];
+  serviceAreasBadge?: string;
+  serviceAreasHeading?: string;
+  serviceAreasSubheading?: string;
+  serviceAreas?: { region: string; areas: string[] }[];
   faqs?: FAQItem[];
   __v?: number;
 }
@@ -588,6 +592,65 @@ export const servicesData: ServiceCategory[] = [
           }
         ]
       }
+    ],
+    "serviceAreas": [
+      {
+        "region": "Central Region",
+        "areas": [
+          "Orchard",
+          "Bugis",
+          "Marina Bay",
+          "Raffles Place",
+          "Tanjong Pagar",
+          "Bishan",
+          "Toa Payoh",
+          "Bukit Merah"
+        ]
+      },
+      {
+        "region": "East Region",
+        "areas": [
+          "Marine Parade",
+          "Katong",
+          "Joo Chiat",
+          "Bedok",
+          "Tampines",
+          "Pasir Ris",
+          "Changi",
+          "Geylang"
+        ]
+      },
+      {
+        "region": "North Region",
+        "areas": [
+          "Woodlands",
+          "Yishun",
+          "Sembawang",
+          "Mandai",
+          "Sungei Kadut"
+        ]
+      },
+      {
+        "region": "North-East Region",
+        "areas": [
+          "Hougang",
+          "Punggol",
+          "Sengkang",
+          "Serangoon",
+          "Ang Mo Kio"
+        ]
+      },
+      {
+        "region": "West Region",
+        "areas": [
+          "Jurong East",
+          "Jurong West",
+          "Bukit Batok",
+          "Clementi",
+          "Boon Lay",
+          "Choa Chu Kang"
+        ]
+      }
     ]
   },
   {
@@ -998,6 +1061,65 @@ export const servicesData: ServiceCategory[] = [
           }
         ]
       }
+    ],
+    "serviceAreas": [
+      {
+        "region": "Central Region",
+        "areas": [
+          "Orchard",
+          "Bugis",
+          "Marina Bay",
+          "Raffles Place",
+          "Tanjong Pagar",
+          "Bishan",
+          "Toa Payoh",
+          "Bukit Merah"
+        ]
+      },
+      {
+        "region": "East Region",
+        "areas": [
+          "Marine Parade",
+          "Katong",
+          "Joo Chiat",
+          "Bedok",
+          "Tampines",
+          "Pasir Ris",
+          "Changi",
+          "Geylang"
+        ]
+      },
+      {
+        "region": "North Region",
+        "areas": [
+          "Woodlands",
+          "Yishun",
+          "Sembawang",
+          "Mandai",
+          "Sungei Kadut"
+        ]
+      },
+      {
+        "region": "North-East Region",
+        "areas": [
+          "Hougang",
+          "Punggol",
+          "Sengkang",
+          "Serangoon",
+          "Ang Mo Kio"
+        ]
+      },
+      {
+        "region": "West Region",
+        "areas": [
+          "Jurong East",
+          "Jurong West",
+          "Bukit Batok",
+          "Clementi",
+          "Boon Lay",
+          "Choa Chu Kang"
+        ]
+      }
     ]
   },
   {
@@ -1239,6 +1361,65 @@ export const servicesData: ServiceCategory[] = [
             "title": "Step 06 – Project Handover",
             "description": "Perform final quality checks, clean the site, and provide maintenance guidance."
           }
+        ]
+      }
+    ],
+    "serviceAreas": [
+      {
+        "region": "Central Region",
+        "areas": [
+          "Orchard",
+          "Bugis",
+          "Marina Bay",
+          "Raffles Place",
+          "Tanjong Pagar",
+          "Bishan",
+          "Toa Payoh",
+          "Bukit Merah"
+        ]
+      },
+      {
+        "region": "East Region",
+        "areas": [
+          "Marine Parade",
+          "Katong",
+          "Joo Chiat",
+          "Bedok",
+          "Tampines",
+          "Pasir Ris",
+          "Changi",
+          "Geylang"
+        ]
+      },
+      {
+        "region": "North Region",
+        "areas": [
+          "Woodlands",
+          "Yishun",
+          "Sembawang",
+          "Mandai",
+          "Sungei Kadut"
+        ]
+      },
+      {
+        "region": "North-East Region",
+        "areas": [
+          "Hougang",
+          "Punggol",
+          "Sengkang",
+          "Serangoon",
+          "Ang Mo Kio"
+        ]
+      },
+      {
+        "region": "West Region",
+        "areas": [
+          "Jurong East",
+          "Jurong West",
+          "Bukit Batok",
+          "Clementi",
+          "Boon Lay",
+          "Choa Chu Kang"
         ]
       }
     ]
@@ -1653,6 +1834,65 @@ export const servicesData: ServiceCategory[] = [
           }
         ]
       }
+    ],
+    "serviceAreas": [
+      {
+        "region": "Central Region",
+        "areas": [
+          "Orchard",
+          "Bugis",
+          "Marina Bay",
+          "Raffles Place",
+          "Tanjong Pagar",
+          "Bishan",
+          "Toa Payoh",
+          "Bukit Merah"
+        ]
+      },
+      {
+        "region": "East Region",
+        "areas": [
+          "Marine Parade",
+          "Katong",
+          "Joo Chiat",
+          "Bedok",
+          "Tampines",
+          "Pasir Ris",
+          "Changi",
+          "Geylang"
+        ]
+      },
+      {
+        "region": "North Region",
+        "areas": [
+          "Woodlands",
+          "Yishun",
+          "Sembawang",
+          "Mandai",
+          "Sungei Kadut"
+        ]
+      },
+      {
+        "region": "North-East Region",
+        "areas": [
+          "Hougang",
+          "Punggol",
+          "Sengkang",
+          "Serangoon",
+          "Ang Mo Kio"
+        ]
+      },
+      {
+        "region": "West Region",
+        "areas": [
+          "Jurong East",
+          "Jurong West",
+          "Bukit Batok",
+          "Clementi",
+          "Boon Lay",
+          "Choa Chu Kang"
+        ]
+      }
     ]
   },
   {
@@ -1951,6 +2191,65 @@ export const servicesData: ServiceCategory[] = [
           }
         ]
       }
+    ],
+    "serviceAreas": [
+      {
+        "region": "Central Region",
+        "areas": [
+          "Orchard",
+          "Bugis",
+          "Marina Bay",
+          "Raffles Place",
+          "Tanjong Pagar",
+          "Bishan",
+          "Toa Payoh",
+          "Bukit Merah"
+        ]
+      },
+      {
+        "region": "East Region",
+        "areas": [
+          "Marine Parade",
+          "Katong",
+          "Joo Chiat",
+          "Bedok",
+          "Tampines",
+          "Pasir Ris",
+          "Changi",
+          "Geylang"
+        ]
+      },
+      {
+        "region": "North Region",
+        "areas": [
+          "Woodlands",
+          "Yishun",
+          "Sembawang",
+          "Mandai",
+          "Sungei Kadut"
+        ]
+      },
+      {
+        "region": "North-East Region",
+        "areas": [
+          "Hougang",
+          "Punggol",
+          "Sengkang",
+          "Serangoon",
+          "Ang Mo Kio"
+        ]
+      },
+      {
+        "region": "West Region",
+        "areas": [
+          "Jurong East",
+          "Jurong West",
+          "Bukit Batok",
+          "Clementi",
+          "Boon Lay",
+          "Choa Chu Kang"
+        ]
+      }
     ]
   },
   {
@@ -2110,6 +2409,67 @@ export const servicesData: ServiceCategory[] = [
             "title": "Step 06 – Testing & Handover",
             "description": "Conduct comprehensive system testing, verify operational performance, perform safety inspections, and complete the final client handover."
           }
+        ]
+      }
+    ],
+    "serviceAreasHeading": "Reliable Engineering & Renovation Solutions Near You",
+    "serviceAreasSubheading": "UA ENGINEERING proudly provides renovation and upgrading services across Singapore, covering all major residential and commercial areas.",
+    "serviceAreas": [
+      {
+        "region": "Central Region",
+        "areas": [
+          "Orchard",
+          "Bugis",
+          "Marina Bay",
+          "Raffles Place",
+          "Tanjong Pagar",
+          "Bishan",
+          "Toa Payoh",
+          "Bukit Merah"
+        ]
+      },
+      {
+        "region": "East Region",
+        "areas": [
+          "Marine Parade",
+          "Katong",
+          "Joo Chiat",
+          "Bedok",
+          "Tampines",
+          "Pasir Ris",
+          "Changi",
+          "Geylang"
+        ]
+      },
+      {
+        "region": "North Region",
+        "areas": [
+          "Woodlands",
+          "Yishun",
+          "Sembawang",
+          "Mandai",
+          "Sungei Kadut"
+        ]
+      },
+      {
+        "region": "North-East Region",
+        "areas": [
+          "Hougang",
+          "Punggol",
+          "Sengkang",
+          "Serangoon",
+          "Ang Mo Kio"
+        ]
+      },
+      {
+        "region": "West Region",
+        "areas": [
+          "Jurong East",
+          "Jurong West",
+          "Bukit Batok",
+          "Clementi",
+          "Boon Lay",
+          "Choa Chu Kang"
         ]
       }
     ]
