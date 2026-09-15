@@ -5,9 +5,9 @@
  */
 export const compressImageFile = (
   file: File,
-  maxWidth: number = 1200,
-  maxHeight: number = 1200,
-  quality: number = 0.75
+  maxWidth: number = 1000,
+  maxHeight: number = 1000,
+  quality: number = 0.65
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     // Return SVG/GIF directly as Data URL without canvas redraw
