@@ -3,6 +3,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
     remotePatterns: [
+      { protocol: 'https', hostname: 'api.uaengineering.com.sg', port: '' },
       { protocol: 'https', hostname: 'ua-engineering-pte-ltd-backend.vercel.app', port: '' },
       { protocol: 'https', hostname: 'www.uaengineering.com.sg', port: '' },
       { protocol: 'https', hostname: 'uaengineering.com.sg', port: '' },

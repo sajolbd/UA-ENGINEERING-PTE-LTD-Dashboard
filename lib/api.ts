@@ -3,8 +3,10 @@
  * - If NEXT_PUBLIC_API_URL is configured in environment, use it.
  * - Otherwise default to http://localhost:5000 for local dev & backend server.
  */
+const LIVE_API_FALLBACK = "https://api.uaengineering.com.sg";
+
 export const getApiBaseUrl = (): string => {
-  if (process.env.NEXT_PUBLIC_API_URL) {
+  if (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL.trim().length > 0) {
     return process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, "").replace(/\/$/, "");
   }
   if (typeof window !== "undefined") {
@@ -13,9 +15,9 @@ export const getApiBaseUrl = (): string => {
     if (hostname === "localhost" || hostname === "127.0.0.1") {
       return `${protocol}//${hostname}:5000`;
     }
-    return "";
+    return LIVE_API_FALLBACK;
   }
-  return "http://127.0.0.1:5000";
+  return LIVE_API_FALLBACK;
 };
 
 export const getApiBaseUrlClient = getApiBaseUrl;
