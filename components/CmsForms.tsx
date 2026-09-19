@@ -279,13 +279,13 @@ const DEFAULT_HERO_SLIDES: Record<number, { heading: string; subheading: string 
 };
 
 export const DEFAULT_HERO_SLIDE_BGS: Record<number, string> = {
-  1: "/images/home/hero/hero-bg.png",
-  2: "/images/services/renovation.png",
-  3: "/images/services/painting.png",
-  4: "/images/services/sub_roof_extension.png",
+  1: "",
+  2: "",
+  3: "",
+  4: "",
   5: "",
   6: "",
-  7: "/images/uploads/image-1787047790944-479913020.jpeg",
+  7: "",
 };
 
 const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
@@ -293,15 +293,15 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     heroHeading: "From Renovation to Painting, Roofing, Electrical, Plumbing and Steel Works.",
     heroSubheading: "We handle it all with expertise, reliability, and guaranteed quality.",
     heroCtaText: "Book An Appointment",
-    heroImage: "/images/home/hero/hero-bg.png",
+    heroImage: "",
     heroImageAlt: "UA Engineering Renovation and Steel Fabrications Banner",
-    heroSlide1Bg: "/images/home/hero/hero-bg.png",
-    heroSlide2Bg: "/images/services/renovation.png",
-    heroSlide3Bg: "/images/services/painting.png",
-    heroSlide4Bg: "/images/services/sub_roof_extension.png",
+    heroSlide1Bg: "",
+    heroSlide2Bg: "",
+    heroSlide3Bg: "",
+    heroSlide4Bg: "",
     heroSlide5Bg: "",
     heroSlide6Bg: "",
-    heroSlide7Bg: "/images/uploads/image-1787047790944-479913020.jpeg",
+    heroSlide7Bg: "",
     aboutHeading: "Your Trusted Partner for High Quality Renovation & Upgrading Services.",
     aboutSubheading: "At UA ENGINEERING PTE. LTD. we deliver reliable Renovation & Upgrading solutions grounded in integrity, expertise, and precision. Our team ensures every project meets high standards of safety, durability, and quality workmanship.",
     aboutImage: "/images/home/about/about-main.jpg",
