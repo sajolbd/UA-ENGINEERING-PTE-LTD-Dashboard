@@ -855,7 +855,7 @@ export default function CmsForms({
 
     let success = false;
     if (formType === "content") {
-      const dataToSave: Record<string, any> = { ...localContent };
+      const dataToSave: Record<string, any> = { ...localContent, _updatedAt: new Date().toISOString() };
       if (pageId === "home") {
         [1, 2, 3, 4, 5, 6, 7].forEach((num) => {
           const hKey = `heroSlide${num}Heading`;
@@ -894,7 +894,7 @@ export default function CmsForms({
     if (success) {
       isDirtyRef.current = false;
       if (formType === "content") {
-        const dataToSave: Record<string, any> = { ...localContent };
+        const dataToSave: Record<string, any> = { ...localContent, _updatedAt: new Date().toISOString() };
         setLocalContent(dataToSave);
       }
       currentLoadedPageRef.current = pageId;

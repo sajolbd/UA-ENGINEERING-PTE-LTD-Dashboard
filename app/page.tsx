@@ -292,26 +292,11 @@ export default function DashboardHome() {
         setDbStatus({ status: "error", database: "" });
       });
 
-    // Check localStorage cache for CMS data
-    try {
-      if (typeof window !== "undefined") {
-        const storedCms = localStorage.getItem("ua_cms_data_cache");
-        if (storedCms) {
-          setCmsData(JSON.parse(storedCms));
-        }
-      }
-    } catch (e) {}
-
     fetch(`${API_BASE}/api/cms`, { cache: "no-store" })
       .then((res) => res.json())
       .then((res) => {
         if (res.success && res.data) {
           setCmsData(res.data);
-          try {
-            if (typeof window !== "undefined") {
-              localStorage.setItem("ua_cms_data_cache", JSON.stringify(res.data));
-            }
-          } catch (e) {}
         }
       })
       .catch((err) => console.error("Failed to load CMS settings from Express backend:", err));
@@ -356,11 +341,6 @@ export default function DashboardHome() {
           seo: { ...initialCmsData[pageId].seo },
         },
       };
-      try {
-        if (typeof window !== "undefined") {
-          localStorage.setItem("ua_cms_data_cache", JSON.stringify(next));
-        }
-      } catch (e) {}
       return next;
     });
   };
@@ -405,12 +385,6 @@ export default function DashboardHome() {
           } as HomeContent,
         };
       }
-
-      try {
-        if (typeof window !== "undefined") {
-          localStorage.setItem("ua_cms_data_cache", JSON.stringify(next));
-        }
-      } catch (e) {}
       return next;
     });
 
@@ -461,16 +435,15 @@ export default function DashboardHome() {
           }).catch(() => {});
         }
       }
-
       if (!res.ok) {
-        console.warn("[CMS Save HTTP Notice]", res.status, res.statusText, "(saved locally)");
-        return true;
+        console.warn("[CMS Save HTTP Notice]", res.status, res.statusText, "(not persisted)");
+        return false;
       }
 
-      const result = await res.json();
-      if (!result.success) {
-        console.warn("[CMS Save API Notice]", result.error, "(saved locally)");
-        return true;
+      const result = await res.json().catch(() => null);
+      if (!result?.success) {
+        console.warn("[CMS Save API Notice]", result?.error || "Unknown API response", "(not persisted)");
+        return false;
       }
 
       return true;
@@ -486,9 +459,13 @@ export default function DashboardHome() {
             data: updatedData,
           }),
         });
-        if (liveRes.ok) return true;
-      } catch (e) {}
-      return true;
+        if (!liveRes.ok) return false;
+        const liveResult = await liveRes.json().catch(() => null);
+        return Boolean(liveResult?.success);
+      } catch (e) {
+        console.warn("[CMS Save Live Retry Failed]", e);
+      }
+      return false;
     }
   };
 

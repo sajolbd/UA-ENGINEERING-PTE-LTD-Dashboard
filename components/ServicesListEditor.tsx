@@ -380,35 +380,17 @@ export default function ServicesListEditor() {
 
   const loadServices = () => {
     setLoading(true);
-    let cachedData: ServiceCategory[] | null = null;
-    try {
-      if (typeof window !== "undefined") {
-        const stored = localStorage.getItem(LOCAL_STORAGE_SERVICES_KEY);
-        if (stored) {
-          cachedData = JSON.parse(stored);
-        }
-      }
-    } catch (e) {
-      console.warn("Failed to parse localStorage services cache:", e);
-    }
 
     fetchWithTimeout(`${API_BASE}/api/services`, { cache: "no-store" }, 15000)
       .then((res) => res.json())
       .then((res) => {
         if (res.success && Array.isArray(res.data) && res.data.length > 0) {
           setCategories(res.data);
-          try {
-            if (typeof window !== "undefined") {
-              localStorage.setItem(LOCAL_STORAGE_SERVICES_KEY, JSON.stringify(res.data));
-            }
-          } catch (e) {
-            console.warn("Failed to set localStorage services cache:", e);
-          }
           if (!expandedCat) {
             setExpandedCat(res.data[0].slug);
           }
         } else {
-          const fallback = cachedData && cachedData.length > 0 ? cachedData : initialServicesData;
+          const fallback = initialServicesData;
           setCategories(fallback);
           if (fallback.length > 0 && !expandedCat) {
             setExpandedCat(fallback[0].slug);
@@ -417,7 +399,7 @@ export default function ServicesListEditor() {
       })
       .catch((err) => {
         console.warn("Backend services fetch timeout or error, using local/cached fallback:", err);
-        const fallback = cachedData && cachedData.length > 0 ? cachedData : initialServicesData;
+        const fallback = initialServicesData;
         setCategories(fallback);
         if (fallback.length > 0 && !expandedCat) {
           setExpandedCat(fallback[0].slug);
@@ -489,17 +471,7 @@ export default function ServicesListEditor() {
   const saveCategoriesToBackend = async (updated: ServiceCategory[], successMsg: string) => {
     // 1. Update React state immediately so UI updates instantly
     setCategories(updated);
-
-    // 2. Persist to localStorage cache
-    try {
-      if (typeof window !== "undefined") {
-        localStorage.setItem(LOCAL_STORAGE_SERVICES_KEY, JSON.stringify(updated));
-      }
-    } catch (e) {
-      console.warn("Failed to save services to localStorage:", e);
-    }
-
-    // 3. Attempt to save to backend REST API with payload size optimization
+    // 2. Persist to backend REST API with payload size optimization
     try {
       const sanitizedPayload = await compressPayloadImages(updated);
 
@@ -514,11 +486,11 @@ export default function ServicesListEditor() {
         result = await res.json();
       } catch {
         if (res.status === 413) {
-          showToast("warning", "Saved Locally (Payload Too Large)", "Images are large. Category saved in browser cache.");
-          return true;
+          showToast("error", "Save Failed (Payload Too Large)", "Images are too large for the backend. Please use smaller images or Base64 compression.");
+          return false;
         }
-        showToast("warning", "Saved Locally (Server Error)", `Saved in browser cache (HTTP ${res.status}).`);
-        return true;
+        showToast("error", "Save Failed", `Backend rejected the save (HTTP ${res.status}).`);
+        return false;
       }
 
       if (res.ok && result.success) {
@@ -527,13 +499,13 @@ export default function ServicesListEditor() {
         setTimeout(() => setSaveSuccess(false), 4000);
         return true;
       } else {
-        showToast("warning", "Saved Locally", (result.error as string) || (result.message as string) || "Category saved in browser cache.");
-        return true;
+        showToast("error", "Save Failed", (result.error as string) || (result.message as string) || "Backend did not persist the service changes.");
+        return false;
       }
     } catch (err) {
       console.warn("saveCategoriesToBackend connection error:", err);
-      showToast("warning", "Saved Locally (Backend Offline)", "Backend server is offline. Changes saved in browser cache.");
-      return true;
+      showToast("error", "Save Failed (Backend Offline)", "Backend server is offline. Changes were not persisted.");
+      return false;
     }
   };
 

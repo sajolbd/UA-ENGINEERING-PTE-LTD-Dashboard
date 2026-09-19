@@ -246,36 +246,20 @@ export default function ProjectsListEditor() {
 
   const loadProjects = () => {
     setLoading(true);
-    let cachedData: ProjectItem[] | null = null;
-    try {
-      if (typeof window !== "undefined") {
-        const stored = localStorage.getItem(LOCAL_STORAGE_PROJECTS_KEY);
-        if (stored) {
-          cachedData = JSON.parse(stored);
-        }
-      }
-    } catch (e) {
-      console.warn("Failed to parse localStorage projects cache:", e);
-    }
 
     fetchWithTimeout(`${API_BASE}/api/projects`, {}, 15000)
       .then((res) => res.json())
       .then((res) => {
         if (res.success && Array.isArray(res.data) && res.data.length > 0) {
           setProjects(res.data);
-          try {
-            if (typeof window !== "undefined") {
-              localStorage.setItem(LOCAL_STORAGE_PROJECTS_KEY, JSON.stringify(res.data));
-            }
-          } catch (e) {}
         } else {
-          const fallback = cachedData && cachedData.length > 0 ? cachedData : initialProjectsData;
+          const fallback = initialProjectsData;
           setProjects(fallback);
         }
       })
       .catch((err) => {
         console.warn("Failed to load projects list, using local/cached fallback:", err);
-        const fallback = cachedData && cachedData.length > 0 ? cachedData : initialProjectsData;
+        const fallback = initialProjectsData;
         setProjects(fallback);
       })
       .finally(() => setLoading(false));
@@ -378,15 +362,7 @@ export default function ProjectsListEditor() {
       : [payload, ...projects];
 
     setProjects(updatedList);
-
-    // 2. Cache in localStorage
-    try {
-      if (typeof window !== "undefined") {
-        localStorage.setItem(LOCAL_STORAGE_PROJECTS_KEY, JSON.stringify(updatedList));
-      }
-    } catch (e) {}
-
-    // 3. Attempt API call
+    // 2. Persist to backend API
     try {
       const url = isEdit ? `${API_BASE}/api/projects/${editingProjectId}` : `${API_BASE}/api/projects`;
       const method = isEdit ? "PUT" : "POST";
@@ -401,8 +377,8 @@ export default function ProjectsListEditor() {
       try {
         result = await res.json();
       } catch {
-        showToast("warning", "Saved Locally (Server Error)", `Saved in browser cache (HTTP ${res.status}).`);
-        setShowModal(false);
+        showToast("error", "Save Failed", `Backend rejected the save (HTTP ${res.status}).`);
+        loadProjects();
         return;
       }
 
@@ -412,13 +388,13 @@ export default function ProjectsListEditor() {
         showToast("success", isEdit ? "Project Updated" : "Project Published", `"${title.trim()}" has been saved successfully.`);
         setTimeout(() => setSaveSuccess(false), 4000);
       } else {
-        showToast("warning", "Saved Locally", (result.error as string) || (result.message as string) || "Saved in browser cache.");
-        setShowModal(false);
+        showToast("error", "Save Failed", (result.error as string) || (result.message as string) || "Backend did not persist the project.");
+        loadProjects();
       }
     } catch (err) {
       console.warn("Project save connection error:", err);
-      showToast("warning", "Saved Locally (Backend Offline)", "Backend server is offline. Changes saved in browser cache.");
-      setShowModal(false);
+      showToast("error", "Save Failed (Backend Offline)", "Backend server is offline. Changes were not persisted.");
+      loadProjects();
     }
   };
 
