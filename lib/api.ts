@@ -37,13 +37,10 @@ export const fetchWithTimeout = async (
   }
 };
 
-/**
- * Resolves image paths dynamically for the dashboard.
- */
-export const getImageUrl = (imagePath: string): string => {
-  if (!imagePath || typeof imagePath !== "string") return "/images/home/hero/hero-bg.png";
+export const getImageUrl = (imagePath?: string, fallback: string = "/images/home/hero/hero-bg.png"): string => {
+  if (!imagePath || typeof imagePath !== "string") return fallback;
   const trimmed = imagePath.trim();
-  if (!trimmed) return "/images/home/hero/hero-bg.png";
+  if (!trimmed) return fallback;
   if (trimmed.startsWith("http") || trimmed.startsWith("data:")) {
     return trimmed;
   }

@@ -12,7 +12,7 @@ import ServicesListEditor from "../components/ServicesListEditor";
 import ProjectsListEditor from "../components/ProjectsListEditor";
 import BreadcrumbEditor from "../components/BreadcrumbEditor";
 import { blogPosts } from "../data/blogData";
-import { initialCmsData, CmsDatabase, CmsContentUnion, PageSeo } from "../data/cmsData";
+import { initialCmsData, CmsDatabase, CmsContentUnion, PageSeo, HomeContent, AboutContent } from "../data/cmsData";
 import {
   Plus,
   X,
@@ -371,14 +371,41 @@ export default function DashboardHome() {
     updatedData: CmsContentUnion | PageSeo
   ): Promise<boolean> => {
     // 1. Update React state immediately and cache to localStorage
+    const content = updatedData as Record<string, any>;
     setCmsData((prev) => {
-      const next = {
+      const next: CmsDatabase = {
         ...prev,
         [pageId]: {
           ...prev[pageId],
           [formType]: { ...updatedData },
         },
       };
+
+      // Cross-sync processStep images between home and about
+      if (pageId === "home" && formType === "content") {
+        next.about = {
+          ...next.about,
+          content: {
+            ...next.about?.content,
+            ...(content.processStep1Image !== undefined ? { processStep1Image: content.processStep1Image } : {}),
+            ...(content.processStep2Image !== undefined ? { processStep2Image: content.processStep2Image } : {}),
+            ...(content.processStep3Image !== undefined ? { processStep3Image: content.processStep3Image } : {}),
+            ...(content.processStep4Image !== undefined ? { processStep4Image: content.processStep4Image } : {}),
+          } as AboutContent,
+        };
+      } else if (pageId === "about" && formType === "content") {
+        next.home = {
+          ...next.home,
+          content: {
+            ...next.home?.content,
+            ...(content.processStep1Image !== undefined ? { processStep1Image: content.processStep1Image } : {}),
+            ...(content.processStep2Image !== undefined ? { processStep2Image: content.processStep2Image } : {}),
+            ...(content.processStep3Image !== undefined ? { processStep3Image: content.processStep3Image } : {}),
+            ...(content.processStep4Image !== undefined ? { processStep4Image: content.processStep4Image } : {}),
+          } as HomeContent,
+        };
+      }
+
       try {
         if (typeof window !== "undefined") {
           localStorage.setItem("ua_cms_data_cache", JSON.stringify(next));
@@ -410,6 +437,29 @@ export default function DashboardHome() {
             data: updatedData,
           }),
         });
+      }
+
+      // Also sync partner page in MongoDB for processStep images
+      if (formType === "content" && (pageId === "home" || pageId === "about")) {
+        const partner = pageId === "home" ? "about" : "home";
+        const partnerUpdates: Record<string, any> = {};
+        [1, 2, 3, 4].forEach((num) => {
+          const k = `processStep${num}Image`;
+          if (content[k] !== undefined && content[k] !== "") {
+            partnerUpdates[k] = content[k];
+          }
+        });
+        if (Object.keys(partnerUpdates).length > 0) {
+          fetch(`${apiBase}/api/cms`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              pageId: partner,
+              formType: "content",
+              data: partnerUpdates,
+            }),
+          }).catch(() => {});
+        }
       }
 
       if (!res.ok) {

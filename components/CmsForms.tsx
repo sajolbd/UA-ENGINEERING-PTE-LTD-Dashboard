@@ -616,19 +616,20 @@ export default function CmsForms({
   const [previewSlide, setPreviewSlide] = useState(1);
 
   const currentLoadedPageRef = useRef<string | null>(null);
-  const hasInitialDataLoadedRef = useRef<Record<string, boolean>>({});
+  const isDirtyRef = useRef(false);
 
   useEffect(() => {
     if (!pageId || !cmsData[pageId]) return;
 
-    // Only load from cmsData when switching to a new pageId or when page hasn't loaded yet.
-    // This prevents background syncs/re-renders from wiping active user edits or uploaded images.
-    if (currentLoadedPageRef.current === pageId && hasInitialDataLoadedRef.current[pageId]) {
+    // Only prevent re-loading from cmsData if the user is actively editing on this SAME page.
+    // If switching pages or if form is not dirty (e.g. backend data just finished fetching or post-save),
+    // always load the fresh data from cmsData so uploaded images & server edits persist reliably!
+    if (currentLoadedPageRef.current === pageId && isDirtyRef.current) {
       return;
     }
 
     currentLoadedPageRef.current = pageId;
-    hasInitialDataLoadedRef.current[pageId] = true;
+    isDirtyRef.current = false;
 
     setSaveSuccess(false);
     setJsonError(null);
@@ -650,7 +651,22 @@ export default function CmsForms({
           contentMap[sKey] = DEFAULT_HERO_SLIDES[num].subheading;
         }
         if (contentMap[bgKey] === undefined) {
-          contentMap[bgKey] = num === 1 ? (contentMap.heroImage || DEFAULT_HERO_SLIDE_BGS[1]) : DEFAULT_HERO_SLIDE_BGS[num];
+          contentMap[bgKey] = num === 1 ? (contentMap.heroImage || "") : "";
+        }
+      });
+      // Cross-sync processStep images from about if home doesn't have them
+      [1, 2, 3, 4].forEach((num) => {
+        const pKey = `processStep${num}Image`;
+        if (!contentMap[pKey] && cmsData.about?.content?.[pKey]) {
+          contentMap[pKey] = cmsData.about.content[pKey];
+        }
+      });
+    } else if (pageId === "about") {
+      // Cross-sync processStep images from home if about doesn't have them
+      [1, 2, 3, 4].forEach((num) => {
+        const pKey = `processStep${num}Image`;
+        if (!contentMap[pKey] && cmsData.home?.content?.[pKey]) {
+          contentMap[pKey] = cmsData.home.content[pKey];
         }
       });
     }
@@ -806,6 +822,7 @@ export default function CmsForms({
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleFieldChange = (field: string, value: any) => {
+    isDirtyRef.current = true;
     setLocalContent((prev) => {
       const updated = { ...prev, [field]: value };
       if (pageId === "home" && field === "heroHeading") {
@@ -825,6 +842,7 @@ export default function CmsForms({
   };
 
   const handleSeoChange = (field: keyof PageSeo, value: string) => {
+    isDirtyRef.current = true;
     setLocalSeo((prev) => ({ ...prev, [field]: value }));
     if (field === "schemaJson") {
       setJsonError(null);
@@ -850,9 +868,14 @@ export default function CmsForms({
             dataToSave[sKey] = num === 1 ? (dataToSave.heroSubheading || DEFAULT_HERO_SLIDES[1].subheading) : DEFAULT_HERO_SLIDES[num].subheading;
           }
           if (dataToSave[bgKey] === undefined) {
-            dataToSave[bgKey] = num === 1 ? (dataToSave.heroImage || DEFAULT_HERO_SLIDE_BGS[1]) : (DEFAULT_HERO_SLIDE_BGS[num] || "");
+            dataToSave[bgKey] = num === 1 ? (dataToSave.heroImage || "") : "";
           }
         });
+        if (dataToSave.heroSlide1Bg) {
+          dataToSave.heroImage = dataToSave.heroSlide1Bg;
+        } else if (dataToSave.heroImage) {
+          dataToSave.heroSlide1Bg = dataToSave.heroImage;
+        }
       }
       success = await onUpdateCmsData(pageId, "content", dataToSave as unknown as CmsContentUnion);
     } else {
@@ -869,11 +892,11 @@ export default function CmsForms({
     }
 
     if (success) {
+      isDirtyRef.current = false;
       if (formType === "content") {
         const dataToSave: Record<string, any> = { ...localContent };
         setLocalContent(dataToSave);
       }
-      hasInitialDataLoadedRef.current[pageId] = true;
       currentLoadedPageRef.current = pageId;
       setSaveSuccess(true);
       setShowSuccessModal(true);
