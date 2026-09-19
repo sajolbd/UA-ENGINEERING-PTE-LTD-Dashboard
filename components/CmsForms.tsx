@@ -283,8 +283,8 @@ export const DEFAULT_HERO_SLIDE_BGS: Record<number, string> = {
   2: "/images/services/renovation.png",
   3: "/images/services/painting.png",
   4: "/images/services/sub_roof_extension.png",
-  5: "/images/services/sub_electrical.png",
-  6: "/images/services/sub_plumbing.png",
+  5: "",
+  6: "",
   7: "/images/uploads/image-1787047790944-479913020.jpeg",
 };
 
@@ -299,8 +299,8 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     heroSlide2Bg: "/images/services/renovation.png",
     heroSlide3Bg: "/images/services/painting.png",
     heroSlide4Bg: "/images/services/sub_roof_extension.png",
-    heroSlide5Bg: "/images/services/sub_electrical.png",
-    heroSlide6Bg: "/images/services/sub_plumbing.png",
+    heroSlide5Bg: "",
+    heroSlide6Bg: "",
     heroSlide7Bg: "/images/uploads/image-1787047790944-479913020.jpeg",
     aboutHeading: "Your Trusted Partner for High Quality Renovation & Upgrading Services.",
     aboutSubheading: "At UA ENGINEERING PTE. LTD. we deliver reliable Renovation & Upgrading solutions grounded in integrity, expertise, and precision. Our team ensures every project meets high standards of safety, durability, and quality workmanship.",
@@ -356,16 +356,16 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     processSubheading: "From site inspection and quotation to professional installation and project handover, we ensure quality, transparency, and customer satisfaction at every stage.",
     processStep1Title: "Free Consultation & Site Visit",
     processStep1Desc: "We assess your requirements, inspect the site, discuss solutions, and understand your project goals.",
-    processStep1Image: "/images/home/process/assessment.png",
+    processStep1Image: "",
     processStep2Title: "Quotation & Project Planning",
     processStep2Desc: "Provide a detailed quotation, project scope, material recommendations, timeline, and execution plan with transparent pricing.",
-    processStep2Image: "/images/home/process/planning.png",
+    processStep2Image: "",
     processStep3Title: "Professional Execution",
     processStep3Desc: "Our skilled team completes every project using quality materials, safe practices, and strict workmanship standards.",
-    processStep3Image: "/images/home/process/execution.png",
+    processStep3Image: "",
     processStep4Title: "Final Inspection & Handover",
     processStep4Desc: "We conduct final quality checks, ensure everything meets expectations, and hand over your completed project with confidence.",
-    processStep4Image: "/images/home/process/handover.png",
+    processStep4Image: "",
     testimonialBadge: "TESTIMONIALS",
     testimonialHeading: "Hear out From our clients",
     testimonialSubheading: "See what our clients has to say about our services and experience.",
@@ -825,8 +825,8 @@ export default function CmsForms({
           if (!dataToSave[sKey]) {
             dataToSave[sKey] = num === 1 ? (dataToSave.heroSubheading || DEFAULT_HERO_SLIDES[1].subheading) : DEFAULT_HERO_SLIDES[num].subheading;
           }
-          if (!dataToSave[bgKey]) {
-            dataToSave[bgKey] = num === 1 ? (dataToSave.heroImage || DEFAULT_HERO_SLIDE_BGS[1]) : DEFAULT_HERO_SLIDE_BGS[num];
+          if (dataToSave[bgKey] === undefined) {
+            dataToSave[bgKey] = num === 1 ? (dataToSave.heroImage || DEFAULT_HERO_SLIDE_BGS[1]) : (DEFAULT_HERO_SLIDE_BGS[num] || "");
           }
         });
       }
@@ -1376,7 +1376,7 @@ export default function CmsForms({
                       const slideDefault = DEFAULT_HERO_SLIDES[slide.id] || { heading: "", subheading: "" };
                       const headingVal = localContent[headingKey] !== undefined ? localContent[headingKey] : slideDefault.heading;
                       const subheadingVal = localContent[subheadingKey] !== undefined ? localContent[subheadingKey] : slideDefault.subheading;
-                      const bgVal = localContent[bgKey] || (slide.id === 1 ? localContent.heroImage : "") || DEFAULT_HERO_SLIDE_BGS[slide.id] || "/images/home/hero/hero-bg.png";
+                      const bgVal = localContent[bgKey] !== undefined ? localContent[bgKey] : (slide.id === 1 ? (localContent.heroImage || DEFAULT_HERO_SLIDE_BGS[1]) : (DEFAULT_HERO_SLIDE_BGS[slide.id] || ""));
 
                       return (
                         <div key={slide.id} className="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl space-y-3">
@@ -2691,6 +2691,35 @@ export default function CmsForms({
                         onChange={(e) => handleFieldChange("processSubheading", e.target.value)}
                         className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary outline-none bg-slate-900 text-white font-medium resize-none"
                       />
+                    </div>
+
+                    {/* 4 Step Circular Images Manager */}
+                    <div className="space-y-3 pt-4 border-t border-slate-800">
+                      <h5 className="text-xs font-black text-slate-300 uppercase tracking-wider">
+                        4 Step Circular Images (Homepage Showcase)
+                      </h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <ImageUploadField
+                          label="Step 01 Circular Image"
+                          value={localContent.processStep1Image || ""}
+                          onChange={(val) => handleFieldChange("processStep1Image", val)}
+                        />
+                        <ImageUploadField
+                          label="Step 02 Circular Image"
+                          value={localContent.processStep2Image || ""}
+                          onChange={(val) => handleFieldChange("processStep2Image", val)}
+                        />
+                        <ImageUploadField
+                          label="Step 03 Circular Image"
+                          value={localContent.processStep3Image || ""}
+                          onChange={(val) => handleFieldChange("processStep3Image", val)}
+                        />
+                        <ImageUploadField
+                          label="Step 04 Circular Image"
+                          value={localContent.processStep4Image || ""}
+                          onChange={(val) => handleFieldChange("processStep4Image", val)}
+                        />
+                      </div>
                     </div>
 
                     {/* Interactive Process Steps List Editor */}
