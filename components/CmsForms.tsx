@@ -392,20 +392,44 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     faqSubheading: "Find expert answers to common questions about our renovation, construction, and handyman services in Singapore.",
     faqsJson: JSON.stringify([
       {
-        question: "What engineering and renovation services does UA Engineering provide in Singapore?",
-        answer: "We provide comprehensive building solutions including renovation & upgrading, structural steel works, roof extension, painting, waterproofing, electrical rewiring, plumbing, aircon servicing, aluminium glazing, and solar panel installation."
+        question: "1. What services does UA Engineering provide in Singapore?",
+        answer: "We provide comprehensive building and property solutions including residential and commercial renovation & upgrading, structural steel works, roof extension, interior & exterior painting, waterproofing, electrical rewiring, plumbing, aircon servicing, aluminium glazing, and solar panel installation across Singapore."
       },
       {
-        question: "Are your engineers and technicians licensed and certified in Singapore?",
-        answer: "Yes, our team consists of BCA-certified professionals, EMA-licensed electricians, and trained Workplace Safety and Health (WSH) officers compliant with Singapore building safety standards."
+        question: "2. Does UA Engineering handle both residential and commercial projects?",
+        answer: "Yes. We undertake projects for HDB flats, BTO, condominiums, landed homes, commercial offices, retail shops, and industrial properties across Singapore. Our team manages projects of all scales, from individual repair works to complete property transformations."
       },
       {
-        question: "Do you offer free site inspection and non-obligatory quotations?",
-        answer: "Yes! We offer free site assessments across all Singapore regions to evaluate your property's requirements and provide clear, transparent upfront quotations with no hidden costs."
+        question: "3. Are your engineers, technicians, and workers licensed and certified in Singapore?",
+        answer: "Yes, our team consists of BCA-certified professionals, EMA-licensed electricians, and trained Workplace Safety and Health (WSH) officers compliant with Singapore building safety standards and MOM regulations."
       },
       {
-        question: "How quickly can UA Engineering start our project upon confirmation?",
-        answer: "Once project scope and quotations are approved, our project management team arranges site preparation and material delivery to commence works promptly according to agreed timelines."
+        question: "4. How does the renovation and engineering process work?",
+        answer: "Our process begins with a consultation and site assessment, followed by a detailed proposal and project planning. Once approved, our skilled team carries out the works under professional supervision and strict quality control. The project concludes with final inspection, handover, site cleaning, and after-sales support."
+      },
+      {
+        question: "5. Do you provide a detailed quotation before starting work?",
+        answer: "Yes. We provide transparent, itemised quotations outlining the project scope, materials, pricing, and expected timeline. This helps clients understand all costs clearly with no hidden fees or unexpected charges."
+      },
+      {
+        question: "6. Do you offer free site inspections and non-obligatory quotations?",
+        answer: "Yes! We offer free site assessments across all Singapore regions to evaluate your property's requirements, take accurate measurements, and provide clear, transparent upfront quotations."
+      },
+      {
+        question: "7. How quickly can UA Engineering start our project upon confirmation?",
+        answer: "Once the project scope and quotations are approved, our project management team arranges site preparation, permit submissions, and material delivery to commence works promptly according to agreed timelines."
+      },
+      {
+        question: "8. Do you provide waterproofing, plumbing, electrical, and air-conditioning services?",
+        answer: "Yes. We provide a wide range of essential M&E and building services, including roof and bathroom waterproofing, leak repairs, pipe replacement, electrical rewiring, switchboard upgrades, and air-conditioning installations."
+      },
+      {
+        question: "9. How does UA Engineering ensure quality, safety, and timely project completion?",
+        answer: "We use structured project planning, experienced supervision, quality inspections, premium certified materials, and strict safety standards (WSH). Clear communication and efficient scheduling ensure every project is completed reliably and on time."
+      },
+      {
+        question: "10. Do you provide warranty and after-sales maintenance support?",
+        answer: "Yes, we provide warranty coverage on our workmanship and materials, along with responsive after-sales maintenance support to give you complete confidence and peace of mind after project handover."
       }
     ]),
   },
@@ -1079,7 +1103,7 @@ export default function CmsForms({
 
                 <div className="relative z-10 border border-white/30 bg-black/50 backdrop-blur-md px-6 py-4 max-w-lg text-center rounded-xl shadow-2xl space-y-1">
                   <h3 className="text-base sm:text-lg font-black text-white tracking-tight uppercase leading-snug">
-                    {(localContent.heroHeading as string) || `${pageId.toUpperCase()} PAGE HERO`}
+                    {(localContent.heroHeading as string) || `${String(pageId).toUpperCase()} PAGE HERO`}
                   </h3>
                   {Boolean(localContent.heroSubheading) && (
                     <p className="text-[11px] text-slate-300 line-clamp-2 font-medium">
@@ -1090,7 +1114,7 @@ export default function CmsForms({
 
                 <div className="absolute bottom-2 left-3 z-20">
                   <span className="text-[9px] font-extrabold bg-primary text-white px-2 py-0.5 rounded uppercase tracking-wider">
-                    {pageId.toUpperCase()} PAGE LIVE BANNER
+                    {String(pageId).toUpperCase()} PAGE LIVE BANNER
                   </span>
                 </div>
               </div>
@@ -1101,17 +1125,17 @@ export default function CmsForms({
           <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
             <div className="flex items-center gap-2 text-[10px] text-slate-400 font-mono">
               <span className="w-2 h-2 rounded-full bg-blue-400"></span>
-              <span>https://ua-engineering.com{pageId === "home" ? "" : `/${pageId}`}</span>
+              <span>https://ua-engineering.com{String(pageId) === "home" ? "" : `/${String(pageId)}`}</span>
             </div>
             <h4 className="text-sm font-bold text-blue-400 hover:underline cursor-pointer line-clamp-1">
-              {localSeo.metaTitle || localContent.heroHeading || `UA Engineering PTE. LTD. | ${pageId.toUpperCase()}`}
+              {localSeo.metaTitle || localContent.heroHeading || `UA Engineering PTE. LTD. | ${String(pageId).toUpperCase()}`}
             </h4>
             <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed font-normal">
               {localSeo.metaDescription || localContent.heroSubheading || "Professional engineering, renovation, waterproofing, and steel fabrication solutions in Singapore."}
             </p>
             {localSeo.metaKeywords && (
               <div className="flex flex-wrap gap-1 pt-1">
-                {localSeo.metaKeywords.split(",").map((kw, i) => (
+                {localSeo.metaKeywords.split(",").map((kw: string, i: number) => (
                   <span key={i} className="text-[9px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded border border-slate-800 font-mono">
                     {kw.trim()}
                   </span>
