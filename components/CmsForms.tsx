@@ -279,13 +279,13 @@ const DEFAULT_HERO_SLIDES: Record<number, { heading: string; subheading: string 
 };
 
 export const DEFAULT_HERO_SLIDE_BGS: Record<number, string> = {
-  1: "",
-  2: "",
-  3: "",
-  4: "",
-  5: "",
-  6: "",
-  7: "",
+  1: "/images/home/hero/slider/1.jpg",
+  2: "/images/home/hero/slider/2.jpg",
+  3: "/images/home/hero/slider/3.jpg",
+  4: "/images/home/hero/slider/4.jpg",
+  5: "/images/home/hero/slider/5.jpg",
+  6: "/images/home/hero/slider/6.jpg",
+  7: "/images/home/hero/slider/7.webp",
 };
 
 const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
@@ -293,15 +293,15 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     heroHeading: "From Renovation to Painting, Roofing, Electrical, Plumbing and Steel Works.",
     heroSubheading: "We handle it all with expertise, reliability, and guaranteed quality.",
     heroCtaText: "Book An Appointment",
-    heroImage: "",
+    heroImage: "/images/home/hero/slider/1.jpg",
     heroImageAlt: "UA Engineering Renovation and Steel Fabrications Banner",
-    heroSlide1Bg: "",
-    heroSlide2Bg: "",
-    heroSlide3Bg: "",
-    heroSlide4Bg: "",
-    heroSlide5Bg: "",
-    heroSlide6Bg: "",
-    heroSlide7Bg: "",
+    heroSlide1Bg: "/images/home/hero/slider/1.jpg",
+    heroSlide2Bg: "/images/home/hero/slider/2.jpg",
+    heroSlide3Bg: "/images/home/hero/slider/3.jpg",
+    heroSlide4Bg: "/images/home/hero/slider/4.jpg",
+    heroSlide5Bg: "/images/home/hero/slider/5.jpg",
+    heroSlide6Bg: "/images/home/hero/slider/6.jpg",
+    heroSlide7Bg: "/images/home/hero/slider/7.webp",
     aboutHeading: "Your Trusted Partner for High Quality Renovation & Upgrading Services.",
     aboutSubheading: "At UA ENGINEERING PTE. LTD. we deliver reliable Renovation & Upgrading solutions grounded in integrity, expertise, and precision. Our team ensures every project meets high standards of safety, durability, and quality workmanship.",
     aboutImage: "/images/home/about/about-main.jpg",
@@ -650,8 +650,8 @@ export default function CmsForms({
         if (contentMap[sKey] === undefined) {
           contentMap[sKey] = DEFAULT_HERO_SLIDES[num].subheading;
         }
-        if (contentMap[bgKey] === undefined) {
-          contentMap[bgKey] = num === 1 ? (contentMap.heroImage || "") : "";
+        if (contentMap[bgKey] === undefined || contentMap[bgKey] === "") {
+          contentMap[bgKey] = num === 1 ? (contentMap.heroImage || DEFAULT_HERO_SLIDE_BGS[1]) : DEFAULT_HERO_SLIDE_BGS[num];
         }
       });
       // Cross-sync processStep images from about if home doesn't have them
@@ -867,8 +867,8 @@ export default function CmsForms({
           if (!dataToSave[sKey]) {
             dataToSave[sKey] = num === 1 ? (dataToSave.heroSubheading || DEFAULT_HERO_SLIDES[1].subheading) : DEFAULT_HERO_SLIDES[num].subheading;
           }
-          if (dataToSave[bgKey] === undefined) {
-            dataToSave[bgKey] = num === 1 ? (dataToSave.heroImage || "") : "";
+          if (!dataToSave[bgKey]) {
+            dataToSave[bgKey] = num === 1 ? (dataToSave.heroImage || DEFAULT_HERO_SLIDE_BGS[1]) : DEFAULT_HERO_SLIDE_BGS[num];
           }
         });
         if (dataToSave.heroSlide1Bg) {
