@@ -60,3 +60,33 @@ export const compressImageFile = (
     reader.readAsDataURL(file);
   });
 };
+
+/**
+ * Converts a Data URL string into a native binary Blob safely
+ */
+export function dataURItoBlob(dataURI: string): Blob {
+  const parts = dataURI.split(",");
+  const byteString = atob(parts[1]);
+  const mimeString = parts[0].split(":")[1].split(";")[0];
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  return new Blob([ab], { type: mimeString });
+}
+
+/**
+ * Compresses an image file and returns both a lightweight Blob (for upload)
+ * and Data URL (for instant optimistic preview).
+ */
+export const compressImageFileToBlob = async (
+  file: File,
+  maxWidth: number = 1600,
+  maxHeight: number = 1000,
+  quality: number = 0.75
+): Promise<{ blob: Blob; dataUrl: string }> => {
+  const dataUrl = await compressImageFile(file, maxWidth, maxHeight, quality);
+  const blob = dataURItoBlob(dataUrl);
+  return { blob, dataUrl };
+};

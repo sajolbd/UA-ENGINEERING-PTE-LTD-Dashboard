@@ -51,11 +51,29 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     setError(null);
 
     try {
-      const compressedDataUrl = await compressImageFile(file, 1000, 1000, 0.75);
-      onChange(compressedDataUrl);
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const res = await fetch(`${API_BASE}/api/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.imagePath) {
+        onChange(data.imagePath);
+      } else {
+        const compressedDataUrl = await compressImageFile(file, 1000, 1000, 0.75);
+        onChange(compressedDataUrl);
+      }
     } catch (err) {
       console.error("Image processing error:", err);
-      setError("Failed to process image file.");
+      try {
+        const compressedDataUrl = await compressImageFile(file, 1000, 1000, 0.75);
+        onChange(compressedDataUrl);
+      } catch {
+        setError("Failed to process image file.");
+      }
     } finally {
       setUploading(false);
       if (e.target) e.target.value = "";

@@ -1,8 +1,8 @@
 "use client";
 import { getImageUrl, getApiBaseUrl } from "../lib/api";
-import { compressImageFile } from "../lib/imageUtils";
+import { compressImageFile, compressImageFileToBlob } from "../lib/imageUtils";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   FileText,
   Globe,
@@ -49,36 +49,54 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     setError(null);
 
     try {
+      let uploadBlob: Blob = file;
+      let previewDataUrl: string = "";
+
       // 1. Client-side compress first to ensure image is lightweight (< 150KB) and avoids Nginx 413 limits
-      const compressedDataUrl = await compressImageFile(file, 1600, 1000, 0.75);
-
-      // 2. Upload the lightweight compressed image to server /api/upload
       try {
-        const blobRes = await fetch(compressedDataUrl);
-        const blob = await blobRes.blob();
-        const formData = new FormData();
-        const ext = file.type === "image/png" ? "webp" : "jpeg";
-        formData.append("image", blob, `slider-${Date.now()}.${ext}`);
+        const compressed = await compressImageFileToBlob(file, 1600, 1000, 0.75);
+        uploadBlob = compressed.blob;
+        previewDataUrl = compressed.dataUrl;
+      } catch (cErr) {
+        console.warn("Client compression notice:", cErr);
+        uploadBlob = file;
+      }
 
-        const apiBase = getApiBaseUrl();
-        const uploadRes = await fetch(`${apiBase}/api/upload`, {
+      // Optimistically update preview immediately
+      if (previewDataUrl) {
+        onChange(previewDataUrl);
+      }
+
+      // 2. Upload the lightweight compressed image directly to server /api/upload
+      const formData = new FormData();
+      const ext = file.type === "image/png" ? "webp" : "jpeg";
+      formData.append("image", uploadBlob, file.name || `slider-${Date.now()}.${ext}`);
+
+      const apiBase = getApiBaseUrl();
+      let uploadRes = await fetch(`${apiBase}/api/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadRes.ok && apiBase !== "https://api.uaengineering.com.sg") {
+        uploadRes = await fetch("https://api.uaengineering.com.sg/api/upload", {
           method: "POST",
           body: formData,
         });
-
-        if (uploadRes.ok) {
-          const uploadData = await uploadRes.json();
-          if (uploadData.success && uploadData.imagePath) {
-            onChange(uploadData.imagePath);
-            return;
-          }
-        }
-      } catch (uploadErr) {
-        console.warn("Upload API failed, falling back to compressed Data URL:", uploadErr);
       }
 
-      // 3. Fallback: use the compressed Data URL directly if API upload is offline
-      onChange(compressedDataUrl);
+      if (uploadRes.ok) {
+        const uploadData = await uploadRes.json();
+        if (uploadData.success && uploadData.imagePath) {
+          onChange(uploadData.imagePath);
+          return;
+        }
+      }
+
+      // 3. Fallback: if server upload failed, keep the preview Data URL
+      if (previewDataUrl) {
+        onChange(previewDataUrl);
+      }
     } catch (err: unknown) {
       console.error("Image processing error:", err);
       setError("Failed to process image file.");
@@ -573,10 +591,23 @@ export default function CmsForms({
   const [showFailureModal, setShowFailureModal] = useState(false);
   const [previewSlide, setPreviewSlide] = useState(1);
 
+  const currentLoadedPageRef = useRef<string | null>(null);
+  const hasInitialDataLoadedRef = useRef<Record<string, boolean>>({});
+
   useEffect(() => {
+    if (!pageId || !cmsData[pageId]) return;
+
+    // Only load from cmsData when switching to a new pageId or when page hasn't loaded yet.
+    // This prevents background syncs/re-renders from wiping active user edits or uploaded images.
+    if (currentLoadedPageRef.current === pageId && hasInitialDataLoadedRef.current[pageId]) {
+      return;
+    }
+
+    currentLoadedPageRef.current = pageId;
+    hasInitialDataLoadedRef.current[pageId] = true;
+
     setSaveSuccess(false);
     setJsonError(null);
-    if (!pageId || !cmsData[pageId]) return;
 
     const pageData = cmsData[pageId];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -814,6 +845,12 @@ export default function CmsForms({
     }
 
     if (success) {
+      if (formType === "content") {
+        const dataToSave: Record<string, any> = { ...localContent };
+        setLocalContent(dataToSave);
+      }
+      hasInitialDataLoadedRef.current[pageId] = true;
+      currentLoadedPageRef.current = pageId;
       setSaveSuccess(true);
       setShowSuccessModal(true);
       setTimeout(() => {
