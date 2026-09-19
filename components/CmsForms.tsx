@@ -1,5 +1,5 @@
 "use client";
-import { getImageUrl } from "../lib/api";
+import { getImageUrl, getApiBaseUrl } from "../lib/api";
 import { compressImageFile } from "../lib/imageUtils";
 
 import React, { useState, useEffect } from "react";
@@ -49,7 +49,35 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     setError(null);
 
     try {
-      const compressedDataUrl = await compressImageFile(file, 1000, 1000, 0.75);
+      // 1. Client-side compress first to ensure image is lightweight (< 150KB) and avoids Nginx 413 limits
+      const compressedDataUrl = await compressImageFile(file, 1600, 1000, 0.75);
+
+      // 2. Upload the lightweight compressed image to server /api/upload
+      try {
+        const blobRes = await fetch(compressedDataUrl);
+        const blob = await blobRes.blob();
+        const formData = new FormData();
+        const ext = file.type === "image/png" ? "webp" : "jpeg";
+        formData.append("image", blob, `slider-${Date.now()}.${ext}`);
+
+        const apiBase = getApiBaseUrl();
+        const uploadRes = await fetch(`${apiBase}/api/upload`, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          if (uploadData.success && uploadData.imagePath) {
+            onChange(uploadData.imagePath);
+            return;
+          }
+        }
+      } catch (uploadErr) {
+        console.warn("Upload API failed, falling back to compressed Data URL:", uploadErr);
+      }
+
+      // 3. Fallback: use the compressed Data URL directly if API upload is offline
       onChange(compressedDataUrl);
     } catch (err: unknown) {
       console.error("Image processing error:", err);
@@ -60,7 +88,23 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     }
   };
 
-  const handleBase64Convert = handleFileChange;
+  const handleBase64Convert = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    setError(null);
+    try {
+      const compressedDataUrl = await compressImageFile(file, 1600, 1000, 0.75);
+      onChange(compressedDataUrl);
+    } catch (err) {
+      console.error("Base64 error:", err);
+      setError("Failed to convert image to Base64.");
+    } finally {
+      setUploading(false);
+      if (e.target) e.target.value = "";
+    }
+  };
 
   const fullImageUrl = getImageUrl(value);
   const isBase64 = value.startsWith("data:");
