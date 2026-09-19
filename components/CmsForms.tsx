@@ -74,9 +74,8 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
           {label}
         </label>
         {value && (
-          <span className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-full shrink-0 ${
-            isBase64 ? "bg-emerald-100 text-emerald-800 border border-emerald-200" : isUploaded ? "bg-blue-100 text-blue-800 border border-blue-200" : "bg-slate-100 text-slate-700 border border-slate-200"
-          }`}>
+          <span className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-full shrink-0 ${isBase64 ? "bg-emerald-100 text-emerald-800 border border-emerald-200" : isUploaded ? "bg-blue-100 text-blue-800 border border-blue-200" : "bg-slate-100 text-slate-700 border border-slate-200"
+            }`}>
             {isBase64 ? "⚡ DB Direct Base64" : isUploaded ? "🌐 DB Uploaded API" : "📁 Local Asset"}
           </span>
         )}
@@ -84,19 +83,17 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
 
       {/* Large Framed Live Image Preview Box */}
       {value ? (
-        <div className={`relative group w-full h-48 rounded-xl border border-slate-200/80 overflow-hidden shadow-inner transition-colors duration-300 ${
-          darkPreview ? "bg-slate-950 text-white" : "bg-slate-50 text-slate-800"
-        }`}>
+        <div className={`relative group w-full h-48 rounded-xl border border-slate-200/80 overflow-hidden shadow-inner transition-colors duration-300 ${darkPreview ? "bg-slate-950 text-white" : "bg-slate-50 text-slate-800"
+          }`}>
           {/* Background grid pattern for transparency */}
           <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:12px_12px]" />
-          
+
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={fullImageUrl}
             alt="Uploaded Preview"
-            className={`relative z-10 w-full h-full p-2 transition-all duration-300 ${
-              fitContain ? "object-contain" : "object-cover"
-            }`}
+            className={`relative z-10 w-full h-full p-2 transition-all duration-300 ${fitContain ? "object-contain" : "object-cover"
+              }`}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.src = "/images/footer-logo.png";
@@ -144,7 +141,7 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
           <span className="text-[10px] text-slate-400 mt-1">Upload a file or enter an image URL below</span>
         </div>
       )}
-      
+
       {/* Path / URL Input Box */}
       <div className="w-full">
         <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl focus-within:border-primary focus-within:ring-1 focus-within:ring-primary overflow-hidden transition-all duration-300">
@@ -219,6 +216,16 @@ const DEFAULT_HERO_SLIDES: Record<number, { heading: string; subheading: string 
   },
 };
 
+export const DEFAULT_HERO_SLIDE_BGS: Record<number, string> = {
+  1: "/images/home/hero/hero-bg.png",
+  2: "/images/services/renovation.png",
+  3: "/images/services/painting.png",
+  4: "/images/services/sub_roof_extension.png",
+  5: "/images/services/sub_electrical.png",
+  6: "/images/services/sub_plumbing.png",
+  7: "/images/uploads/image-1787047790944-479913020.jpeg",
+};
+
 const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
   home: {
     heroHeading: "From Renovation to Painting, Roofing, Electrical, Plumbing and Steel Works.",
@@ -226,6 +233,13 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     heroCtaText: "Book An Appointment",
     heroImage: "/images/home/hero/hero-bg.png",
     heroImageAlt: "UA Engineering Renovation and Steel Fabrications Banner",
+    heroSlide1Bg: "/images/home/hero/hero-bg.png",
+    heroSlide2Bg: "/images/services/renovation.png",
+    heroSlide3Bg: "/images/services/painting.png",
+    heroSlide4Bg: "/images/services/sub_roof_extension.png",
+    heroSlide5Bg: "/images/services/sub_electrical.png",
+    heroSlide6Bg: "/images/services/sub_plumbing.png",
+    heroSlide7Bg: "/images/uploads/image-1787047790944-479913020.jpeg",
     aboutHeading: "Your Trusted Partner for High Quality Renovation & Upgrading Services.",
     aboutSubheading: "At UA ENGINEERING PTE. LTD. we deliver reliable Renovation & Upgrading solutions grounded in integrity, expertise, and precision. Our team ensures every project meets high standards of safety, durability, and quality workmanship.",
     aboutImage: "/images/home/about/about-main.jpg",
@@ -311,6 +325,27 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     testimonial3Quote: "Superb coordination and safety protocol adherence during our substation electrical works. The project was completed efficiently and complied with all regulations.",
     testimonial3Thumbnail: "/images/home/projects/project-electrical.png",
     testimonial3VideoId: "yY19i3889p4",
+    faqBadge: "FAQ'S",
+    faqHeading: "Frequently Asked Questions",
+    faqSubheading: "Find expert answers to common questions about our renovation, construction, and handyman services in Singapore.",
+    faqsJson: JSON.stringify([
+      {
+        question: "What engineering and renovation services does UA Engineering provide in Singapore?",
+        answer: "We provide comprehensive building solutions including renovation & upgrading, structural steel works, roof extension, painting, waterproofing, electrical rewiring, plumbing, aircon servicing, aluminium glazing, and solar panel installation."
+      },
+      {
+        question: "Are your engineers and technicians licensed and certified in Singapore?",
+        answer: "Yes, our team consists of BCA-certified professionals, EMA-licensed electricians, and trained Workplace Safety and Health (WSH) officers compliant with Singapore building safety standards."
+      },
+      {
+        question: "Do you offer free site inspection and non-obligatory quotations?",
+        answer: "Yes! We offer free site assessments across all Singapore regions to evaluate your property's requirements and provide clear, transparent upfront quotations with no hidden costs."
+      },
+      {
+        question: "How quickly can UA Engineering start our project upon confirmation?",
+        answer: "Once project scope and quotations are approved, our project management team arranges site preparation and material delivery to commence works promptly according to agreed timelines."
+      }
+    ]),
   },
   about: {
     heroHeading: "About UA Engineering",
@@ -508,11 +543,15 @@ export default function CmsForms({
       [1, 2, 3, 4, 5, 6, 7].forEach((num) => {
         const hKey = `heroSlide${num}Heading`;
         const sKey = `heroSlide${num}Subheading`;
+        const bgKey = `heroSlide${num}Bg`;
         if (contentMap[hKey] === undefined) {
           contentMap[hKey] = DEFAULT_HERO_SLIDES[num].heading;
         }
         if (contentMap[sKey] === undefined) {
           contentMap[sKey] = DEFAULT_HERO_SLIDES[num].subheading;
+        }
+        if (contentMap[bgKey] === undefined) {
+          contentMap[bgKey] = num === 1 ? (contentMap.heroImage || DEFAULT_HERO_SLIDE_BGS[1]) : DEFAULT_HERO_SLIDE_BGS[num];
         }
       });
     }
@@ -644,6 +683,17 @@ export default function CmsForms({
           }
         ];
       }
+
+      // Ensure home FAQs are initialized if empty
+      if (!contentMap.faqsJson || contentMap.faqsJson === "[]" || contentMap.faqsJson === "") {
+        contentMap.faqsJson = DEFAULT_PAGE_CONTENT.home.faqsJson;
+      }
+      if (!contentMap.faqHeading) {
+        contentMap.faqHeading = "Frequently Asked Questions";
+      }
+      if (!contentMap.faqSubheading) {
+        contentMap.faqSubheading = "Find expert answers to common questions about our renovation, construction, and handyman services in Singapore.";
+      }
     }
 
     setLocalContent(contentMap);
@@ -665,6 +715,12 @@ export default function CmsForms({
       if (pageId === "home" && field === "heroSubheading") {
         updated.heroSlide1Subheading = value;
       }
+      if (pageId === "home" && field === "heroImage") {
+        updated.heroSlide1Bg = value;
+      }
+      if (pageId === "home" && field === "heroSlide1Bg") {
+        updated.heroImage = value;
+      }
       return updated;
     });
   };
@@ -682,7 +738,24 @@ export default function CmsForms({
 
     let success = false;
     if (formType === "content") {
-      success = await onUpdateCmsData(pageId, "content", localContent as unknown as CmsContentUnion);
+      const dataToSave: Record<string, any> = { ...localContent };
+      if (pageId === "home") {
+        [1, 2, 3, 4, 5, 6, 7].forEach((num) => {
+          const hKey = `heroSlide${num}Heading`;
+          const sKey = `heroSlide${num}Subheading`;
+          const bgKey = `heroSlide${num}Bg`;
+          if (!dataToSave[hKey]) {
+            dataToSave[hKey] = num === 1 ? (dataToSave.heroHeading || DEFAULT_HERO_SLIDES[1].heading) : DEFAULT_HERO_SLIDES[num].heading;
+          }
+          if (!dataToSave[sKey]) {
+            dataToSave[sKey] = num === 1 ? (dataToSave.heroSubheading || DEFAULT_HERO_SLIDES[1].subheading) : DEFAULT_HERO_SLIDES[num].subheading;
+          }
+          if (!dataToSave[bgKey]) {
+            dataToSave[bgKey] = num === 1 ? (dataToSave.heroImage || DEFAULT_HERO_SLIDE_BGS[1]) : DEFAULT_HERO_SLIDE_BGS[num];
+          }
+        });
+      }
+      success = await onUpdateCmsData(pageId, "content", dataToSave as unknown as CmsContentUnion);
     } else {
       if (localSeo.schemaJson.trim()) {
         try {
@@ -757,21 +830,19 @@ export default function CmsForms({
       <div className="flex gap-2 p-1.5 bg-slate-100 rounded-2xl max-w-sm">
         <button
           onClick={() => setFormType("content")}
-          className={`flex-1 py-2 text-center text-xs font-extrabold rounded-xl transition-all duration-300 ${
-            formType === "content"
+          className={`flex-1 py-2 text-center text-xs font-extrabold rounded-xl transition-all duration-300 ${formType === "content"
               ? "bg-primary text-white shadow-md"
               : "text-slate-500 hover:text-slate-800"
-          }`}
+            }`}
         >
           Section Content
         </button>
         <button
           onClick={() => setFormType("seo")}
-          className={`flex-1 py-2 text-center text-xs font-extrabold rounded-xl transition-all duration-300 ${
-            formType === "seo"
+          className={`flex-1 py-2 text-center text-xs font-extrabold rounded-xl transition-all duration-300 ${formType === "seo"
               ? "bg-primary text-white shadow-md"
               : "text-slate-500 hover:text-slate-800"
-          }`}
+            }`}
         >
           SEO & Schema.org
         </button>
@@ -874,9 +945,9 @@ export default function CmsForms({
                 <div className="relative w-full h-[220px] sm:h-[250px] flex items-center justify-center overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-xl group">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={getImageUrl(localContent.heroImage || "/images/home/hero/hero-bg.png")}
+                    src={getImageUrl((localContent[`heroSlide${previewSlide}Bg`] as string) || (localContent.heroImage as string) || DEFAULT_HERO_SLIDE_BGS[previewSlide] || "/images/home/hero/hero-bg.png")}
                     alt="Hero Background"
-                    className="absolute inset-0 w-full h-full object-cover opacity-50 transition-transform duration-500 group-hover:scale-105"
+                    className="absolute inset-0 w-full h-full object-cover opacity-60 transition-transform duration-500 group-hover:scale-105"
                     onError={(e) => { (e.target as HTMLImageElement).src = "/images/footer-logo.png"; }}
                   />
                   <div className="absolute inset-0 bg-black/40" />
@@ -901,9 +972,8 @@ export default function CmsForms({
                         key={num}
                         type="button"
                         onClick={() => setPreviewSlide(num)}
-                        className={`px-2 py-0.5 text-[9px] font-black rounded-lg transition-all ${
-                          previewSlide === num ? "bg-primary text-white shadow" : "text-slate-400 hover:text-white"
-                        }`}
+                        className={`px-2 py-0.5 text-[9px] font-black rounded-lg transition-all ${previewSlide === num ? "bg-primary text-white shadow" : "text-slate-400 hover:text-white"
+                          }`}
                       >
                         Slide {num}
                       </button>
@@ -976,7 +1046,7 @@ export default function CmsForms({
         <form onSubmit={handleSubmit} className="space-y-6">
           {formType === "content" ? (
             <div className="space-y-6">
-              
+
               {/* --- SITE GLOBAL SETTINGS --- */}
               {pageId === "site" && (
                 <div className="space-y-6">
@@ -1178,7 +1248,7 @@ export default function CmsForms({
                       className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-900 text-white font-medium resize-none placeholder:text-slate-500"
                     />
                   </div>
-                  
+
                   {/* Hero Image upload */}
                   <ImageUploadField
                     label="Hero Section Background Image"
@@ -1225,16 +1295,7 @@ export default function CmsForms({
                       const slideDefault = DEFAULT_HERO_SLIDES[slide.id] || { heading: "", subheading: "" };
                       const headingVal = localContent[headingKey] !== undefined ? localContent[headingKey] : slideDefault.heading;
                       const subheadingVal = localContent[subheadingKey] !== undefined ? localContent[subheadingKey] : slideDefault.subheading;
-                      const DEFAULT_HERO_SLIDE_BGS: Record<number, string> = {
-                        1: "/images/home/hero/hero-bg.png",
-                        2: "/images/services/renovation.png",
-                        3: "/images/services/painting.png",
-                        4: "/images/services/sub_roof_extension.png",
-                        5: "/images/services/sub_electrical.png",
-                        6: "/images/services/sub_plumbing.png",
-                        7: "/images/services/sub_steel_work.png",
-                      };
-                      const bgVal = localContent[bgKey] || DEFAULT_HERO_SLIDE_BGS[slide.id] || localContent.heroImage || "/images/home/hero/hero-bg.png";
+                      const bgVal = localContent[bgKey] || (slide.id === 1 ? localContent.heroImage : "") || DEFAULT_HERO_SLIDE_BGS[slide.id] || "/images/home/hero/hero-bg.png";
 
                       return (
                         <div key={slide.id} className="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl space-y-3">
@@ -1799,7 +1860,7 @@ export default function CmsForms({
                           const currentList = Array.isArray(localContent.testimonials) ? [...localContent.testimonials] : [];
                           const listCopy = [...currentList];
                           listCopy[idx] = { ...listCopy[idx], [field]: val };
-                          
+
                           // Also sync single fields if first item for backward compatibility
                           if (idx === 0) {
                             if (field === "name") handleFieldChange("testimonial1Name", val);
@@ -2112,8 +2173,8 @@ export default function CmsForms({
                         const areasString = Array.isArray(region.areas)
                           ? region.areas.join(", ")
                           : typeof region.areas === "string"
-                          ? region.areas
-                          : "";
+                            ? region.areas
+                            : "";
 
                         return (
                           <div key={idx} className="p-4 bg-slate-950/70 border border-slate-800 rounded-xl space-y-3 relative group">
@@ -2197,7 +2258,7 @@ export default function CmsForms({
                           type="button"
                           onClick={() => {
                             let list = [];
-                            try { list = JSON.parse(localContent.faqsJson || "[]"); } catch {}
+                            try { list = JSON.parse(localContent.faqsJson || "[]"); } catch { }
                             const newList = [...list, { question: "New Question?", answer: "New Answer text..." }];
                             handleFieldChange("faqsJson", JSON.stringify(newList));
                           }}
@@ -2211,12 +2272,21 @@ export default function CmsForms({
                         let list = [];
                         try {
                           list = JSON.parse(localContent.faqsJson || "[]");
-                        } catch {}
-                        
+                        } catch { }
+
                         if (list.length === 0) {
                           return (
-                            <div className="text-center py-4 bg-slate-950/20 border border-dashed border-slate-800 rounded-xl p-3">
-                              <span className="text-xs text-slate-500">No FAQ items defined yet. Click above to add.</span>
+                            <div className="text-center py-5 bg-slate-950/20 border border-dashed border-slate-800 rounded-xl p-4 space-y-2">
+                              <span className="text-xs text-slate-400 block">No FAQ items defined yet. Click &quot;+ Add FAQ Item&quot; or restore defaults.</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleFieldChange("faqsJson", DEFAULT_PAGE_CONTENT.home.faqsJson);
+                                }}
+                                className="px-3 py-1.5 bg-primary/20 hover:bg-primary/30 text-primary border border-primary/40 rounded-lg text-xs font-bold transition-colors inline-flex items-center gap-1.5"
+                              >
+                                Restore Default FAQs
+                              </button>
                             </div>
                           );
                         }
@@ -2383,7 +2453,7 @@ export default function CmsForms({
                         type="button"
                         onClick={() => {
                           let list = [];
-                          try { list = JSON.parse(localContent.highlightsJson || "[]"); } catch {}
+                          try { list = JSON.parse(localContent.highlightsJson || "[]"); } catch { }
                           const newList = [...list, { text: "New Trust Highlight", icon: "ShieldCheck" }];
                           handleFieldChange("highlightsJson", JSON.stringify(newList));
                         }}
@@ -2398,7 +2468,7 @@ export default function CmsForms({
                         let list = [];
                         try {
                           list = JSON.parse(localContent.highlightsJson || "[]");
-                        } catch {}
+                        } catch { }
 
                         if (list.length === 0) {
                           return (
@@ -2552,7 +2622,7 @@ export default function CmsForms({
                           type="button"
                           onClick={() => {
                             let list = [];
-                            try { list = JSON.parse(localContent.processStepsJson || "[]"); } catch {}
+                            try { list = JSON.parse(localContent.processStepsJson || "[]"); } catch { }
                             const newStep = {
                               id: Date.now(),
                               tag: `STEP 0${list.length + 1}`,
@@ -2572,7 +2642,7 @@ export default function CmsForms({
                         let list = [];
                         try {
                           list = JSON.parse(localContent.processStepsJson || "[]");
-                        } catch {}
+                        } catch { }
 
                         if (list.length === 0) {
                           return (
@@ -2788,7 +2858,7 @@ export default function CmsForms({
                           type="button"
                           onClick={() => {
                             let list = [];
-                            try { list = JSON.parse(localContent.faqsJson || "[]"); } catch {}
+                            try { list = JSON.parse(localContent.faqsJson || "[]"); } catch { }
                             const newList = [...list, { question: "New Question?", answer: "New Answer text..." }];
                             handleFieldChange("faqsJson", JSON.stringify(newList));
                           }}
@@ -2802,8 +2872,8 @@ export default function CmsForms({
                         let list = [];
                         try {
                           list = JSON.parse(localContent.faqsJson || "[]");
-                        } catch {}
-                        
+                        } catch { }
+
                         if (list.length === 0) {
                           return (
                             <div className="text-center py-4 bg-slate-950/20 border border-dashed border-slate-800 rounded-xl p-3">
@@ -3072,11 +3142,10 @@ export default function CmsForms({
                   placeholder={`{\n  "@context": "https://schema.org",\n  "@type": "LocalBusiness"\n}`}
                   value={localSeo.schemaJson}
                   onChange={(e) => handleSeoChange("schemaJson", e.target.value)}
-                  className={`w-full px-4 py-3 text-xs border rounded-xl outline-none font-mono resize-none bg-slate-900 text-white font-medium placeholder:text-slate-500 focus:ring-1 ${
-                    jsonError
+                  className={`w-full px-4 py-3 text-xs border rounded-xl outline-none font-mono resize-none bg-slate-900 text-white font-medium placeholder:text-slate-500 focus:ring-1 ${jsonError
                       ? "border-red-300 focus:border-red-500 focus:ring-red-500"
                       : "border-slate-700 focus:border-primary focus:ring-primary"
-                  }`}
+                    }`}
                 />
                 {jsonError && (
                   <p className="mt-1.5 text-[10px] text-red-600 font-mono">
@@ -3107,7 +3176,7 @@ export default function CmsForms({
       {showSuccessModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm z-50 animate-fade-in">
           <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl p-8 max-w-sm w-full mx-4 text-center space-y-6 animate-scale-up">
-            
+
             {/* Animated Check Circle Container */}
             <div className="mx-auto w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100 flex items-center justify-center shadow-inner relative">
               <CheckCircle className="w-10 h-10 animate-pulse" />
@@ -3138,7 +3207,7 @@ export default function CmsForms({
       {showFailureModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm z-50 animate-fade-in">
           <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl p-8 max-w-sm w-full mx-4 text-center space-y-6 animate-scale-up">
-            
+
             {/* Animated Warning Icon Container */}
             <div className="mx-auto w-16 h-16 bg-rose-50 text-rose-600 rounded-full border border-rose-100 flex items-center justify-center shadow-inner relative">
               <AlertCircle className="w-10 h-10 animate-bounce" />

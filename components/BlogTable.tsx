@@ -543,7 +543,7 @@ export default function BlogTable({
                     </td>
                     <td className="py-3.5 px-4">{post.date}</td>
                     <td className="py-3.5 px-4 font-bold text-slate-900">
-                      {post.views.toLocaleString()}
+                      {(post.views ?? 0).toLocaleString()}
                     </td>
                     <td className="py-3.5 px-5 text-right flex items-center justify-end gap-3.5">
                       <a

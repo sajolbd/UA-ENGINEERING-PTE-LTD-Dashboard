@@ -390,7 +390,7 @@ export default function DashboardHome() {
     // 2. Attempt backend sync
     try {
       const apiBase = getApiBaseUrl();
-      const res = await fetch(`${apiBase}/api/cms`, {
+      let res = await fetch(`${apiBase}/api/cms`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -399,6 +399,18 @@ export default function DashboardHome() {
           data: updatedData,
         }),
       });
+
+      if (!res.ok && apiBase !== "https://api.uaengineering.com.sg") {
+        res = await fetch("https://api.uaengineering.com.sg/api/cms", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            pageId,
+            formType,
+            data: updatedData,
+          }),
+        });
+      }
 
       if (!res.ok) {
         console.warn("[CMS Save HTTP Notice]", res.status, res.statusText, "(saved locally)");
@@ -413,7 +425,19 @@ export default function DashboardHome() {
 
       return true;
     } catch (err) {
-      console.warn("[CMS Save Connection Notice]", err, "(saved locally)");
+      console.warn("[CMS Save Connection Notice]", err, "(retrying live VPS directly)");
+      try {
+        const liveRes = await fetch("https://api.uaengineering.com.sg/api/cms", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            pageId,
+            formType,
+            data: updatedData,
+          }),
+        });
+        if (liveRes.ok) return true;
+      } catch (e) {}
       return true;
     }
   };

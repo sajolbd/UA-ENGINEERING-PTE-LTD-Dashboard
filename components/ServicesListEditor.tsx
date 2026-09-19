@@ -39,11 +39,29 @@ function ImageUploadField({ label, value, onChange }: ImageUploadFieldProps) {
     setError(null);
 
     try {
-      const compressedDataUrl = await compressImageFile(file, 1000, 1000, 0.75);
-      onChange(compressedDataUrl);
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const res = await fetch(`${API_BASE}/api/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.imagePath) {
+        onChange(data.imagePath);
+      } else {
+        const compressedDataUrl = await compressImageFile(file, 800, 800, 0.75);
+        onChange(compressedDataUrl);
+      }
     } catch (err) {
-      console.error("Image processing error:", err);
-      setError("Failed to process image file.");
+      console.error("Image upload error, using local compressed fallback:", err);
+      try {
+        const compressedDataUrl = await compressImageFile(file, 800, 800, 0.75);
+        onChange(compressedDataUrl);
+      } catch {
+        setError("Failed to process image file.");
+      }
     } finally {
       setUploading(false);
       if (e.target) e.target.value = "";
@@ -415,34 +433,36 @@ export default function ServicesListEditor() {
 
   const compressPayloadImages = async (cats: ServiceCategory[]): Promise<ServiceCategory[]> => {
     const processImg = async (imgStr?: string): Promise<string> => {
-      if (!imgStr || !imgStr.startsWith("data:image/") || imgStr.length < 200000) {
+      if (!imgStr || !imgStr.startsWith("data:image/")) {
         return imgStr || "";
       }
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-          let { width, height } = img;
-          const maxDim = 800;
-          if (width > maxDim || height > maxDim) {
-            if (width > height) {
-              height = Math.round((height * maxDim) / width);
-              width = maxDim;
-            } else {
-              width = Math.round((width * maxDim) / height);
-              height = maxDim;
-            }
+      try {
+        const match = imgStr.match(/^data:([^;]+);base64,(.+)$/);
+        if (match) {
+          const mimeType = match[1];
+          const bstr = atob(match[2]);
+          let n = bstr.length;
+          const u8arr = new Uint8Array(n);
+          while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
           }
-          const canvas = document.createElement("canvas");
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext("2d");
-          if (!ctx) return resolve(imgStr);
-          ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL("image/webp", 0.65));
-        };
-        img.onerror = () => resolve(imgStr);
-        img.src = imgStr;
-      });
+          const blob = new Blob([u8arr], { type: mimeType });
+          const file = new File([blob], `service-${Date.now()}.${mimeType.split("/")[1] || "png"}`, { type: mimeType });
+          const formData = new FormData();
+          formData.append("image", file);
+          const res = await fetch(`${API_BASE}/api/upload`, {
+            method: "POST",
+            body: formData,
+          });
+          const json = await res.json();
+          if (res.ok && json.success && json.imagePath) {
+            return json.imagePath;
+          }
+        }
+      } catch (e) {
+        console.warn("Auto-upload base64 error:", e);
+      }
+      return imgStr;
     };
 
     return Promise.all(

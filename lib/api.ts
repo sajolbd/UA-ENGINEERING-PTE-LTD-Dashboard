@@ -9,14 +9,6 @@ export const getApiBaseUrl = (): string => {
   if (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL.trim().length > 0) {
     return process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, "").replace(/\/$/, "");
   }
-  if (typeof window !== "undefined") {
-    const hostname = window.location.hostname;
-    const protocol = window.location.protocol;
-    if (hostname === "localhost" || hostname === "127.0.0.1") {
-      return `${protocol}//${hostname}:5000`;
-    }
-    return LIVE_API_FALLBACK;
-  }
   return LIVE_API_FALLBACK;
 };
 
@@ -49,16 +41,22 @@ export const fetchWithTimeout = async (
  * Resolves image paths dynamically for the dashboard.
  */
 export const getImageUrl = (imagePath: string): string => {
-  if (!imagePath) return "/images/logo.webp";
-  if (imagePath.startsWith("http") || imagePath.startsWith("data:")) {
-    return imagePath;
+  if (!imagePath || typeof imagePath !== "string") return "/images/home/hero/hero-bg.png";
+  const trimmed = imagePath.trim();
+  if (!trimmed) return "/images/home/hero/hero-bg.png";
+  if (trimmed.startsWith("http") || trimmed.startsWith("data:")) {
+    return trimmed;
   }
   
-  if (imagePath.startsWith("/images/uploads/")) {
-    return `${getApiBaseUrl()}${imagePath}`;
+  if (trimmed.startsWith("/images/uploads/")) {
+    return `${getApiBaseUrl()}${trimmed}`;
+  }
+
+  if (trimmed.startsWith("images/uploads/")) {
+    return `${getApiBaseUrl()}/${trimmed}`;
   }
   
   // Local static asset paths are served directly from public/images
-  return imagePath;
+  return trimmed;
 };
 
