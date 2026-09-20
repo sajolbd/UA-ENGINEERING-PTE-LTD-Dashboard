@@ -1,3 +1,10 @@
+export interface ServiceSeo {
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string;
+  schemaJson?: string;
+}
+
 export interface SubService {
   id?: string;
   _id?: string;
@@ -26,6 +33,7 @@ export interface SubService {
   faqHeading?: string;
   faqSubheading?: string;
   faqs?: { question: string; answer: string }[];
+  seo?: ServiceSeo;
 }
 
 export interface FAQItem {
@@ -79,6 +87,7 @@ export interface ServiceCategory {
   serviceAreasSubheading?: string;
   serviceAreas?: { region: string; areas: string[] }[];
   faqs?: FAQItem[];
+  seo?: ServiceSeo;
   __v?: number;
 }
 

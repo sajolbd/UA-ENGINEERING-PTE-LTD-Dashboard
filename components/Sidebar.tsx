@@ -13,7 +13,8 @@ import {
   ChevronRight,
   LogOut,
   X,
-  Globe
+  Globe,
+  UserCog
 } from "lucide-react";
 
 interface SidebarProps {
@@ -197,6 +198,31 @@ export default function Sidebar({
           <div className="flex items-center gap-3">
             <FolderGit className="w-4 h-4 shrink-0 text-slate-400 group-hover:text-slate-200" />
             {!isCollapsed && <span>Portfolio Projects</span>}
+          </div>
+        </button>
+
+        {/* System Management */}
+        <div className="pt-4 pb-1 border-t border-[#15233c] mt-2 mb-1">
+          {!isCollapsed ? (
+            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 px-4">
+              System Settings
+            </span>
+          ) : (
+            <div className="border-b border-[#15233c] mx-4" />
+          )}
+        </div>
+
+        <button
+          onClick={() => handleTabClick("admins")}
+          className={`flex items-center justify-between w-full py-2.5 text-xs font-bold rounded-xl transition-all duration-300 group ${
+            activeTab === "admins"
+              ? "bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]"
+              : "text-slate-400 hover:text-white hover:bg-slate-800/20"
+          } ${isCollapsed ? "px-2 justify-center" : "px-4"}`}
+        >
+          <div className="flex items-center gap-3">
+            <UserCog className="w-4 h-4 shrink-0 text-amber-400 group-hover:text-white" />
+            {!isCollapsed && <span>Admin Management</span>}
           </div>
         </button>
 

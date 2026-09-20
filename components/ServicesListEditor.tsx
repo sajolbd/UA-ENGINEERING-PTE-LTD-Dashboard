@@ -226,6 +226,71 @@ export default function ServicesListEditor() {
   const [catAreasSubheading, setCatAreasSubheading] = useState("");
   const [catFaqs, setCatFaqs] = useState<{ question: string; answer: string }[]>([{ question: "", answer: "" }]);
 
+  // SEO & Schema States - Category
+  const [catMetaTitle, setCatMetaTitle] = useState("");
+  const [catMetaDescription, setCatMetaDescription] = useState("");
+  const [catMetaKeywords, setCatMetaKeywords] = useState("");
+  const [catSchemaJson, setCatSchemaJson] = useState("");
+
+  // SEO & Schema States - Sub-Service
+  const [subMetaTitle, setSubMetaTitle] = useState("");
+  const [subMetaDescription, setSubMetaDescription] = useState("");
+  const [subMetaKeywords, setSubMetaKeywords] = useState("");
+  const [subSchemaJson, setSubSchemaJson] = useState("");
+
+  const handleAutoGenerateCategorySchema = () => {
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": catTitle.trim() || "Service Category",
+      "description": catShortDesc.trim() || catDesc.trim() || "",
+      "provider": {
+        "@type": "LocalBusiness",
+        "name": "UA Engineering PTE LTD",
+        "url": "https://www.uaengineering.com.sg",
+        "telephone": "+65 6123 4567",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "SG",
+          "addressLocality": "Singapore"
+        }
+      },
+      "areaServed": "Singapore"
+    };
+    setCatSchemaJson(JSON.stringify(schema, null, 2));
+    if (!catMetaTitle) setCatMetaTitle(`${catTitle.trim()} | UA Engineering PTE LTD`);
+    if (!catMetaDescription) setCatMetaDescription(catShortDesc.trim() || catDesc.trim());
+    if (!catMetaKeywords) setCatMetaKeywords(`${catTitle.trim()}, Singapore engineering, renovation, UA Engineering`);
+  };
+
+  const handleAutoGenerateSubServiceSchema = () => {
+    const catObj = categories.find(c => c.slug === targetCategorySlug);
+    const catName = catObj?.title || "Engineering Services";
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": subTitle.trim() || "Sub Service",
+      "description": subDesc.trim() || subLongDesc.trim() || "",
+      "serviceType": catName,
+      "provider": {
+        "@type": "LocalBusiness",
+        "name": "UA Engineering PTE LTD",
+        "url": "https://www.uaengineering.com.sg",
+        "telephone": "+65 6123 4567",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "SG",
+          "addressLocality": "Singapore"
+        }
+      },
+      "areaServed": "Singapore"
+    };
+    setSubSchemaJson(JSON.stringify(schema, null, 2));
+    if (!subMetaTitle) setSubMetaTitle(`${subTitle.trim()} - ${catName} | UA Engineering PTE LTD`);
+    if (!subMetaDescription) setSubMetaDescription(subDesc.trim() || subLongDesc.trim());
+    if (!subMetaKeywords) setSubMetaKeywords(`${subTitle.trim()}, ${catName}, Singapore engineering, UA Engineering`);
+  };
+
   const handleWhyAdvantageChange = (index: number, field: "title" | "description", value: string) => {
     const copy = [...catWhyAdvantages];
     copy[index] = { ...copy[index], [field]: value };
@@ -542,6 +607,10 @@ export default function ServicesListEditor() {
     setCatAreasHeading("");
     setCatAreasSubheading("");
     setCatFaqs([{ question: "", answer: "" }]);
+    setCatMetaTitle("");
+    setCatMetaDescription("");
+    setCatMetaKeywords("");
+    setCatSchemaJson("");
     setShowCategoryModal(true);
   };
 
@@ -578,6 +647,10 @@ export default function ServicesListEditor() {
     setCatAreasHeading(cat.serviceAreasHeading || "");
     setCatAreasSubheading(cat.serviceAreasSubheading || "");
     setCatFaqs(cat.faqs && cat.faqs.length > 0 ? cat.faqs : [{ question: "", answer: "" }]);
+    setCatMetaTitle(cat.seo?.metaTitle || "");
+    setCatMetaDescription(cat.seo?.metaDescription || "");
+    setCatMetaKeywords(cat.seo?.metaKeywords || "");
+    setCatSchemaJson(cat.seo?.schemaJson || "");
     setShowCategoryModal(true);
   };
 
@@ -637,7 +710,13 @@ export default function ServicesListEditor() {
             serviceAreasBadge: catAreasBadge.trim() || undefined,
             serviceAreasHeading: catAreasHeading.trim() || undefined,
             serviceAreasSubheading: catAreasSubheading.trim() || undefined,
-            faqs: faqsClean
+            faqs: faqsClean,
+            seo: {
+              metaTitle: catMetaTitle.trim() || undefined,
+              metaDescription: catMetaDescription.trim() || undefined,
+              metaKeywords: catMetaKeywords.trim() || undefined,
+              schemaJson: catSchemaJson.trim() || undefined,
+            }
           };
         }
         return c;
@@ -676,7 +755,13 @@ export default function ServicesListEditor() {
         serviceAreasBadge: catAreasBadge.trim() || undefined,
         serviceAreasHeading: catAreasHeading.trim() || undefined,
         serviceAreasSubheading: catAreasSubheading.trim() || undefined,
-        faqs: faqsClean
+        faqs: faqsClean,
+        seo: {
+          metaTitle: catMetaTitle.trim() || undefined,
+          metaDescription: catMetaDescription.trim() || undefined,
+          metaKeywords: catMetaKeywords.trim() || undefined,
+          schemaJson: catSchemaJson.trim() || undefined,
+        }
       };
       updated = [...categories, newCategory];
     }
@@ -723,6 +808,10 @@ export default function ServicesListEditor() {
       { title: "Installation", description: "Electrical, plumbing & carpentry installation" },
       { title: "Verification", description: "Final touch-ups, QA inspection & key handover" }
     ]);
+    setSubMetaTitle("");
+    setSubMetaDescription("");
+    setSubMetaKeywords("");
+    setSubSchemaJson("");
     setShowSubModal(true);
   };
 
@@ -758,6 +847,10 @@ export default function ServicesListEditor() {
           })
         : [{ title: "", description: "" }];
     setSubProcessSteps(stepsInitial);
+    setSubMetaTitle(service.seo?.metaTitle || "");
+    setSubMetaDescription(service.seo?.metaDescription || "");
+    setSubMetaKeywords(service.seo?.metaKeywords || "");
+    setSubSchemaJson(service.seo?.schemaJson || "");
     setShowSubModal(true);
   };
 
@@ -814,7 +907,13 @@ export default function ServicesListEditor() {
       features: features.filter((f) => f.trim() !== ""),
       benefits: benefits.filter((b) => b.trim() !== ""),
       process: processListClean,
-      processSteps: processStepsClean
+      processSteps: processStepsClean,
+      seo: {
+        metaTitle: subMetaTitle.trim() || undefined,
+        metaDescription: subMetaDescription.trim() || undefined,
+        metaKeywords: subMetaKeywords.trim() || undefined,
+        schemaJson: subSchemaJson.trim() || undefined,
+      }
     };
 
     const activeTargetCatSlug = targetCategorySlug || expandedCat || (categories.length > 0 ? categories[0].slug : "renovation-upgrading");
@@ -1723,6 +1822,75 @@ export default function ServicesListEditor() {
                 ))}
               </div>
 
+              {/* --- CATEGORY SEO & STRUCTURED DATA (JSON-LD) SETTINGS --- */}
+              <div className="space-y-4 pt-4 border-t border-slate-800">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-emerald-400 border-l-2 border-emerald-400 pl-2">
+                    🎯 Category SEO & Structured Data (Schema JSON-LD) Settings
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={handleAutoGenerateCategorySchema}
+                    className="px-3 py-1 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-700 rounded-lg text-[10px] font-bold transition flex items-center gap-1.5"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>⚡ Auto-Generate Schema & Meta</span>
+                  </button>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                    Meta Title (Search Engine Title Tag)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Renovation & Upgrading Solutions Singapore | UA Engineering"
+                    value={catMetaTitle}
+                    onChange={(e) => setCatMetaTitle(e.target.value)}
+                    className="w-full px-4 py-2 text-xs border border-slate-700 rounded-xl focus:border-emerald-500 outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                    Meta Description
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="e.g. Expert property renovation, HDB upgrading and commercial contractor services in Singapore."
+                    value={catMetaDescription}
+                    onChange={(e) => setCatMetaDescription(e.target.value)}
+                    className="w-full px-4 py-2 text-xs border border-slate-700 rounded-xl focus:border-emerald-500 outline-none bg-slate-950 text-white font-medium resize-none placeholder:text-slate-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                    Meta Keywords (Comma separated)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. renovation Singapore, house upgrading, interior contractor"
+                    value={catMetaKeywords}
+                    onChange={(e) => setCatMetaKeywords(e.target.value)}
+                    className="w-full px-4 py-2 text-xs border border-slate-700 rounded-xl focus:border-emerald-500 outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                    Custom JSON-LD Structured Data Schema (JSON)
+                  </label>
+                  <textarea
+                    rows={4}
+                    placeholder='{ "@context": "https://schema.org", "@type": "Service", "name": "..." }'
+                    value={catSchemaJson}
+                    onChange={(e) => setCatSchemaJson(e.target.value)}
+                    className="w-full px-4 py-2 text-xs font-mono border border-slate-700 rounded-xl focus:border-emerald-500 outline-none bg-slate-950 text-emerald-300 placeholder:text-slate-600 resize-y"
+                  />
+                </div>
+              </div>
+
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
                 <button
                   type="button"
@@ -1981,6 +2149,75 @@ export default function ServicesListEditor() {
                       </div>
                     ))}
                   </div>
+                </div>
+              </div>
+
+              {/* --- SUB-SERVICE SEO & STRUCTURED DATA (JSON-LD) SETTINGS --- */}
+              <div className="space-y-4 pt-4 border-t border-slate-800">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-emerald-400 border-l-2 border-emerald-400 pl-2">
+                    🎯 Sub-Service SEO & Structured Data (Schema JSON-LD) Settings
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={handleAutoGenerateSubServiceSchema}
+                    className="px-3 py-1 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-700 rounded-lg text-[10px] font-bold transition flex items-center gap-1.5"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>⚡ Auto-Generate Schema & Meta</span>
+                  </button>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                    Meta Title
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. HDB Toilet Renovation & Sanitary Services | UA Engineering"
+                    value={subMetaTitle}
+                    onChange={(e) => setSubMetaTitle(e.target.value)}
+                    className="w-full px-4 py-2 text-xs border border-slate-700 rounded-xl focus:border-emerald-500 outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                    Meta Description
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="e.g. Professional toilet renovation and pipe installation services in Singapore."
+                    value={subMetaDescription}
+                    onChange={(e) => setSubMetaDescription(e.target.value)}
+                    className="w-full px-4 py-2 text-xs border border-slate-700 rounded-xl focus:border-emerald-500 outline-none bg-slate-950 text-white font-medium resize-none placeholder:text-slate-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                    Meta Keywords
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. toilet renovation, HDB plumbing, sanitary installation"
+                    value={subMetaKeywords}
+                    onChange={(e) => setSubMetaKeywords(e.target.value)}
+                    className="w-full px-4 py-2 text-xs border border-slate-700 rounded-xl focus:border-emerald-500 outline-none bg-slate-950 text-white font-medium placeholder:text-slate-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                    Custom JSON-LD Structured Data Schema (JSON)
+                  </label>
+                  <textarea
+                    rows={4}
+                    placeholder='{ "@context": "https://schema.org", "@type": "Service", ... }'
+                    value={subSchemaJson}
+                    onChange={(e) => setSubSchemaJson(e.target.value)}
+                    className="w-full px-4 py-2 text-xs font-mono border border-slate-700 rounded-xl focus:border-emerald-500 outline-none bg-slate-950 text-emerald-300 placeholder:text-slate-600 resize-y"
+                  />
                 </div>
               </div>
 

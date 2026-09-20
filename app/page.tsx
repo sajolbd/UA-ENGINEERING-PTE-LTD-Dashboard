@@ -11,6 +11,7 @@ import CmsForms from "../components/CmsForms";
 import ServicesListEditor from "../components/ServicesListEditor";
 import ProjectsListEditor from "../components/ProjectsListEditor";
 import BreadcrumbEditor from "../components/BreadcrumbEditor";
+import AdminManagement, { AdminUser } from "../components/AdminManagement";
 import { blogPosts } from "../data/blogData";
 import { initialCmsData, CmsDatabase, CmsContentUnion, PageSeo, HomeContent, AboutContent } from "../data/cmsData";
 import {
@@ -196,6 +197,7 @@ export default function DashboardHome() {
   
   // Authentication states
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -275,6 +277,12 @@ export default function DashboardHome() {
   React.useEffect(() => {
     if (typeof window !== "undefined") {
       const auth = localStorage.getItem("admin_auth");
+      const storedUser = localStorage.getItem("admin_user");
+      if (storedUser) {
+        try {
+          setAdminUser(JSON.parse(storedUser));
+        } catch (e) {}
+      }
       setIsAuthenticated(auth === "true");
     }
 
@@ -654,20 +662,57 @@ export default function DashboardHome() {
     execEditorCommand("foreColor", e.target.value);
   };
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError(null);
-    if (loginUsername === "admin" && loginPassword === "admin123") {
-      localStorage.setItem("admin_auth", "true");
-      setIsAuthenticated(true);
-      showToast("success", "Access Granted", "Welcome back, Administrator!");
-    } else {
-      setLoginError("Invalid username or password credentials. Please try again.");
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: loginUsername.trim(),
+          password: loginPassword.trim()
+        })
+      });
+
+      const result = await res.json();
+      if (result.success && result.user) {
+        localStorage.setItem("admin_auth", "true");
+        localStorage.setItem("admin_user", JSON.stringify(result.user));
+        setAdminUser(result.user);
+        setIsAuthenticated(true);
+        showToast("success", "Access Granted", `Welcome back, ${result.user.name || result.user.username}!`);
+      } else {
+        setLoginError(result.error || "Invalid username or password credentials. Please try again.");
+      }
+    } catch {
+      // Fallback auth verification if backend endpoint is offline
+      if (loginUsername === "admin" && loginPassword === "admin123") {
+        const defaultUser: AdminUser = {
+          id: "1",
+          username: "admin",
+          name: "UA Administrator",
+          email: "admin@uaengineering.com.sg",
+          role: "Super Admin",
+          status: "Active",
+          avatar: "/images/logo.webp"
+        };
+        localStorage.setItem("admin_auth", "true");
+        localStorage.setItem("admin_user", JSON.stringify(defaultUser));
+        setAdminUser(defaultUser);
+        setIsAuthenticated(true);
+        showToast("success", "Access Granted", "Welcome back, Administrator!");
+      } else {
+        setLoginError("Invalid username or password credentials. Please try again.");
+      }
     }
   };
 
   const handleLogout = () => {
     localStorage.removeItem("admin_auth");
+    localStorage.removeItem("admin_user");
+    setAdminUser(null);
     setIsAuthenticated(false);
     showToast("warning", "Signed Out", "You have successfully signed out.");
   };
@@ -799,7 +844,7 @@ export default function DashboardHome() {
       {/* MAIN CONTAINER */}
       <div className="flex flex-col flex-1 overflow-hidden min-w-0">
         {/* HEADER BAR */}
-        <Header totalViews={totalViews} onMenuClick={() => setMobileOpen(true)} />
+        <Header totalViews={totalViews} onMenuClick={() => setMobileOpen(true)} adminUser={adminUser} />
 
         {/* PAGE CONTENT CONTAINER */}
         <main className="flex-1 p-3 sm:p-6 overflow-y-auto bg-slate-50/50 thin-scrollbar">
@@ -856,6 +901,9 @@ export default function DashboardHome() {
           ) : activeTab === "projects_list" ? (
             /* DYNAMIC PROJECTS PORTFOLIO EDITOR VIEW */
             <ProjectsListEditor />
+          ) : activeTab === "admins" ? (
+            /* ADMIN MANAGEMENT VIEW */
+            <AdminManagement currentLoggedUser={adminUser} showToast={showToast} />
           ) : (
             /* CMS FORMS PANEL VIEW */
             <CmsForms
