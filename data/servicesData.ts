@@ -34,6 +34,7 @@ export interface SubService {
   faqSubheading?: string;
   faqs?: { question: string; answer: string }[];
   seo?: ServiceSeo;
+  [key: string]: any;
 }
 
 export interface FAQItem {
@@ -89,6 +90,7 @@ export interface ServiceCategory {
   faqs?: FAQItem[];
   seo?: ServiceSeo;
   __v?: number;
+  [key: string]: any;
 }
 
 export const servicesData: ServiceCategory[] = [
