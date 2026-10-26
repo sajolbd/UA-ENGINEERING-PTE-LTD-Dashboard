@@ -566,7 +566,7 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     heroSubheading: "Get in touch for commercial quotations, structural surveys, emergency substation audits, or custom plumbing design layout consultations.",
     heroImage: "/images/contact/contact-bg.jpg",
     heroImageAlt: "UA Engineering Singapore Customer Support Center",
-    contactAddress: "38C Sea Avenue Marine Mansion Singapore 424256",
+    contactAddress: "88 Koon Seng Rd, Singapore 427029",
     contactPhone: "+65 8459 3003",
     contactEmail: "Info@uaengineering.com.sg",
     contactHours: "Mon - Sat: 9:00 AM - 6:00 PM (Emergency 24/7 Support)",
@@ -578,7 +578,7 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     welcomeMessage: "Welcome to UA Engineering",
     phone: "+65 8459 3003",
     email: "Info@uaengineering.com.sg",
-    address: "38C Sea Avenue Marine Mansion Singapore 424256",
+    address: "88 Koon Seng Rd, Singapore 427029",
     workingHours: "Mon - Sat: 9:00 AM - 6:00 PM (Emergency 24/7 Support)",
     appointmentButtonText: "Book An Appointment",
     footerAboutText: "Professional engineering, renovation, waterproofing, and steel fabrication solutions in Singapore. Licensed, certified, and compliant with BCA standards.",
@@ -1060,7 +1060,7 @@ export default function CmsForms({
                     {(localContent.footerAboutText as string) || "Professional engineering, renovation, waterproofing, and steel fabrication solutions in Singapore."}
                   </p>
                   <div className="text-[10px] text-slate-500 font-mono pt-1">
-                    📍 {(localContent.address as string) || "38C Sea Avenue Marine Mansion Singapore 424256"} | ✉️ {(localContent.email as string) || "Info@uaengineering.com.sg"}
+                    📍 {(localContent.address as string) || "88 Koon Seng Rd, Singapore 427029"} | ✉️ {(localContent.email as string) || "Info@uaengineering.com.sg"}
                   </div>
                 </div>
               </div>
