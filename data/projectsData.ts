@@ -61,7 +61,7 @@ export const initialProjectsData: ProjectItem[] = [
   },
   {
     "title": "Commercial Plumbing Installation",
-    "category": "Electrical & Plumbing",
+    "category": "Electrical, Plumbing & Aircon",
     "image": "/images/home/projects/project-plumbing.png",
     "description": "Design and installation of high-pressure copper water supply pipelines, heavy-duty floor traps, and sanitary fixtures.",
     "location": "Marina Bay, Singapore",
@@ -74,7 +74,7 @@ export const initialProjectsData: ProjectItem[] = [
   },
   {
     "title": "Industrial Substation Electrical Works",
-    "category": "Electrical & Plumbing",
+    "category": "Electrical, Plumbing & Aircon",
     "image": "/images/home/projects/project-electrical.png",
     "description": "Installation and testing of three-phase distribution boards, industrial conduit wiring, and safety grounding systems.",
     "location": "Changi Business Park, Singapore",
@@ -100,7 +100,7 @@ export const initialProjectsData: ProjectItem[] = [
   },
   {
     "title": "Modern Office Drywall Fit-out",
-    "category": "Renovation & Tiling",
+    "category": "Renovation & Upgrading",
     "image": "/images/home/projects/project-drywall.png",
     "description": "Acoustic-rated double-layered gypsum board drywall partitions with galvanized iron framing for an open-plan office.",
     "location": "Raffles Place, Singapore",
@@ -113,7 +113,7 @@ export const initialProjectsData: ProjectItem[] = [
   },
   {
     "title": "Rooftop Solar Array Grid Integration",
-    "category": "Solar Panel",
+    "category": "Solar Panel Installation",
     "image": "/images/home/projects/project-solar.png",
     "description": "Installation of high-efficiency monocrystalline solar panels with customized aluminium mounting rails and grid-tied inverters.",
     "location": "Ang Mo Kio, Singapore",
@@ -126,7 +126,7 @@ export const initialProjectsData: ProjectItem[] = [
   },
   {
     "title": "Luxury Condominium Lobby Tiling",
-    "category": "Renovation & Tiling",
+    "category": "Renovation & Upgrading",
     "image": "/images/home/projects/project-tiling.png",
     "description": "Precision laying of large-format premium homogeneous marble-grain tiles with epoxy grout lines in a high-rise lobby.",
     "location": "Sentosa Cove, Singapore",
@@ -139,7 +139,7 @@ export const initialProjectsData: ProjectItem[] = [
   },
   {
     "title": "Controlled Concrete Demolition",
-    "category": "Structural & Steel",
+    "category": "Structural & Exterior Works",
     "image": "/images/home/projects/project-demolition.png",
     "description": "Controlled hacking and demolition of reinforced concrete partition walls with safety barriers and structural support props.",
     "location": "Bedok Mall, Singapore",
@@ -152,7 +152,7 @@ export const initialProjectsData: ProjectItem[] = [
   },
   {
     "title": "Suspended Cove Ceiling Grid System",
-    "category": "Renovation & Tiling",
+    "category": "Renovation & Upgrading",
     "image": "/images/home/projects/project-ceiling.png",
     "description": "Fabrication of suspended plasterboard false ceilings with integrated indirect LED cove lighting troughs and access panels.",
     "location": "Bukit Timah, Singapore",

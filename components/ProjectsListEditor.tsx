@@ -16,10 +16,12 @@ import {
   Database
 } from "lucide-react";
 import { initialProjectsData } from "../data/projectsData";
+import { initialServicesData } from "../data/servicesData";
 
 interface ProjectItem {
   id?: string;
   _id?: string;
+  slug?: string;
   title: string;
   subtitle?: string;
   category: string;
@@ -225,27 +227,47 @@ export default function ProjectsListEditor() {
     }, 4000);
   };
 
+  // Main service categories
+  const DEFAULT_MAIN_SERVICES = [
+    "Renovation & Upgrading",
+    "Structural & Exterior Works",
+    "Painting & Waterproofing",
+    "Aluminium & Glazing Works",
+    "Electrical, Plumbing & Aircon",
+    "Solar Panel Installation"
+  ];
+
   // Form Fields State
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("Painting & Waterproofing");
+  const [mainServices, setMainServices] = useState<string[]>(() => {
+    if (Array.isArray(initialServicesData) && initialServicesData.length > 0) {
+      return initialServicesData.map((s) => s.title).filter(Boolean);
+    }
+    return DEFAULT_MAIN_SERVICES;
+  });
+  const [category, setCategory] = useState("Renovation & Upgrading");
   const [image, setImage] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [gallery, setGallery] = useState<string[]>([""]);
 
-  const CATEGORIES = [
-    "Sanitary & Plumbing",
-    "Painting & Waterproofing",
-    "Renovation & Tiling",
-    "Structural & Steel",
-    "Electrical & Plumbing",
-    "Solar Panel"
-  ];
-
   const LOCAL_STORAGE_PROJECTS_KEY = "ua_projects_data_cache";
 
   const loadProjects = () => {
     setLoading(true);
+
+    // Fetch latest service categories from API to stay dynamically synced
+    fetchWithTimeout(`${API_BASE}/api/services`, {}, 10000)
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+          const titles = res.data.map((c: any) => c.title).filter(Boolean);
+          if (titles.length > 0) {
+            setMainServices(titles);
+          }
+        }
+      })
+      .catch(() => {});
 
     fetchWithTimeout(`${API_BASE}/api/projects`, {}, 15000)
       .then((res) => res.json())
@@ -317,7 +339,7 @@ export default function ProjectsListEditor() {
   const handleOpenAddModal = () => {
     setEditingProjectId(null);
     setTitle("");
-    setCategory("Painting & Waterproofing");
+    setCategory(mainServices[0] || "Renovation & Upgrading");
     setImage("/images/projects/project1.png");
     setDescription("");
     setLocation("Singapore");
@@ -330,7 +352,7 @@ export default function ProjectsListEditor() {
     const id = p._id || p.id || "";
     setEditingProjectId(id);
     setTitle(p.title);
-    setCategory(p.category || "Painting & Waterproofing");
+    setCategory(p.category || mainServices[0] || "Renovation & Upgrading");
     setImage(p.image || "");
     setDescription(p.description || "");
     setLocation(p.location || "Singapore");
@@ -346,8 +368,12 @@ export default function ProjectsListEditor() {
     }
 
     const isEdit = !!editingProjectId;
+    const existing = isEdit ? projects.find((p) => (p._id || p.id) === editingProjectId) : null;
+    const generatedSlug = title.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
     const payload: ProjectItem = {
       id: isEdit ? editingProjectId : Date.now().toString(),
+      slug: existing?.slug || generatedSlug,
       title: title.trim(),
       category,
       image: image || "/images/layout/breadcrumb-bg.png",
@@ -449,6 +475,13 @@ export default function ProjectsListEditor() {
       </div>
     );
   }
+
+  const availableCategories = Array.from(
+    new Set([
+      ...mainServices,
+      ...(category ? [category] : [])
+    ])
+  );
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto animate-fade-in pb-12">
@@ -644,9 +677,9 @@ export default function ProjectsListEditor() {
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-700 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-slate-950 text-white font-medium cursor-pointer"
                   >
-                    {CATEGORIES.map((cat) => (
+                    {availableCategories.map((cat) => (
                       <option key={cat} value={cat}>
                         {cat}
                       </option>
