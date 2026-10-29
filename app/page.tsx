@@ -867,8 +867,8 @@ export default function DashboardHome() {
             </div>
           )}
 
-          {activeTab === "overview" ? (
-            /* OVERVIEW TAB VIEW */
+          {activeTab === "overview" || activeTab === "blogs_list" ? (
+            /* OVERVIEW / BLOG ARTICLES CATALOG TAB VIEW */
             <div className="space-y-6 animate-fade-in">
               {/* KPI SECTION */}
               <KPISection

@@ -201,6 +201,20 @@ export default function Sidebar({
           </div>
         </button>
 
+        <button
+          onClick={() => handleTabClick("blogs_list")}
+          className={`flex items-center justify-between w-full py-2.5 text-xs font-bold rounded-xl transition-all duration-300 group ${
+            activeTab === "blogs_list"
+              ? "bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]"
+              : "text-slate-400 hover:text-white hover:bg-slate-800/20"
+          } ${isCollapsed ? "px-2 justify-center" : "px-4"}`}
+        >
+          <div className="flex items-center gap-3">
+            <BookOpen className="w-4 h-4 shrink-0 text-slate-400 group-hover:text-slate-200" />
+            {!isCollapsed && <span>Blog Articles Catalog</span>}
+          </div>
+        </button>
+
         {/* System Management */}
         <div className="pt-4 pb-1 border-t border-[#15233c] mt-2 mb-1">
           {!isCollapsed ? (

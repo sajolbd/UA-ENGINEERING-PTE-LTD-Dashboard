@@ -569,7 +569,7 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     contactAddress: "88 Koon Seng Rd, Singapore 427029",
     contactPhone: "+65 8459 3003",
     contactEmail: "Info@uaengineering.com.sg",
-    contactHours: "Mon - Sat: 9:00 AM - 6:00 PM (Emergency 24/7 Support)",
+    contactHours: "Mon - Sat: 7:00 AM - 9:00 PM (Emergency 24/7 Support)",
   },
   site: {
     siteLogo: "/images/logo.webp",
@@ -579,7 +579,7 @@ const DEFAULT_PAGE_CONTENT: Record<string, Record<string, string>> = {
     phone: "+65 8459 3003",
     email: "Info@uaengineering.com.sg",
     address: "88 Koon Seng Rd, Singapore 427029",
-    workingHours: "Mon - Sat: 9:00 AM - 6:00 PM (Emergency 24/7 Support)",
+    workingHours: "Mon - Sat: 7:00 AM - 9:00 PM (Emergency 24/7 Support)",
     appointmentButtonText: "Book An Appointment",
     footerAboutText: "Professional engineering, renovation, waterproofing, and steel fabrication solutions in Singapore. Licensed, certified, and compliant with BCA standards.",
     facebook: "https://facebook.com",

@@ -37,7 +37,8 @@ import {
   Sparkles,
   HelpCircle,
   Eye,
-  FileText
+  FileText,
+  Pencil
 } from "lucide-react";
 import { BlogPost } from "../data/blogData";
 
@@ -175,6 +176,8 @@ export default function BlogTable({
   onRefresh
 }: BlogTableProps) {
   const [showModal, setShowModal] = useState(false);
+  const [editingBlogId, setEditingBlogId] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Table grid states inside blog table component
@@ -235,6 +238,7 @@ export default function BlogTable({
   ];
 
   const handleOpenAddModal = () => {
+    setEditingBlogId(null);
     setTitle("");
     setCategory("Renovation & Upgrading");
     setImage("");
@@ -249,7 +253,24 @@ export default function BlogTable({
     }, 100);
   };
 
-  const handleAddBlogSubmit = async (e: React.FormEvent) => {
+  const handleOpenEditModal = (post: BlogPostWithId) => {
+    const id = post._id || post.id || post.slug || "";
+    setEditingBlogId(id);
+    setTitle(post.title || "");
+    setCategory(post.category || "Renovation & Upgrading");
+    setImage(post.image || "");
+    setBgColor(post.bgColor || "bg-amber-100");
+    setPopular(Boolean(post.popular));
+    setShowTableSelector(false);
+    setShowModal(true);
+    setTimeout(() => {
+      if (editorRef.current) {
+        editorRef.current.innerHTML = post.content || "";
+      }
+    }, 100);
+  };
+
+  const handleBlogSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
       showToast("warning", "Missing Title", "Please enter a blog title.");
@@ -267,42 +288,58 @@ export default function BlogTable({
     const wordCount = cleanText.split(/\s+/).filter(Boolean).length;
     const calculatedReadTime = Math.max(1, Math.ceil(wordCount / 200)) + " mins read";
 
-    const slug = title.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    const isEdit = Boolean(editingBlogId);
+    const existing = isEdit ? posts.find((p) => (p._id || p.id || p.slug) === editingBlogId) : null;
+
+    const generatedSlug = title.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
     const categorySlug = category.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
-    const newBlog = {
-      slug,
+    const blogPayload = {
+      id: isEdit ? (existing?.id || editingBlogId) : Date.now().toString(),
+      _id: isEdit ? (existing?._id || editingBlogId) : undefined,
+      slug: existing?.slug || generatedSlug,
       title: title.trim(),
       category,
       categorySlug,
-      date: new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
-      author: "Er. Tan Boon",
+      date: existing?.date || new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
+      author: existing?.author || "Er. Tan Boon",
       image: image || "/images/services/sub_home_reno.png",
       bgColor,
       readTime: calculatedReadTime,
       popular,
       content: htmlContent.trim(),
-      views: 0
+      views: existing?.views ?? 0
     };
 
+    setSubmitting(true);
     try {
-      const res = await fetch(`${API_BASE}/api/blogs`, {
-        method: "POST",
+      const url = isEdit ? `${API_BASE}/api/blogs/${encodeURIComponent(editingBlogId!)}` : `${API_BASE}/api/blogs`;
+      const method = isEdit ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newBlog)
+        body: JSON.stringify(blogPayload)
       });
       const result = await res.json();
       if (res.ok && result.success) {
         setSaveSuccess(true);
         setShowModal(false);
+        setEditingBlogId(null);
         onRefresh();
-        showToast("success", "Article Published", `"${title.trim()}" has been published successfully.`);
+        showToast(
+          "success",
+          isEdit ? "Article Updated" : "Article Published",
+          `"${title.trim()}" has been ${isEdit ? "updated" : "published"} successfully.`
+        );
         setTimeout(() => setSaveSuccess(false), 4000);
       } else {
-        showToast("error", "Publish Failed", result.error || result.message || "Failed to publish article");
+        showToast("error", isEdit ? "Update Failed" : "Publish Failed", result.error || result.message || "Failed to save article");
       }
     } catch (err: any) {
-      showToast("error", "Publish Error", err?.message || "Failed to connect to backend API server.");
+      showToast("error", "Save Error", err?.message || "Failed to connect to backend API server.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -545,18 +582,30 @@ export default function BlogTable({
                     <td className="py-3.5 px-4 font-bold text-slate-900">
                       {(post.views ?? 0).toLocaleString()}
                     </td>
-                    <td className="py-3.5 px-5 text-right flex items-center justify-end gap-3.5">
+                    <td className="py-3.5 px-5 text-right flex items-center justify-end gap-2.5">
                       <a
                         href={`https://ua-engineering.com/blog/${post.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-0.5 text-primary hover:underline font-bold"
+                        className="inline-flex items-center gap-1 text-slate-500 hover:text-primary transition-colors font-bold text-xs px-2 py-1 hover:bg-slate-100 rounded-lg"
+                        title="View Live Article"
                       >
                         <span>Live</span>
                         <ArrowUpRight className="w-3 h-3" />
                       </a>
 
                       <button
+                        type="button"
+                        onClick={() => handleOpenEditModal(post)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 hover:text-amber-800 rounded-lg font-bold text-xs transition-all active:scale-95 border border-amber-200/60 shadow-xs"
+                        title="Edit Article"
+                      >
+                        <Pencil className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Edit</span>
+                      </button>
+
+                      <button
+                        type="button"
                         onClick={() => handleDeleteBlog(id, post.title)}
                         className="p-1 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-md transition-colors"
                         title="Delete Article"
@@ -579,21 +628,47 @@ export default function BlogTable({
             
             {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <Plus className="w-5 h-5 text-primary" />
-                <h3 className="text-sm font-black text-secondary font-display">
-                  Publish New Article (MS Word Editor)
-                </h3>
+              <div className="flex items-center gap-2.5">
+                {editingBlogId ? (
+                  <div className="p-2 rounded-xl bg-amber-100 text-amber-700">
+                    <Pencil className="w-5 h-5" />
+                  </div>
+                ) : (
+                  <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                    <Plus className="w-5 h-5" />
+                  </div>
+                )}
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-black text-secondary font-display">
+                      {editingBlogId ? "Edit Article" : "Publish New Article (MS Word Editor)"}
+                    </h3>
+                    <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                      editingBlogId ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"
+                    }`}>
+                      {editingBlogId ? "Edit Mode" : "New Post"}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 font-medium">
+                    {editingBlogId
+                      ? "Make changes to your article title, image, category, and content below."
+                      : "Create and publish a brand new article with rich text styling."}
+                  </p>
+                </div>
               </div>
               <button
-                onClick={() => setShowModal(false)}
+                type="button"
+                onClick={() => {
+                  setShowModal(false);
+                  setEditingBlogId(null);
+                }}
                 className="p-1 hover:bg-slate-100 rounded-full text-slate-400 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleAddBlogSubmit} className="space-y-5">
+            <form onSubmit={handleBlogSubmit} className="space-y-5">
               
               {/* Title */}
               <div>
@@ -903,7 +978,10 @@ export default function BlogTable({
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => setShowModal(false)}
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditingBlogId(null);
+                  }}
                   className="px-4 py-2.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors"
                 >
                   Cancel
@@ -911,10 +989,11 @@ export default function BlogTable({
                 
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl shadow-md text-xs font-bold transition-all active:scale-95"
+                  disabled={submitting}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl shadow-md text-xs font-bold transition-all active:scale-95 disabled:opacity-60"
                 >
                   <Save className="w-4 h-4" />
-                  <span>Publish Article</span>
+                  <span>{submitting ? "Saving..." : editingBlogId ? "Update Article" : "Publish Article"}</span>
                 </button>
               </div>
 
